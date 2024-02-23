@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import router from "./routes.js";
-dotenv.config();
+dotenv.config({ path: "../.env"});
 
 function checkEnvVariables() {
   const requiredEnvVariables = ["INTERACTIVE_KEY", "INTERACTIVE_SECRET"];

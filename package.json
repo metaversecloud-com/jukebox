@@ -9,9 +9,7 @@
     "build": "cd client && npm run build",
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
     "dev-server": "cd server && nodemon index.js",
-    "dev-client": "cd client && npm run dev",
-    "link-sdk": "yalc link @rtsdk/topia",
-    "unlink-sdk": "yalc remove @rtsdk/topia"
+    "dev-client": "cd client && npm run dev"
   },
   "dependencies": {
     "@rtsdk/topia": "^0.8.5",
