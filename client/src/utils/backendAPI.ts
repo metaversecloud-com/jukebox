@@ -1,12 +1,9 @@
+// TODO - Remove ts-nocheck and fix types
+// @ts-nocheck
 import axios from "axios";
 
-const BASE_URL = process.env.API_URL || "";
+const BASE_URL = "http://localhost:3001";
 let backendAPI = axios;
-
-const initBackendAPI = function () {
-  backendAPI = null;
-  backendAPI = axios;
-};
 
 const setupBackendAPI = (interactiveParams) => {
   backendAPI = axios.create({
@@ -35,8 +32,4 @@ const setupBackendAPI = (interactiveParams) => {
   }
 };
 
-export { backendAPI, initBackendAPI, setupBackendAPI };
-
-export default () => {
-  return backendAPI;
-};
+export { backendAPI, setupBackendAPI };

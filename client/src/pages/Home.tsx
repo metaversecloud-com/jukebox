@@ -1,3 +1,4 @@
+import { backendAPI } from "@/utils/backendAPI";
 import { Button, Grid, Typography } from "@mui/material";
 import React, { useState } from "react";
 
@@ -6,7 +7,16 @@ const Home = () => {
 
   const hasInteractiveParams = null;
 
-  const handleGetDroppedAsset = () => {};
+  const handleGetDroppedAsset = async () => {
+    try {
+      const result = await backendAPI.get("/dropped-asset");
+      if (result.data.success) {
+        setDroppedAsset(result.data.droppedAsset);
+      } else return console.log("Error getting data object");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Grid container direction="column" justifyContent="space-around" p={10}>
@@ -34,14 +44,14 @@ const Home = () => {
           </Grid>
           {droppedAsset && (
             <>
-              {/* <Grid item pt={4} xs={12}>
+              <Grid item pt={4} xs={12}>
               <Typography>
                 You have successfully retrieved the dropped asset details for {droppedAsset.assetName}!
               </Typography>
             </Grid>
             <Grid item m={4} xs={12}>
               <img alt="preview" src={droppedAsset.topLayerURL || droppedAsset.bottomLayerURL} />
-            </Grid> */}
+            </Grid>
             </>
           )}
         </Grid>
