@@ -41,17 +41,27 @@ const Home = () => {
             <Button onClick={handleGetDroppedAsset} variant="contained">
               Get Dropped Asset Details
             </Button>
+            <Button
+              onClick={() => {
+                console.log("CLICKING");
+                backendAPI.get("/system/health")
+                  .then((res) => res.json())
+                  .then((data) => console.log(data));
+              }}
+            >
+              Test
+            </Button>
           </Grid>
           {droppedAsset && (
             <>
               <Grid item pt={4} xs={12}>
-              <Typography>
-                You have successfully retrieved the dropped asset details for {droppedAsset.assetName}!
-              </Typography>
-            </Grid>
-            <Grid item m={4} xs={12}>
-              <img alt="preview" src={droppedAsset.topLayerURL || droppedAsset.bottomLayerURL} />
-            </Grid>
+                <Typography>
+                  You have successfully retrieved the dropped asset details for {droppedAsset.assetName}!
+                </Typography>
+              </Grid>
+              <Grid item m={4} xs={12}>
+                <img alt="preview" src={droppedAsset.topLayerURL || droppedAsset.bottomLayerURL} />
+              </Grid>
             </>
           )}
         </Grid>
