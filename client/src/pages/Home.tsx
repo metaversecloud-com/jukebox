@@ -1,11 +1,12 @@
+import { GlobalStateContext } from "@/context/GlobalContext";
 import { backendAPI } from "@/utils/backendAPI";
 import { Button, Grid, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 const Home = () => {
   const [droppedAsset, setDroppedAsset] = useState();
 
-  const hasInteractiveParams = null;
+  const { hasInteractiveParams } = useContext(GlobalStateContext);
 
   const handleGetDroppedAsset = async () => {
     try {
@@ -45,13 +46,13 @@ const Home = () => {
           {droppedAsset && (
             <>
               <Grid item pt={4} xs={12}>
-              <Typography>
-                You have successfully retrieved the dropped asset details for {droppedAsset.assetName}!
-              </Typography>
-            </Grid>
-            <Grid item m={4} xs={12}>
-              <img alt="preview" src={droppedAsset.topLayerURL || droppedAsset.bottomLayerURL} />
-            </Grid>
+                <Typography>
+                  You have successfully retrieved the dropped asset details for {droppedAsset.assetName}!
+                </Typography>
+              </Grid>
+              <Grid item m={4} xs={12}>
+                <img alt="preview" src={droppedAsset.topLayerURL || droppedAsset.bottomLayerURL} />
+              </Grid>
             </>
           )}
         </Grid>

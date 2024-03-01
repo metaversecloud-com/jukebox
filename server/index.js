@@ -2,6 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import router from "./routes.js";
+import youtubeRouter from "./youtubeRoutes.js";
+import { cleanReturnPayload } from "./utils/cleanReturnPayload.js";
+
 dotenv.config({ path: "../.env"});
 
 function checkEnvVariables() {
@@ -63,6 +66,8 @@ app.use(function (req, res, next) {
 });
 
 app.use("/api", router);
+
+app.use("/youtube", youtubeRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}`);

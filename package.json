@@ -12,6 +12,7 @@
     "dev-client": "cd client && npm run dev"
   },
   "dependencies": {
+    "@googleapis/youtube": "^13.1.0",
     "@rtsdk/topia": "^0.8.5",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
