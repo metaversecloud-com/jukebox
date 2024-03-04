@@ -6,6 +6,7 @@ import path from "path";
 
 import { cleanReturnPayload } from "./utils/cleanReturnPayload.ts";
 import { fileURLToPath } from "url";
+// import youtubeRouter from "./youtubeRoutes.ts";
 dotenv.config({ path: "../.env"});
 
 function checkEnvVariables() {
@@ -29,7 +30,7 @@ app.use(express.urlencoded({ extended: false }));
 
 if (process.env.NODE_ENV === "development") {
   const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
     credentials: true, //access-control-allow-credentials:true
     optionSuccessStatus: 200,
   };

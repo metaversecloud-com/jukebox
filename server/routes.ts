@@ -10,6 +10,7 @@ import {
   handleRemoveDroppedAssets,
 } from "./controllers/index.ts"
 import { getVersion } from "./utils/getVersion.ts"
+import { playVideo, searchVideos } from "./external/google.ts";
 
 const router = express.Router();
 
@@ -37,5 +38,9 @@ router.put("/visitor/move", moveVisitor);
 // World
 router.get("/world", handleGetWorldDetails);
 router.put("/world/data-object", handleUpdateWorldDataObject);
+
+// YouTube
+router.post("/search", searchVideos);
+router.post("/play", playVideo);
 
 export default router;

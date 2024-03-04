@@ -1,3 +1,4 @@
+import Search from "@/components/search";
 import { GlobalStateContext } from "@/context/GlobalContext";
 import { backendAPI } from "@/utils/backendAPI";
 import React, { useContext, useState } from "react";
@@ -19,9 +20,9 @@ const Home = () => {
   };
 
   return (
-    <div className="container p-24 flex items-center justify-start">
+    <div className="container p-6 flex items-center justify-start">
       <div className="flex flex-col">
-        <h1 className="h2 font-semibold">Server side example using interactive parameters</h1>
+        {/* <h1 className="h2 font-semibold">Server side example using interactive parameters</h1>
         <div className="max-w-screen-lg">
           {!hasInteractiveParams ? (
             <p className="p1 my-4">
@@ -48,7 +49,9 @@ const Home = () => {
               src={droppedAsset.topLayerURL || droppedAsset.bottomLayerURL}
             />
           </div>
-        )}
+        )} */}
+
+        <Search />
       </div>
     </div>
   );

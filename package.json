@@ -17,7 +17,6 @@
     "dev-client": "npm run start --prefix client"
   },
   "dependencies": {
-    "@googleapis/youtube": "^13.1.0",
     "@rtsdk/topia": "^0.8.5",
     "concurrently": "^8.2.2",
     "dotenv": "^16.4.5",
