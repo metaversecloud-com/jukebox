@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 
 const Search = () => {
   const [result, setResults] = useState([]);
-  const [search, setSearch] = useState("Manchester United");
+  const [search, setSearch] = useState("");
 
   const {
     assetId,
@@ -76,6 +76,7 @@ const Search = () => {
             id="search"
             name="search"
             value={search}
+            autoComplete="off"
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>

@@ -19,7 +19,7 @@ export async function searchVideos(req, res) {
       part: "snippet",
       type: "video",
       videoEmbeddable: true,
-      fields: "items(snippet(title,thumbnails(high)),id(videoId))",
+      fields: "items(snippet(title,publishedAt,thumbnails(high)),id(videoId))",
       q: q, // Replace with your desired search query
       maxResults: 25, // Adjust the number of results you want
     };
@@ -44,7 +44,14 @@ export async function searchVideos(req, res) {
 export async function playVideo(req, res) {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId, videoId } = req.body;
-    console.log("Got these: ", req.body )
+    console.log("Got these: ", req.body);
+    const isSame =
+      assetId === "-NrMIMrX-59YD9ecAyJP" &&
+      interactiveNonce === "57cbc661-7aa9-4f64-bcc2-379f47601899" &&
+      interactivePublicKey === "V4PvbCJSh7FsfbNdwSfB" &&
+      urlSlug === "jukebox-dev" &&
+      visitorId === "31";
+    console.log("Is Same", isSame);
     const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
     const droppedAsset = await getDroppedAsset(credentials);
 
