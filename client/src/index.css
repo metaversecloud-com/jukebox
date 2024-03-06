@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+p {
+  letter-spacing: 0.05em !important;
+}
+
+.btn-enhanced {
+  @apply transition-colors hover:bg-[#4f6275] active:bg-[#3b5166];
+}
