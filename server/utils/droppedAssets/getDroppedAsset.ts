@@ -7,7 +7,7 @@ export const getDroppedAsset = async (credentials) => {
     const droppedAsset = await DroppedAsset.get(assetId, urlSlug, {
       credentials: {
         // Why pass apiKey here when it's already set in the Topia instance?
-        apiKey: process.env.API_KEY,
+        // apiKey: process.env.API_KEY,
         interactiveNonce,
         interactivePublicKey,
         visitorId,

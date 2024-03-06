@@ -6,6 +6,7 @@ import path from "path";
 
 import { cleanReturnPayload } from "./utils/cleanReturnPayload.ts";
 import { fileURLToPath } from "url";
+import webhookRouter from "./webhook.ts";
 // import youtubeRouter from "./youtubeRoutes.ts";
 dotenv.config({ path: "../.env"});
 
@@ -58,6 +59,7 @@ app.use(function (req, res, next) {
 });
 
 app.use("/api", router);
+app.use("/webhook", webhookRouter);
 
 if (process.env.NODE_ENV !== "development") {
   // Node serves the files for the React app
