@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import Marquee from "react-fast-marquee";
 
 interface VideoInfoTileProps {
+  videoId: string;
   videoName: string;
   videoMetaData: string;
   thumbnail: string;
   showControls?: boolean;
+  playVideo: (videoId: string) => void;
 }
 
-const VideoInfoTile: React.FC<VideoInfoTileProps> = ({ videoName, videoMetaData, thumbnail, showControls }) => {
+const VideoInfoTile: React.FC<VideoInfoTileProps> = ({ videoId, videoName, videoMetaData, thumbnail, showControls, playVideo }) => {
   const [playMarquee, setPlayMarquee] = useState(true);
   return (
     <div className="flex flex-row w-full my-1">
@@ -32,7 +34,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({ videoName, videoMetaData,
             {/* <button className="btn-icon flex items-center justify-center">
               <i className="icon pause-icon h-4 w-4" />
             </button> */}
-            <button className="btn-icon flex items-center justify-center">
+            <button onClick={() => playVideo(videoId)} className="btn-icon flex items-center justify-center">
               <i className="icon play-icon h-4 w-4" />
             </button>
             {/* <button className="btn-icon flex items-center justify-center">

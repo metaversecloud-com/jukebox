@@ -1,4 +1,12 @@
-import { ActionType, InitialState, SET_CATALOG, SET_INTERACTIVE_PARAMS, SET_SEARCH_LOADING, SET_SEARCH_STATUS } from "./types";
+import {
+  ActionType,
+  InitialState,
+  RESET_CATALOG,
+  SET_CATALOG,
+  SET_INTERACTIVE_PARAMS,
+  SET_SEARCH_LOADING,
+  SET_SEARCH_STATUS,
+} from "./types";
 
 const globalReducer = (state: InitialState, action: ActionType) => {
   const { type, payload } = action;
@@ -26,6 +34,12 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         searchLoading: false,
         searchStatus: "SUCCESS",
         nextPageToken: payload.newNextPageToken,
+      };
+    case RESET_CATALOG:
+      return {
+        ...state,
+        catalog: [],
+        nextPageToken: "",
       };
     default: {
       throw new Error(`Unhandled action type: ${type}`);

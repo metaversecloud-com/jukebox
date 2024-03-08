@@ -9,4 +9,13 @@ const fetchCatalog = async (searchTerm: string, nextPageToken: string) => {
   }
 };
 
-export { fetchCatalog };
+const playVideo = async (credentials) => {
+  try {
+    const result = await backendAPI.post("/play", credentials);
+    return result.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export { fetchCatalog, playVideo };

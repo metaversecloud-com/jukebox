@@ -3,9 +3,22 @@ import VideoInfoTile from "./VideoInfoTile";
 import { GlobalStateContext } from "@/context/GlobalContext";
 import { Video } from "@/context/types";
 import InfiniteScroll from "react-infinite-scroller";
+import { playVideo } from "@/context/actions";
 
 const Catalog = ({ loadNextSet }) => {
-  const { catalog } = useContext(GlobalStateContext);
+  const {
+    catalog,
+    assetId,
+    displayName,
+    interactiveNonce,
+    interactivePublicKey,
+    profileId,
+    sceneDropId,
+    uniqueName,
+    urlSlug,
+    username,
+    visitorId,
+  } = useContext(GlobalStateContext);
 
   const [page, setPage] = useState(catalog.length / 5);
 
@@ -17,6 +30,22 @@ const Catalog = ({ loadNextSet }) => {
 
     return `${hours ? hours + ":" : ""}${minutes < 10 && hours ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
+
+  const handlePlayVideo = async (videoId: string) => {
+    await playVideo({
+      assetId,
+      displayName,
+      interactiveNonce,
+      interactivePublicKey,
+      profileId,
+      sceneDropId,
+      uniqueName,
+      urlSlug,
+      username,
+      visitorId,
+      videoId,
+    });
+  };
 
   return (
     <InfiniteScroll
@@ -32,10 +61,12 @@ const Catalog = ({ loadNextSet }) => {
       {catalog.map((video: Video, i: number) => (
         <VideoInfoTile
           key={`${video.id.videoId}${i}`}
+          videoId={video.id.videoId}
           videoName={video.snippet.title}
           videoMetaData={convertMillisToMinutes(video.duration)}
           thumbnail={video.snippet.thumbnails.high.url}
           showControls
+          playVideo={handlePlayVideo}
         />
       ))}
     </InfiniteScroll>

@@ -2,6 +2,7 @@ import Catalog from "@/components/Catalog";
 import Header from "@/components/Header";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
 import { fetchCatalog } from "@/context/actions";
+import { RESET_CATALOG, SET_CATALOG, SET_SEARCH_LOADING } from "@/context/types";
 import React, { useContext, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -16,9 +17,10 @@ const Search = () => {
   const searchVideo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchLoading || searchTerm == "") return;
-    dispatch!({ type: "SET_SEARCH_LOADING", payload: { searchLoading: true } });
-    const { catalog, newNextPageToken } = await fetchCatalog(searchTerm, nextPageToken);
-    dispatch!({ type: "SET_CATALOG", payload: { catalog: catalog, newNextPageToken } });
+    dispatch!({ type: SET_SEARCH_LOADING, payload: { searchLoading: true } });
+    dispatch!({ type: RESET_CATALOG });
+    const { catalog, newNextPageToken } = await fetchCatalog(searchTerm, "");
+    dispatch!({ type: SET_CATALOG, payload: { catalog: catalog, newNextPageToken } });
   };
 
   const fetchNextPage = async () => {

@@ -2,6 +2,7 @@ export const SET_INTERACTIVE_PARAMS = "SET_INTERACTIVE_PARAMS";
 export const SET_CATALOG = "SET_CATALOG";
 export const SET_SEARCH_LOADING = "SET_SEARCH_LOADING";
 export const SET_SEARCH_STATUS = "SET_SEARCH_STATUS";
+export const RESET_CATALOG = "RESET_CATALOG";
 
 export type InteractiveParams = {
   assetId: string | null;
