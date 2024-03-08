@@ -1,6 +1,7 @@
 // const { google } = require("@googleapis/youtube");
 import { youtube } from "@googleapis/youtube";
 import { getDroppedAsset } from "../utils";
+import { YTDurationToMilliseconds } from "../utils/youtube";
 
 // No idea why this is causing problems with concurrently running dev servers
 const yt = youtube({
@@ -21,8 +22,8 @@ export async function searchVideos(req, res) {
       safeSearch: "strict",
       fields: "nextPageToken,items(snippet(title,publishedAt,publishTime,thumbnails(high)),id(videoId))",
       q: q, // Replace with your desired search query
-      maxResults: 5, // Adjust the number of results you want
-      nextPageToken,
+      maxResults: 25, // Adjust the number of results you want
+      pageToken: nextPageToken,
     };
 
     // Send the search request
@@ -34,7 +35,7 @@ export async function searchVideos(req, res) {
     const videosWithDuration = await getVideoDuration(videos);
     console.log("Found videos:");
     videos.forEach((video) => {
-      console.log(`* Title: ${video.snippet.title}`);
+      console.log(`* Title (${nextPageToken}): ${video.snippet.title}`);
     });
 
     return res.json({ catalog: videosWithDuration, newNextPageToken });
@@ -55,41 +56,9 @@ async function getVideoDuration(videos) {
   });
 }
 
-function YTDurationToMilliseconds(isoDurationString) {
-  const regex =
-    /^P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?$/;
-
-  const match = isoDurationString.match(regex);
-
-  try {
-    const years = parseFloat(match[1] || 0);
-    const months = parseFloat(match[2] || 0);
-    const weeks = parseFloat(match[3] || 0);
-    const days = parseFloat(match[4] || 0);
-    const hours = parseFloat(match[5] || 0);
-    const minutes = parseFloat(match[6] || 0);
-    const seconds = parseFloat(match[7] || 0);
-
-    const milliseconds =
-      years * 31536000000 + 
-      months * 2629800000 + 
-      weeks * 604800000 + 
-      days * 86400000 + 
-      hours * 3600000 +
-      minutes * 60000 + 
-      seconds * 1000;
-
-    return milliseconds;
-  } catch (error) {
-    console.error("Error:", error);
-    return 0;
-  }
-}
-
 export async function playVideo(req, res) {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId, videoId } = req.body;
-
     const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
     const droppedAsset = await getDroppedAsset(credentials);
 
