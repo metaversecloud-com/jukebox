@@ -81,15 +81,13 @@ const App = () => {
   }, [hasInitBackendAPI, interactiveParams]);
 
   return (
-    <div className="w-full p-6 flex items-center justify-start">
-      <div className="flex flex-col items-center justify-center">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/search" element={<Search />} />
+    <div className="flex flex-col p-6 items-center justify-center w-full">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/search" element={<Search />} />
 
-          <Route path="*" element={<Error />} />
-        </Routes>
-      </div>
+        <Route path="*" element={<Error />} />
+      </Routes>
     </div>
   );
 };

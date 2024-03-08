@@ -28,7 +28,7 @@ const Home = () => {
       <div className="flex flex-col w-full justify-start">
         <p className="p1 font-semibold">Now Playing: </p>
         <div className="my-4">
-          <VideoInfoTile videoName="Hello" videoMetaData="Yes sirsky" thumbnail="vite.svg"></VideoInfoTile>
+          <VideoInfoTile videoName="Hello" videoMetaData="11:30" thumbnail="vite.svg"></VideoInfoTile>
         </div>
         <p className="p1 font-semibold">Next Up: </p>
         {Array(5)
@@ -37,7 +37,7 @@ const Home = () => {
             <div key={i} className="my-4">
               <VideoInfoTile
                 videoName="Hello"
-                videoMetaData="Yes sirsky"
+                videoMetaData="11:30"
                 thumbnail="vite.svg"
                 showControls
               ></VideoInfoTile>

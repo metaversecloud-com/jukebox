@@ -6,6 +6,8 @@ import GlobalState from "./GlobalState";
 const initialState: InitialState = {
   catalog: [],
   nextPageToken: "",
+  searchLoading: false,
+  searchStatus: "",
   hasInteractiveParams: false,
   selectedWorld: {},
   urlSlug: "",

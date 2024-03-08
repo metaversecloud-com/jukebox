@@ -1,10 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import VideoInfoTile from "./VideoInfoTile";
 import { GlobalStateContext } from "@/context/GlobalContext";
 import { Video } from "@/context/types";
+import InfiniteScroll from "react-infinite-scroller";
 
-const Catalog = () => {
+const Catalog = ({ loadNextSet }) => {
   const { catalog } = useContext(GlobalStateContext);
+
+  const [page, setPage] = useState(catalog.length / 5);
 
   function convertMillisToMinutes(milliseconds) {
     const remainingMilliseconds = milliseconds % (1000 * 60 * 60);
@@ -15,15 +18,28 @@ const Catalog = () => {
     return `${hours ? hours + ":" : ""}${minutes < 10 && hours ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
-  return catalog.map((video: Video) => (
-    <VideoInfoTile
-      key={video.id.videoId}
-      videoName={video.snippet.title}
-      videoMetaData={convertMillisToMinutes(video.duration)}
-      thumbnail={video.snippet.thumbnails.high.url}
-      showControls
-    />
-  ));
+  return (
+    <InfiniteScroll
+      loadMore={loadNextSet}
+      initialLoad={false}
+      hasMore={catalog.length > 0}
+      loader={
+        <div className="loader" key={0}>
+          Loading ...
+        </div>
+      }
+    >
+      {catalog.map((video: Video, i: number) => (
+        <VideoInfoTile
+          key={`${video.id.videoId}${i}`}
+          videoName={video.snippet.title}
+          videoMetaData={convertMillisToMinutes(video.duration)}
+          thumbnail={video.snippet.thumbnails.high.url}
+          showControls
+        />
+      ))}
+    </InfiniteScroll>
+  );
 };
 
 export default Catalog;

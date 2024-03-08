@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import Marquee from "react-fast-marquee";
 
 interface VideoInfoTileProps {
   videoName: string;
@@ -8,19 +9,35 @@ interface VideoInfoTileProps {
 }
 
 const VideoInfoTile: React.FC<VideoInfoTileProps> = ({ videoName, videoMetaData, thumbnail, showControls }) => {
+  const [playMarquee, setPlayMarquee] = useState(true);
   return (
-    <div className="flex flex-row w-full">
-      <div className="w-1/3 h-full  rounded-xl p-4 border">
-        <img src={thumbnail} alt={videoName} className="w-full h-full object-cover rounded-xl" />
+    <div className="flex flex-row w-full my-1">
+      <div className="rounded-xl border h-fit p-1">
+        <img src={thumbnail} alt={videoName} className="aspect-square min-w-16 max-w-16 object-cover rounded-xl" />
       </div>
       <div className="flex w-full justify-between px-3 items-center">
-        <div className="flex flex-col items-start self-start mr-2">
-          <p className="p1 font-semibold">{videoName}</p>
+        <div className="flex flex-col items-start self-start mr-2 w-40">
+          <Marquee gradient={false} speed={50} delay={3} play={playMarquee} pauseOnHover onCycleComplete={() => {
+            setPlayMarquee(false);
+            setTimeout(() => {
+              setPlayMarquee(true);
+            }, 3000);
+          }}>
+            <p className="p1 font-semibold w-full">{videoName}</p>
+          </Marquee>
           <p className="p1">{videoMetaData}</p>
         </div>
         {showControls && (
-          <div className="rounded-full h-fit w-fit border flex items-center">
-            <div className="w-4 h-4 bg-blue-950 m-2"></div>
+          <div className="w-1/2 flex items-center justify-end">
+            {/* <button className="btn-icon flex items-center justify-center">
+              <i className="icon pause-icon h-4 w-4" />
+            </button> */}
+            <button className="btn-icon flex items-center justify-center">
+              <i className="icon play-icon h-4 w-4" />
+            </button>
+            {/* <button className="btn-icon flex items-center justify-center">
+              <i className="icon stop-icon h-4 w-4" />
+            </button> */}
           </div>
         )}
       </div>

@@ -9,3 +9,21 @@ p {
 .btn-enhanced {
   @apply transition-colors active:bg-[#4f6275];
 }
+
+.icon {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+}
+
+.play-icon {
+  background-image: url('play.svg');
+}
+
+.stop-icon {
+  background-image: url('stop.svg');
+}
+
+.pause-icon {
+  background-image: url('pause.svg');
+}
