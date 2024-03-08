@@ -1,4 +1,4 @@
-import { ActionType, InitialState, SET_INTERACTIVE_PARAMS } from "./types";
+import { ActionType, InitialState, SET_CATALOG, SET_INTERACTIVE_PARAMS } from "./types";
 
 const globalReducer = (state: InitialState, action: ActionType) => {
   const { type, payload } = action;
@@ -8,6 +8,12 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         ...payload,
         hasInteractiveParams: true,
+      };
+    case SET_CATALOG:
+      return {
+        ...state,
+        catalog: [...state.catalog, ...payload.catalog],
+        nextPageToken: payload.nextPageToken,
       };
     default: {
       throw new Error(`Unhandled action type: ${type}`);

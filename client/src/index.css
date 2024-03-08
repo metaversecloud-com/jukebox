@@ -7,5 +7,5 @@ p {
 }
 
 .btn-enhanced {
-  @apply transition-colors hover:bg-[#4f6275] active:bg-[#3b5166];
+  @apply transition-colors active:bg-[#4f6275];
 }

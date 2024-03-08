@@ -1,8 +1,10 @@
-import NowPlaying from "@/components/NowPlaying";
+import Header from "@/components/Header";
+import VideoInfoTile from "@/components/VideoInfoTile";
 import Search from "@/components/search";
 import { GlobalStateContext } from "@/context/GlobalContext";
 import { backendAPI } from "@/utils/backendAPI";
 import React, { useContext, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [droppedAsset, setDroppedAsset] = useState();
@@ -21,26 +23,31 @@ const Home = () => {
   };
 
   return (
-    <div className="w-full p-6 flex items-center justify-start">
-      <div className="flex flex-col items-center justify-center">
-        <img src="Gramophone_Front.png" alt="Gramophone" className="w-96 h-52 object-cover" />
-        <h1 className="h3 font-semibold my-6">Jukebox</h1>
-        <div className="flex flex-col w-full justify-start">
-          <p className="p1 font-semibold">Now Playing: </p>
-          <div className="my-4">
-            <NowPlaying videoName="Hello" videoMetaData="Yes sirsky" thumbnail="vite.svg"></NowPlaying>
-          </div>
-          <p className="p1 font-semibold">Next Up: </p>
-          {Array(5)
-            .fill(0)
-            .map((_, i) => (
-              <div key={i} className="my-4">
-                <NowPlaying videoName="Hello" videoMetaData="Yes sirsky" thumbnail="vite.svg" showControls></NowPlaying>
-              </div>
-            ))}
+    <>
+      <Header />
+      <div className="flex flex-col w-full justify-start">
+        <p className="p1 font-semibold">Now Playing: </p>
+        <div className="my-4">
+          <VideoInfoTile videoName="Hello" videoMetaData="Yes sirsky" thumbnail="vite.svg"></VideoInfoTile>
         </div>
-        <button className="btn btn-enhanced w-full my-2">Add a Song</button>
-        {/* <h1 className="h2 font-semibold">Server side example using interactive parameters</h1>
+        <p className="p1 font-semibold">Next Up: </p>
+        {Array(5)
+          .fill(0)
+          .map((_, i) => (
+            <div key={i} className="my-4">
+              <VideoInfoTile
+                videoName="Hello"
+                videoMetaData="Yes sirsky"
+                thumbnail="vite.svg"
+                showControls
+              ></VideoInfoTile>
+            </div>
+          ))}
+      </div>
+      <Link className="btn btn-enhanced w-full my-2" to={"/search"}>
+        Add a Song
+      </Link>
+      {/* <h1 className="h2 font-semibold">Server side example using interactive parameters</h1>
         <div className="max-w-screen-lg">
           {!hasInteractiveParams ? (
             <p className="p1 my-4">
@@ -69,9 +76,8 @@ const Home = () => {
           </div>
         )} */}
 
-        {/* <Search /> */}
-      </div>
-    </div>
+      {/* <Search /> */}
+    </>
   );
 };
 

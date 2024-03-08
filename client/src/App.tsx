@@ -6,6 +6,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { GlobalDispatchContext } from "./context/GlobalContext";
 import { setupBackendAPI } from "./utils/backendAPI";
 import { InteractiveParams, SET_INTERACTIVE_PARAMS } from "./context/types";
+import Search from "./pages/Search";
 
 const App = () => {
   const [searchParams] = useSearchParams();
@@ -80,10 +81,16 @@ const App = () => {
   }, [hasInitBackendAPI, interactiveParams]);
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="*" element={<Error />} />
-    </Routes>
+    <div className="w-full p-6 flex items-center justify-start">
+      <div className="flex flex-col items-center justify-center">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/search" element={<Search />} />
+
+          <Route path="*" element={<Error />} />
+        </Routes>
+      </div>
+    </div>
   );
 };
 

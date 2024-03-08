@@ -1,13 +1,13 @@
 import React from "react";
 
-interface NowPlayingProps {
+interface VideoInfoTileProps {
   videoName: string;
   videoMetaData: string;
   thumbnail: string;
   showControls?: boolean;
 }
 
-const NowPlaying: React.FC<NowPlayingProps> = ({ videoName, videoMetaData, thumbnail, showControls }) => {
+const VideoInfoTile: React.FC<VideoInfoTileProps> = ({ videoName, videoMetaData, thumbnail, showControls }) => {
   return (
     <div className="flex flex-row w-full">
       <div className="w-1/3 h-full  rounded-xl p-4 border">
@@ -28,4 +28,4 @@ const NowPlaying: React.FC<NowPlayingProps> = ({ videoName, videoMetaData, thumb
   );
 };
 
-export default NowPlaying;
+export default VideoInfoTile;

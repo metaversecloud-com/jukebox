@@ -4,6 +4,8 @@ import { InitialState } from "./types";
 import GlobalState from "./GlobalState";
 
 const initialState: InitialState = {
+  catalog: [],
+  nextPageToken: "",
   hasInteractiveParams: false,
   selectedWorld: {},
   urlSlug: "",
