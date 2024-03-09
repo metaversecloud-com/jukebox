@@ -11,6 +11,7 @@ import {
 } from "./controllers/index.ts"
 import { getVersion } from "./utils/getVersion.ts"
 import { playVideo, searchVideos } from "./external/google.ts";
+import getCatalog from "./controllers/getCatalog.ts";
 
 const router = express.Router();
 
@@ -42,5 +43,7 @@ router.put("/world/data-object", handleUpdateWorldDataObject);
 // YouTube
 router.post("/search", searchVideos);
 router.post("/play", playVideo);
+
+router.get('/catalog', getCatalog)
 
 export default router;

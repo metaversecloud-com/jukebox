@@ -38,7 +38,7 @@ export async function searchVideos(req, res) {
       console.log(`* Title (${nextPageToken}): ${video.snippet.title}`);
     });
 
-    return res.json({ catalog: videosWithDuration, newNextPageToken });
+    return res.json({ searchResults: videosWithDuration, newNextPageToken });
   } catch (error) {
     console.error("Error:", error);
   }
@@ -58,7 +58,8 @@ async function getVideoDuration(videos) {
 
 export async function playVideo(req, res) {
   try {
-    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId, videoId } = req.body;
+    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { videoId } = req.body;
     const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
     const droppedAsset = await getDroppedAsset(credentials);
 

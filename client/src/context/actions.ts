@@ -1,6 +1,6 @@
 import { backendAPI } from "@/utils/backendAPI";
 
-const fetchCatalog = async (searchTerm: string, nextPageToken: string) => {
+const searchCatalog = async (searchTerm: string, nextPageToken: string) => {
   try {
     const result = await backendAPI.post("/search", { q: searchTerm, nextPageToken});
     return result.data;
@@ -9,13 +9,22 @@ const fetchCatalog = async (searchTerm: string, nextPageToken: string) => {
   }
 };
 
-const playVideo = async (credentials) => {
+const fetchCatalog = async () => {
   try {
-    const result = await backendAPI.post("/play", credentials);
+    const result = await backendAPI.get("/catalog");
     return result.data;
   } catch (error) {
     console.error(error);
   }
 }
 
-export { fetchCatalog, playVideo };
+const playVideo = async (videoId) => {
+  try {
+    const result = await backendAPI.post("/play", {videoId});
+    return result.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export { searchCatalog, fetchCatalog, playVideo };

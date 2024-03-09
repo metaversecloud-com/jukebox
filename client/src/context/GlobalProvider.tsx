@@ -5,9 +5,13 @@ import GlobalState from "./GlobalState";
 
 const initialState: InitialState = {
   catalog: [],
+  currentPlayIndex: 0,
+  searchResults: [],
   nextPageToken: "",
   searchLoading: false,
   searchStatus: "",
+  catalogLoading: false,
+  catalogStatus: "",
   hasInteractiveParams: false,
   selectedWorld: {},
   urlSlug: "",

@@ -1,15 +1,27 @@
 import Header from "@/components/Header";
 import VideoInfoTile from "@/components/VideoInfoTile";
 import Search from "@/components/search";
-import { GlobalStateContext } from "@/context/GlobalContext";
+import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
+import { fetchCatalog, playVideo } from "@/context/actions";
+import { SET_CATALOG, SET_CATALOG_LOADING } from "@/context/types";
 import { backendAPI } from "@/utils/backendAPI";
-import React, { useContext, useState } from "react";
+import { convertMillisToMinutes } from "@/utils/duration";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Home = () => {
   const [droppedAsset, setDroppedAsset] = useState();
 
-  const { hasInteractiveParams } = useContext(GlobalStateContext);
+  const all = useContext(GlobalStateContext);
+  console.log("GLOBAL", all);
+  const { hasInteractiveParams, catalog, currentPlayIndex } = all;
+  const dispatch = useContext(GlobalDispatchContext);
+
+  const [currentVideo, setCurrentVideo] = useState({
+    id: { videoId: "" },
+    snippet: { title: "", thumbnails: { high: { url: "" } } },
+    duration: "",
+  });
 
   const handleGetDroppedAsset = async () => {
     try {
@@ -22,27 +34,57 @@ const Home = () => {
     }
   };
 
+  const handlePlayVideo = async (videoId: string) => {
+    await playVideo(videoId);
+  };
+
+  useEffect(() => {
+    async function loadCatalog() {
+      dispatch!({ type: SET_CATALOG_LOADING, payload: { catalogLoading: true } });
+      const { currentPlayIndex, media } = await fetchCatalog();
+      dispatch!({ type: SET_CATALOG, payload: { catalog: media, currentPlayIndex } });
+    }
+
+    if (hasInteractiveParams) {
+      loadCatalog();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (catalog && catalog.length > 0) {
+      setCurrentVideo(catalog[currentPlayIndex]);
+    }
+  }, [catalog, currentPlayIndex]);
+
   return (
     <>
       <Header />
       <div className="flex flex-col w-full justify-start">
         <p className="p1 font-semibold">Now Playing: </p>
         <div className="my-4">
-          <VideoInfoTile videoName="Hello" videoMetaData="11:30" thumbnail="vite.svg"></VideoInfoTile>
+          <VideoInfoTile
+            videoId={currentVideo.id.videoId}
+            videoName={currentVideo.snippet.title}
+            videoMetaData={convertMillisToMinutes(currentVideo.duration)}
+            thumbnail={currentVideo.snippet.thumbnails.high.url}
+            // showControls
+            // playVideo={handlePlayVideo}
+          ></VideoInfoTile>
         </div>
         <p className="p1 font-semibold">Next Up: </p>
-        {Array(5)
-          .fill(0)
-          .map((_, i) => (
-            <div key={i} className="my-4">
-              <VideoInfoTile
-                videoName="Hello"
-                videoMetaData="11:30"
-                thumbnail="vite.svg"
-                showControls
-              ></VideoInfoTile>
-            </div>
-          ))}
+        {catalog.map((video, i) => (
+          <div key={i} className="my-4">
+            <VideoInfoTile
+              key={`${video.id.videoId}${i}`}
+              videoId={video.id.videoId}
+              videoName={video.snippet.title}
+              videoMetaData={convertMillisToMinutes(video.duration)}
+              thumbnail={video.snippet.thumbnails.high.url}
+              showControls
+              playVideo={handlePlayVideo}
+            ></VideoInfoTile>
+          </div>
+        ))}
       </div>
       <Link className="btn btn-enhanced w-full my-2" to={"/search"}>
         Add a Song
