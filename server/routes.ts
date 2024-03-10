@@ -12,6 +12,7 @@ import {
 import { getVersion } from "./utils/getVersion.ts"
 import { playVideo, searchVideos } from "./external/google.ts";
 import getCatalog from "./controllers/getCatalog.ts";
+import sendNextSongInfo from "./controllers/media/sendNextSongInfo.ts";
 
 const router = express.Router();
 
@@ -46,4 +47,5 @@ router.post("/play", playVideo);
 
 router.get('/catalog', getCatalog)
 
+router.get("/sse", sendNextSongInfo);
 export default router;

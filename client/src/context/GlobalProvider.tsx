@@ -2,9 +2,10 @@ import { useReducer } from "react";
 import { globalReducer } from "./reducer";
 import { InitialState } from "./types";
 import GlobalState from "./GlobalState";
+import { skeleton } from "./constants";
 
 const initialState: InitialState = {
-  catalog: [],
+  catalog: skeleton,
   currentPlayIndex: 0,
   searchResults: [],
   nextPageToken: "",

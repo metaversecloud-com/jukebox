@@ -5,7 +5,7 @@ export async function nextSong(req, res) {
   const jukeboxAsset = await getDroppedAsset({ assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId });
   const { currentPlayIndex, media } = jukeboxAsset.dataObject;
   const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}`;
-  const newPlayIndex = media.length === currentPlayIndex + 1 ? 0 : currentPlayIndex + 1;
+  const newPlayIndex = media.length - 20 === currentPlayIndex + 1 ? 0 : currentPlayIndex + 1;
   
   try {
     await jukeboxAsset.updateDataObject(

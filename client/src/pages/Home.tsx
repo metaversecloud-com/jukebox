@@ -14,7 +14,7 @@ const Home = () => {
 
   const all = useContext(GlobalStateContext);
   console.log("GLOBAL", all);
-  const { hasInteractiveParams, catalog, currentPlayIndex } = all;
+  const { hasInteractiveParams, catalog, currentPlayIndex, catalogLoading } = all;
   const dispatch = useContext(GlobalDispatchContext);
 
   const [currentVideo, setCurrentVideo] = useState({
@@ -48,13 +48,23 @@ const Home = () => {
     if (hasInteractiveParams) {
       loadCatalog();
     }
-  }, []);
+  }, [hasInteractiveParams, dispatch]);
 
   useEffect(() => {
     if (catalog && catalog.length > 0) {
       setCurrentVideo(catalog[currentPlayIndex]);
     }
   }, [catalog, currentPlayIndex]);
+
+  useEffect(() => {
+    const es = new EventSource("/api/sse");
+    es.onopen = () => console.log(">>> Connection opened!");
+    es.onerror = (e) => console.log("ERROR!", e);
+    es.onmessage = (e) => {
+      console.log(">>>", e.data);
+    };
+    return () => es.close();
+  }, []);
 
   return (
     <>
@@ -63,6 +73,7 @@ const Home = () => {
         <p className="p1 font-semibold">Now Playing: </p>
         <div className="my-4">
           <VideoInfoTile
+            isLoading={catalogLoading}
             videoId={currentVideo.id.videoId}
             videoName={currentVideo.snippet.title}
             videoMetaData={convertMillisToMinutes(currentVideo.duration)}
@@ -75,12 +86,13 @@ const Home = () => {
         {catalog.map((video, i) => (
           <div key={i} className="my-4">
             <VideoInfoTile
+              isLoading={catalogLoading}
               key={`${video.id.videoId}${i}`}
               videoId={video.id.videoId}
               videoName={video.snippet.title}
               videoMetaData={convertMillisToMinutes(video.duration)}
               thumbnail={video.snippet.thumbnails.high.url}
-              showControls
+              showControls={!catalogLoading}
               playVideo={handlePlayVideo}
             ></VideoInfoTile>
           </div>

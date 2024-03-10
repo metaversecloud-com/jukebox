@@ -1,5 +1,7 @@
+import { skeleton } from "./constants";
 import {
   ActionType,
+  GENERATE_SKELETON,
   InitialState,
   RESET_SEARCH_RESULTS,
   SET_CATALOG,
@@ -43,12 +45,21 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         catalogStatus: "SUCCESS",
       };
     case SET_SEARCH_RESULTS:
+      let searchResults = state.searchResults;
+      if (state.searchResults[0].id.videoId === "") {
+        searchResults = []
+      }
       return {
         ...state,
-        searchResults: [...state.searchResults, ...payload.searchResults],
+        searchResults: [...searchResults, ...payload.searchResults],
         searchLoading: false,
         searchStatus: "SUCCESS",
         nextPageToken: payload.newNextPageToken,
+      };
+    case GENERATE_SKELETON: 
+      return {
+        ...state,
+        searchResults: skeleton,
       };
     case RESET_SEARCH_RESULTS:
       return {

@@ -2,7 +2,7 @@ import SearchResults from "@/components/SearchResults";
 import Header from "@/components/Header";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
 import { searchCatalog } from "@/context/actions";
-import { RESET_SEARCH_RESULTS, SET_SEARCH_RESULTS, SET_SEARCH_LOADING } from "@/context/types";
+import { RESET_SEARCH_RESULTS, SET_SEARCH_RESULTS, SET_SEARCH_LOADING, GENERATE_SKELETON } from "@/context/types";
 import React, { useContext, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -17,15 +17,17 @@ const Search = () => {
   const searchVideo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchLoading || searchTerm == "") return;
-    dispatch!({ type: SET_SEARCH_LOADING, payload: { searchLoading: true } });
     dispatch!({ type: RESET_SEARCH_RESULTS });
+    dispatch!({ type: GENERATE_SKELETON });
+
+    dispatch!({ type: SET_SEARCH_LOADING, payload: { searchLoading: true } });
     const { searchResults, newNextPageToken } = await searchCatalog(searchTerm, "");
     dispatch!({ type: SET_SEARCH_RESULTS, payload: { searchResults, newNextPageToken } });
   };
 
   const fetchNextPage = async () => {
     if (searchLoading || searchTerm == "") return;
-    dispatch!({ type: SET_SEARCH_LOADING, payload: { searchLoading: true } });
+    // dispatch!({ type: SET_SEARCH_LOADING, payload: { searchLoading: true } });
     const { searchResults, newNextPageToken } = await searchCatalog(searchTerm, nextPageToken);
     dispatch!({ type: SET_SEARCH_RESULTS, payload: { searchResults, newNextPageToken } });
   };
@@ -43,12 +45,13 @@ const Search = () => {
         <form onSubmit={searchVideo} className="flex w-full justify-between items-center mt-1 mb-6">
           <input
             type="text"
-            className="p-2 mr-2"
+            className="outline-[#0a2540] p-2 mr-2"
             id="search"
             name="search"
             value={searchTerm}
             autoComplete="off"
-            placeholder="Search for videos..."
+            autoFocus
+            placeholder="Type here to search..."
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button disabled={searchLoading} className="btn btn-enhanced w-fit">
