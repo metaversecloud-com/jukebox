@@ -47,5 +47,5 @@ router.post("/play", playVideo);
 
 router.get('/catalog', getCatalog)
 
-router.get("/sse", sendNextSongInfo);
+router.post("/sse", sendNextSongInfo);
 export default router;

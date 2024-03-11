@@ -6,6 +6,7 @@ import {
   RESET_SEARCH_RESULTS,
   SET_CATALOG,
   SET_CATALOG_LOADING,
+  SET_CURRENT_MEDIA,
   SET_INTERACTIVE_PARAMS,
   SET_SEARCH_LOADING,
   SET_SEARCH_RESULTS,
@@ -56,6 +57,11 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         searchStatus: "SUCCESS",
         nextPageToken: payload.newNextPageToken,
       };
+    case SET_CURRENT_MEDIA: 
+      return {
+        ...state,
+        nowPlaying: payload.nowPlaying,
+      }
     case GENERATE_SKELETON: 
       return {
         ...state,

@@ -7,6 +7,7 @@ import { skeleton } from "./constants";
 const initialState: InitialState = {
   catalog: skeleton,
   currentPlayIndex: 0,
+  nowPlaying: {},
   searchResults: [],
   nextPageToken: "",
   searchLoading: false,

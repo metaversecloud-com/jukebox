@@ -3,18 +3,36 @@ import VideoInfoTile from "@/components/VideoInfoTile";
 import Search from "@/components/search";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
 import { fetchCatalog, playVideo } from "@/context/actions";
-import { SET_CATALOG, SET_CATALOG_LOADING } from "@/context/types";
+import { SET_CATALOG, SET_CATALOG_LOADING, SET_CURRENT_MEDIA } from "@/context/types";
 import { backendAPI } from "@/utils/backendAPI";
 import { convertMillisToMinutes } from "@/utils/duration";
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 const Home = () => {
   const [droppedAsset, setDroppedAsset] = useState();
 
   const all = useContext(GlobalStateContext);
-  console.log("GLOBAL", all);
-  const { hasInteractiveParams, catalog, currentPlayIndex, catalogLoading } = all;
+  // console.log("GLOBAL", all);
+  const {
+    hasInteractiveParams,
+    catalog,
+    currentPlayIndex,
+    catalogLoading,
+    assetId,
+    displayName,
+    interactiveNonce,
+    interactivePublicKey,
+    isInteractiveIframe,
+    profileId,
+    sceneDropId,
+    uniqueName,
+    urlSlug,
+    username,
+    visitorId,
+    nowPlaying,
+  } = all;
   const dispatch = useContext(GlobalDispatchContext);
 
   const [currentVideo, setCurrentVideo] = useState({
@@ -56,15 +74,79 @@ const Home = () => {
     }
   }, [catalog, currentPlayIndex]);
 
+  // useEffect(() => {
+  //   async function establishSSE() {
+  //     const response = await backendAPI.get("/sse");
+  //     if (response.status === 200) {
+  //       const es = new EventSource("/api/sse");
+  //       es.onopen = () => console.log(">>> Connection opened!");
+  //       es.onerror = (e) => console.log("ERROR!", e);
+  //       es.onmessage = (e) => {
+  //         console.log(">>>", e.data);
+  //       };
+  //       return () => es.close();
+  //     }
+  //   }
+  //   establishSSE();
+  // }, []);
+
+  const [data, setData] = useState([]);
+
   useEffect(() => {
-    const es = new EventSource("/api/sse");
-    es.onopen = () => console.log(">>> Connection opened!");
-    es.onerror = (e) => console.log("ERROR!", e);
-    es.onmessage = (e) => {
-      console.log(">>>", e.data);
+    const fetchData = async () => {
+      await fetchEventSource(`${import.meta.env.VITE_API_URL}/api/sse`, {
+        method: "POST",
+        headers: {
+          "Accept": "text/event-stream",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          assetId,
+          displayName,
+          interactiveNonce,
+          interactivePublicKey,
+          isInteractiveIframe,
+          profileId,
+          sceneDropId,
+          uniqueName,
+          urlSlug,
+          username,
+          visitorId,
+        }),
+        onopen(res) {
+          if (res.ok && res.status === 200) {
+            console.log("Connection made ", res);
+          } else if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+            console.log("Client side error ", res);
+          }
+        },
+        onmessage(event) {
+          console.log("EVENT", event.data);
+          const nowPlaying = JSON.parse(event.data);
+          dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying } });
+          console.log("NOW PLAYING", nowPlaying);
+          setCurrentVideo(nowPlaying);
+
+          // const parsedData = JSON.parse(event.data);
+          // setData((data) => [...data, parsedData]);
+        },
+        onclose() {
+          console.log("Connection closed by the server");
+        },
+        onerror(err) {
+          console.log("There was an error from server", err);
+        },
+      });
     };
-    return () => es.close();
-  }, []);
+    if (hasInteractiveParams) {
+      fetchData();
+    }
+  }, [hasInteractiveParams]);
+
+  // useEffect(() => {
+  //   if (nowPlaying) {
+  //   }
+  // }, [nowPlaying]);
 
   return (
     <>

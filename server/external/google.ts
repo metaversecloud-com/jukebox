@@ -1,10 +1,10 @@
 // const { google } = require("@googleapis/youtube");
-import { youtube } from "@googleapis/youtube";
+import { google } from "googleapis";
 import { getDroppedAsset } from "../utils";
 import { YTDurationToMilliseconds } from "../utils/youtube";
 
 // No idea why this is causing problems with concurrently running dev servers
-const yt = youtube({
+const yt = google.youtube({
   version: "v3",
   auth: process.env.GOOGLE_API_KEY,
 });

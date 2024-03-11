@@ -7,6 +7,7 @@ export const SET_CATALOG = "SET_CATALOG";
 export const SET_CATALOG_LOADING = "SET_CATALOG_LOADING";
 export const SET_CATALOG_STATUS = "SET_CATALOG_STATUS";
 export const GENERATE_SKELETON = "GENERATE_SKELETON";
+export const SET_CURRENT_MEDIA = "SET_CURRENT_MEDIA";
 
 export type InteractiveParams = {
   assetId: string | null;
@@ -23,6 +24,7 @@ export type InteractiveParams = {
 
 export interface InitialState {
   catalog: Video[];
+  nowPlaying: Video;
   currentPlayIndex: number;
   searchResults: Video[];
   searchLoading: boolean;
