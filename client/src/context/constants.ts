@@ -1,17 +1,21 @@
-export const skeleton = Array.from({ length: 3 }, () => {
-  return {
-    id: {
-      videoId: "",
-    },
-    snippet: {
-      title: "",
-      publishedAt: "",
-      thumbnails: {
-        high: {
-          url: "",
-        },
+import { Video } from "./types";
+
+export const videoSample: Video = {
+  id: {
+    videoId: "",
+  },
+  snippet: {
+    title: "",
+    publishedAt: "",
+    thumbnails: {
+      high: {
+        url: "",
       },
     },
-    duration: "",
-  };
+  },
+  duration: 0,
+};
+
+export const skeleton: Video[] = Array.from({ length: 3 }, () => {
+  return videoSample;
 });

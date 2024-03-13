@@ -1,3 +1,5 @@
+import { AxiosInstance } from "axios";
+
 export const SET_INTERACTIVE_PARAMS = "SET_INTERACTIVE_PARAMS";
 export const SET_SEARCH_RESULTS = "SET_SEARCH_RESULTS";
 export const SET_SEARCH_LOADING = "SET_SEARCH_LOADING";
@@ -9,21 +11,24 @@ export const SET_CATALOG_STATUS = "SET_CATALOG_STATUS";
 export const GENERATE_SKELETON = "GENERATE_SKELETON";
 export const SET_CURRENT_MEDIA = "SET_CURRENT_MEDIA";
 export const SET_NEXT_PAGE_LOADING = "SET_NEXT_PAGE_LOADING";
+export const SET_BACKEND_API = "SET_BACKEND_API";
 
 export type InteractiveParams = {
   assetId: string | null;
-  displayName: string;
-  interactiveNonce: string;
-  interactivePublicKey: string;
+  displayName: string | null;
+  interactiveNonce: string | null;
+  interactivePublicKey: string | null;
+  isInteractiveIframe: boolean;
   profileId: string;
   sceneDropId: string;
   uniqueName: string;
   urlSlug: string;
   username: string;
-  visitorId: string;
+  visitorId: string | null;
 };
 
 export interface InitialState {
+  backendAPI: AxiosInstance | null;
   catalog: Video[];
   nowPlaying: Video;
   currentPlayIndex: number;
@@ -35,8 +40,8 @@ export interface InitialState {
   nextPageToken: string;
   nextPageLoading: boolean;
   hasInteractiveParams: boolean;
+  interactiveParams: InteractiveParams | null;
   selectedWorld: { [key: string]: any };
-  urlSlug: string;
 }
 
 export type ActionType = {
@@ -57,5 +62,5 @@ export type Video = {
       }
     }
   },
-  duration: string;
+  duration: number;
 }

@@ -2,12 +2,12 @@ import { useReducer } from "react";
 import { globalReducer } from "./reducer";
 import { InitialState } from "./types";
 import GlobalState from "./GlobalState";
-import { skeleton } from "./constants";
+import { skeleton, videoSample } from "./constants";
 
 const initialState: InitialState = {
   catalog: skeleton,
   currentPlayIndex: 0,
-  nowPlaying: {},
+  nowPlaying: videoSample,
   searchResults: [],
   nextPageToken: "",
   searchLoading: false,
@@ -17,7 +17,8 @@ const initialState: InitialState = {
   catalogStatus: "",
   hasInteractiveParams: false,
   selectedWorld: {},
-  urlSlug: "",
+  interactiveParams: null,
+  backendAPI: null,
 };
 
 const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

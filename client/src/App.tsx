@@ -2,30 +2,45 @@ import { Route, Routes, useSearchParams } from "react-router-dom";
 
 import Home from "@pages/Home";
 import Error from "@pages/Error";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { GlobalDispatchContext } from "./context/GlobalContext";
+import { useCallback, useContext, useEffect, useMemo } from "react";
+import { GlobalDispatchContext, GlobalStateContext } from "./context/GlobalContext";
 import { setupBackendAPI } from "./utils/backendAPI";
-import { InteractiveParams, SET_INTERACTIVE_PARAMS } from "./context/types";
+import { InitialState, InteractiveParams, SET_BACKEND_API, SET_INTERACTIVE_PARAMS } from "./context/types";
 import Search from "./pages/Search";
 
 const App = () => {
   const [searchParams] = useSearchParams();
-  const [hasInitBackendAPI, setHasInitBackendAPI] = useState(false);
 
+  const { backendAPI } = useContext(GlobalStateContext) as InitialState;
   const dispatch = useContext(GlobalDispatchContext);
 
   const interactiveParams = useMemo(() => {
+    const assetId = searchParams.get("assetId");
+    const displayName = searchParams.get("displayName") as string;
+    const interactiveNonce = searchParams.get("interactiveNonce");
+    const interactivePublicKey = searchParams.get("interactivePublicKey");
+    const profileId = searchParams.get("profileId") as string;
+    const sceneDropId = searchParams.get("sceneDropId") as string;
+    const uniqueName = searchParams.get("uniqueName") as string;
+    const urlSlug = searchParams.get("urlSlug") as string;
+    const username = searchParams.get("username") as string;
+    const visitorId = searchParams.get("visitorId");
+
+    const isInteractiveIframe =
+      visitorId !== null && interactiveNonce !== null && interactivePublicKey !== null && assetId !== null;
+
     return {
-      assetId: searchParams.get("assetId"),
-      displayName: searchParams.get("displayName"),
-      interactiveNonce: searchParams.get("interactiveNonce"),
-      interactivePublicKey: searchParams.get("interactivePublicKey"),
-      profileId: searchParams.get("profileId"),
-      sceneDropId: searchParams.get("sceneDropId"),
-      uniqueName: searchParams.get("uniqueName"),
-      urlSlug: searchParams.get("urlSlug"),
-      username: searchParams.get("username"),
-      visitorId: searchParams.get("visitorId"),
+      assetId,
+      displayName,
+      isInteractiveIframe,
+      interactiveNonce,
+      interactivePublicKey,
+      profileId,
+      sceneDropId,
+      uniqueName,
+      urlSlug,
+      username,
+      visitorId,
     };
   }, [searchParams]);
 
@@ -64,9 +79,7 @@ const App = () => {
   );
 
   useEffect(() => {
-    if (interactiveParams.assetId) {
-      // TODO: Remove ts-ignore
-      // @ts-ignore
+    if (interactiveParams.assetId && interactiveParams.isInteractiveIframe) {
       setInteractiveParams({
         ...interactiveParams,
       });
@@ -74,11 +87,11 @@ const App = () => {
   }, [interactiveParams, setInteractiveParams]);
 
   useEffect(() => {
-    if (!hasInitBackendAPI) {
-      setupBackendAPI(interactiveParams);
-      setHasInitBackendAPI(true);
+    if (!backendAPI) {
+      const API = setupBackendAPI(interactiveParams);
+      dispatch!({ type: SET_BACKEND_API, payload: { backendAPI: API } });
     }
-  }, [hasInitBackendAPI, interactiveParams]);
+  }, [backendAPI, interactiveParams, dispatch]);
 
   return (
     <div className="flex flex-col p-6 items-center justify-center w-full">

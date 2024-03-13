@@ -1,32 +1,26 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import VideoInfoTile from "./VideoInfoTile";
 import { GlobalStateContext } from "@/context/GlobalContext";
-import { Video } from "@/context/types";
+import { InitialState, Video } from "@/context/types";
 import InfiniteScroll from "react-infinite-scroller";
 import { playVideo } from "@/context/actions";
 import { convertMillisToMinutes } from "@/utils/duration";
+import { AxiosInstance } from "axios";
 
-const SearchResults = ({ loadNextSet }) => {
+interface SearchResultsProps {
+  loadNextSet: () => void;
+}
+
+const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
   const {
     searchResults,
     searchLoading,
-    nextPageToken
-    // assetId,
-    // displayName,
-    // interactiveNonce,
-    // interactivePublicKey,
-    // profileId,
-    // sceneDropId,
-    // uniqueName,
-    // urlSlug,
-    // username,
-    // visitorId,
-  } = useContext(GlobalStateContext);
-
-  const [page, setPage] = useState(searchResults.length / 5);
+    nextPageToken,
+    backendAPI
+  } = useContext(GlobalStateContext) as InitialState;
 
   const handlePlayVideo = async (videoId: string) => {
-    await playVideo(videoId);
+    await playVideo(backendAPI as AxiosInstance, videoId);
   };
 
   return (
@@ -36,28 +30,6 @@ const SearchResults = ({ loadNextSet }) => {
       hasMore={searchResults.length > 0 && searchResults[0].id.videoId !== "" && nextPageToken !== null}
       loader={
         <div className="flex items-center justify-center w-full my-2">
-          {/* <div className="relative w-10 h-10">
-            <svg className="w-full h-full" viewBox="0 0 100 100">
-              <circle
-                className="text-red-900 stroke-current"
-                stroke-width="10"
-                cx="50"
-                cy="50"
-                r="40"
-                fill="transparent"
-              ></circle>
-              <circle
-                className="text-blue-200 progress-ring__circle stroke-current"
-                stroke-width="10"
-                stroke-linecap="round"
-                cx="50"
-                cy="50"
-                r="40"
-                fill="transparent"
-                stroke-dashoffset="calc(400 - (400 * 45) / 100)"
-              ></circle>
-            </svg>
-          </div> */}
           <div className="text-center">
             <div role="status">
               <svg

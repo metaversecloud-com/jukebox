@@ -1,96 +1,54 @@
 import Header from "@/components/Header";
 import VideoInfoTile from "@/components/VideoInfoTile";
-import Search from "@/components/search";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
 import { fetchCatalog, playVideo } from "@/context/actions";
-import { SET_CATALOG, SET_CATALOG_LOADING, SET_CURRENT_MEDIA } from "@/context/types";
-import { backendAPI } from "@/utils/backendAPI";
+import {
+  InitialState,
+  InteractiveParams,
+  SET_CATALOG,
+  SET_CATALOG_LOADING,
+  SET_CURRENT_MEDIA,
+  Video,
+} from "@/context/types";
 import { convertMillisToMinutes } from "@/utils/duration";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { AxiosInstance } from "axios";
 
 const Home = () => {
-  const [droppedAsset, setDroppedAsset] = useState();
+  const { hasInteractiveParams, catalog, currentPlayIndex, catalogLoading, interactiveParams, nowPlaying, backendAPI } =
+    useContext(GlobalStateContext) as InitialState;
 
-  const all = useContext(GlobalStateContext);
-  // console.log("GLOBAL", all);
-  const {
-    hasInteractiveParams,
-    catalog,
-    currentPlayIndex,
-    catalogLoading,
-    assetId,
-    displayName,
-    interactiveNonce,
-    interactivePublicKey,
-    isInteractiveIframe,
-    profileId,
-    sceneDropId,
-    uniqueName,
-    urlSlug,
-    username,
-    visitorId,
-    nowPlaying,
-  } = all;
   const dispatch = useContext(GlobalDispatchContext);
 
-  const [currentVideo, setCurrentVideo] = useState({
+  const [currentVideo, setCurrentVideo] = useState<Video>({
     id: { videoId: "" },
-    snippet: { title: "", thumbnails: { high: { url: "" } } },
-    duration: "",
+    snippet: { title: "", publishedAt: "", thumbnails: { high: { url: "" } } },
+    duration: 0,
   });
 
-  const handleGetDroppedAsset = async () => {
-    try {
-      const result = await backendAPI.get("/dropped-asset");
-      if (result.data.success) {
-        setDroppedAsset(result.data.droppedAsset);
-      } else return console.log("Error getting data object");
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const handlePlayVideo = async (videoId: string) => {
-    await playVideo(videoId);
+    await playVideo(backendAPI as AxiosInstance, videoId);
   };
 
   useEffect(() => {
     async function loadCatalog() {
       dispatch!({ type: SET_CATALOG_LOADING, payload: { catalogLoading: true } });
-      const { currentPlayIndex, media } = await fetchCatalog();
+      const { currentPlayIndex, media } = await fetchCatalog(backendAPI as AxiosInstance);
       dispatch!({ type: SET_CATALOG, payload: { catalog: media, currentPlayIndex } });
     }
 
-    if (hasInteractiveParams && !catalogLoading && catalog[0].id.videoId === "") {
+    if (hasInteractiveParams && !catalogLoading && catalog[0].id.videoId === "" && backendAPI !== null) {
       loadCatalog();
     }
-  }, [hasInteractiveParams, dispatch]);
+  }, [hasInteractiveParams, dispatch, catalogLoading, catalog, backendAPI]);
 
   useEffect(() => {
     if (catalog && catalog.length > 0) {
       setCurrentVideo(catalog[currentPlayIndex]);
     }
   }, [catalog, currentPlayIndex]);
-
-  // useEffect(() => {
-  //   async function establishSSE() {
-  //     const response = await backendAPI.get("/sse");
-  //     if (response.status === 200) {
-  //       const es = new EventSource("/api/sse");
-  //       es.onopen = () => console.log(">>> Connection opened!");
-  //       es.onerror = (e) => console.log("ERROR!", e);
-  //       es.onmessage = (e) => {
-  //         console.log(">>>", e.data);
-  //       };
-  //       return () => es.close();
-  //     }
-  //   }
-  //   establishSSE();
-  // }, []);
-
-  const [data, setData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,17 +59,17 @@ const Home = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          assetId,
-          displayName,
-          interactiveNonce,
-          interactivePublicKey,
-          isInteractiveIframe,
-          profileId,
-          sceneDropId,
-          uniqueName,
-          urlSlug,
-          username,
-          visitorId,
+          assetId: interactiveParams?.assetId,
+          displayName: interactiveParams?.displayName,
+          interactiveNonce: interactiveParams?.interactiveNonce,
+          interactivePublicKey: interactiveParams?.interactivePublicKey,
+          isInteractiveIframe: interactiveParams?.isInteractiveIframe,
+          profileId: interactiveParams?.profileId,
+          sceneDropId: interactiveParams?.sceneDropId,
+          uniqueName: interactiveParams?.uniqueName,
+          urlSlug: interactiveParams?.urlSlug,
+          username: interactiveParams?.username,
+          visitorId: interactiveParams?.visitorId,
         }),
         onopen(res) {
           if (res.ok && res.status === 200) {
@@ -138,10 +96,10 @@ const Home = () => {
         },
       });
     };
-    if (hasInteractiveParams) {
+    if (hasInteractiveParams && interactiveParams !== null) {
       fetchData();
     }
-  }, [hasInteractiveParams]);
+  }, [hasInteractiveParams, interactiveParams, dispatch]);
 
   // useEffect(() => {
   //   if (nowPlaying) {
@@ -183,36 +141,6 @@ const Home = () => {
       <Link className="btn btn-enhanced w-full my-2" to={"/search"}>
         Add a Song
       </Link>
-      {/* <h1 className="h2 font-semibold">Server side example using interactive parameters</h1>
-        <div className="max-w-screen-lg">
-          {!hasInteractiveParams ? (
-            <p className="p1 my-4">
-              Edit an asset in your world and open the Links page in the Modify Asset drawer and add a link to your
-              website or use &quot;http://localhost:3000&quot; for testing locally. You can also add assetId,
-              interactiveNonce, interactivePublicKey, urlSlug, and visitorId directly to the URL as search parameters to
-              use this feature.
-            </p>
-          ) : (
-            <p className="p1 my-4">Interactive parameters found, nice work!</p>
-          )}
-        </div>
-        <button className="btn w-fit" onClick={handleGetDroppedAsset}>
-          Get Dropped Asset Details
-        </button>
-        {droppedAsset && (
-          <div className="flex flex-col w-full items-start">
-            <p className="p1 mt-4 mb-2">
-              You have successfully retrieved the dropped asset details for {droppedAsset.assetName}!
-            </p>
-            <img
-              className="w-96 h-96 object-cover rounded-2xl my-4"
-              alt="preview"
-              src={droppedAsset.topLayerURL || droppedAsset.bottomLayerURL}
-            />
-          </div>
-        )} */}
-
-      {/* <Search /> */}
     </>
   );
 };

@@ -10,7 +10,7 @@ interface VideoInfoTileProps {
   thumbnail: string;
   isLoading: boolean;
   showControls?: boolean;
-  playVideo: (videoId: string) => void;
+  playVideo?: (videoId: string) => void;
 }
 
 const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
@@ -56,7 +56,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
           )}
           {!isLoading ? <p className="p1">{videoMetaData}</p> : <Skeleton count={1} width={100}/>}
         </div>
-        {showControls && (
+        {showControls && playVideo && (
           <div className="w-1/2 flex items-center justify-end">
             {/* <button className="btn-icon flex items-center justify-center">
               <i className="icon pause-icon h-4 w-4" />

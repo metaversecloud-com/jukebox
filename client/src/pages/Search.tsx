@@ -2,15 +2,25 @@ import SearchResults from "@/components/SearchResults";
 import Header from "@/components/Header";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
 import { searchCatalog } from "@/context/actions";
-import { RESET_SEARCH_RESULTS, SET_SEARCH_RESULTS, SET_SEARCH_LOADING, GENERATE_SKELETON, SET_NEXT_PAGE_LOADING } from "@/context/types";
+import {
+  RESET_SEARCH_RESULTS,
+  SET_SEARCH_RESULTS,
+  SET_SEARCH_LOADING,
+  GENERATE_SKELETON,
+  SET_NEXT_PAGE_LOADING,
+  InitialState,
+} from "@/context/types";
 import React, { useContext, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { AxiosInstance } from "axios";
 
 const Search = () => {
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useContext(GlobalDispatchContext);
-  const { nextPageToken, searchLoading, nextPageLoading, searchStatus } = useContext(GlobalStateContext);
+  const { nextPageToken, searchLoading, nextPageLoading, searchStatus, backendAPI } = useContext(
+    GlobalStateContext,
+  ) as InitialState;
 
   const currentPath = location.pathname;
 
@@ -21,14 +31,18 @@ const Search = () => {
     dispatch!({ type: GENERATE_SKELETON });
 
     dispatch!({ type: SET_SEARCH_LOADING, payload: { searchLoading: true } });
-    const { searchResults, newNextPageToken } = await searchCatalog(searchTerm, "");
+    const { searchResults, newNextPageToken } = await searchCatalog(backendAPI as AxiosInstance, searchTerm, "");
     dispatch!({ type: SET_SEARCH_RESULTS, payload: { searchResults, newNextPageToken } });
   };
 
   const fetchNextPage = async () => {
     if (searchLoading || searchTerm == "" || nextPageLoading || nextPageToken === null) return;
     dispatch!({ type: SET_NEXT_PAGE_LOADING, payload: { nextPageLoading: true } });
-    const { searchResults, newNextPageToken } = await searchCatalog(searchTerm, nextPageToken);
+    const { searchResults, newNextPageToken } = await searchCatalog(
+      backendAPI as AxiosInstance,
+      searchTerm,
+      nextPageToken,
+    );
     dispatch!({ type: SET_SEARCH_RESULTS, payload: { searchResults, newNextPageToken } });
   };
 
