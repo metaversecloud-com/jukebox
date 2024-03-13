@@ -8,6 +8,7 @@ import {
   SET_CATALOG_LOADING,
   SET_CURRENT_MEDIA,
   SET_INTERACTIVE_PARAMS,
+  SET_NEXT_PAGE_LOADING,
   SET_SEARCH_LOADING,
   SET_SEARCH_RESULTS,
   SET_SEARCH_STATUS,
@@ -45,6 +46,11 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         catalogLoading: false,
         catalogStatus: "SUCCESS",
       };
+    case SET_NEXT_PAGE_LOADING:
+      return {
+        ...state,
+        nextPageLoading: payload.nextPageLoading,
+      };
     case SET_SEARCH_RESULTS:
       let searchResults = state.searchResults;
       if (state.searchResults[0].id.videoId === "") {
@@ -54,6 +60,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         searchResults: [...searchResults, ...payload.searchResults],
         searchLoading: false,
+        nextPageLoading: false,
         searchStatus: "SUCCESS",
         nextPageToken: payload.newNextPageToken,
       };

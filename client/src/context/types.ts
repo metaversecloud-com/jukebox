@@ -8,6 +8,7 @@ export const SET_CATALOG_LOADING = "SET_CATALOG_LOADING";
 export const SET_CATALOG_STATUS = "SET_CATALOG_STATUS";
 export const GENERATE_SKELETON = "GENERATE_SKELETON";
 export const SET_CURRENT_MEDIA = "SET_CURRENT_MEDIA";
+export const SET_NEXT_PAGE_LOADING = "SET_NEXT_PAGE_LOADING";
 
 export type InteractiveParams = {
   assetId: string | null;
@@ -32,6 +33,7 @@ export interface InitialState {
   catalogLoading: boolean;
   catalogStatus: string;
   nextPageToken: string;
+  nextPageLoading: boolean;
   hasInteractiveParams: boolean;
   selectedWorld: { [key: string]: any };
   urlSlug: string;

@@ -21,7 +21,7 @@ export async function nextSong(req, res) {
         },
       },
     );
-
+    console.log("UPDATE IN PROGRESS");
     const videoId = media[newPlayIndex].id.videoId;
     const videoTitle = media[newPlayIndex].snippet.title;
 

@@ -2,7 +2,7 @@ import SearchResults from "@/components/SearchResults";
 import Header from "@/components/Header";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
 import { searchCatalog } from "@/context/actions";
-import { RESET_SEARCH_RESULTS, SET_SEARCH_RESULTS, SET_SEARCH_LOADING, GENERATE_SKELETON } from "@/context/types";
+import { RESET_SEARCH_RESULTS, SET_SEARCH_RESULTS, SET_SEARCH_LOADING, GENERATE_SKELETON, SET_NEXT_PAGE_LOADING } from "@/context/types";
 import React, { useContext, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -10,7 +10,7 @@ const Search = () => {
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useContext(GlobalDispatchContext);
-  const { nextPageToken, searchLoading, searchStatus } = useContext(GlobalStateContext);
+  const { nextPageToken, searchLoading, nextPageLoading, searchStatus } = useContext(GlobalStateContext);
 
   const currentPath = location.pathname;
 
@@ -26,8 +26,8 @@ const Search = () => {
   };
 
   const fetchNextPage = async () => {
-    if (searchLoading || searchTerm == "") return;
-    // dispatch!({ type: SET_SEARCH_LOADING, payload: { searchLoading: true } });
+    if (searchLoading || searchTerm == "" || nextPageLoading || nextPageToken === null) return;
+    dispatch!({ type: SET_NEXT_PAGE_LOADING, payload: { nextPageLoading: true } });
     const { searchResults, newNextPageToken } = await searchCatalog(searchTerm, nextPageToken);
     dispatch!({ type: SET_SEARCH_RESULTS, payload: { searchResults, newNextPageToken } });
   };

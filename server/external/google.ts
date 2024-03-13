@@ -2,6 +2,7 @@
 import { google } from "googleapis";
 import { getDroppedAsset } from "../utils";
 import { YTDurationToMilliseconds } from "../utils/youtube";
+import { sleep } from "../utils/dev";
 
 // No idea why this is causing problems with concurrently running dev servers
 const yt = google.youtube({
@@ -11,12 +12,11 @@ const yt = google.youtube({
 
 export async function searchVideos(req, res) {
   try {
+
     // Create a YouTube service object
     const { q, nextPageToken } = req.body;
-    
-    // function sleep(ms) {
-    //   return new Promise(resolve => setTimeout(resolve, ms));
-    // }
+
+
     // await sleep(5000);
 
     // Define search parameters
@@ -36,7 +36,7 @@ export async function searchVideos(req, res) {
 
     // Process the search results
     const videos = response.data.items;
-    const newNextPageToken = response.data.nextPageToken;
+    const newNextPageToken = response.data.nextPageToken ? response.data.nextPageToken : null;
     const videosWithDuration = await getVideoDuration(videos);
     console.log("Found videos:");
     videos.forEach((video) => {

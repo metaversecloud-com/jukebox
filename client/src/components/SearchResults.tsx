@@ -10,6 +10,7 @@ const SearchResults = ({ loadNextSet }) => {
   const {
     searchResults,
     searchLoading,
+    nextPageToken
     // assetId,
     // displayName,
     // interactiveNonce,
@@ -32,7 +33,7 @@ const SearchResults = ({ loadNextSet }) => {
     <InfiniteScroll
       loadMore={loadNextSet}
       initialLoad={false}
-      hasMore={searchResults.length > 0}
+      hasMore={searchResults.length > 0 && searchResults[0].id.videoId !== "" && nextPageToken !== null}
       loader={
         <div className="flex items-center justify-center w-full my-2">
           {/* <div className="relative w-10 h-10">
@@ -82,16 +83,18 @@ const SearchResults = ({ loadNextSet }) => {
       }
     >
       {searchResults.map((video: Video, i: number) => (
-        <VideoInfoTile
-          key={`${video.id.videoId}${i}`}
-          isLoading={searchLoading}
-          videoId={video.id.videoId}
-          videoName={video.snippet.title}
-          videoMetaData={convertMillisToMinutes(video.duration)}
-          thumbnail={video.snippet.thumbnails.high.url}
-          showControls={!searchLoading}
-          playVideo={handlePlayVideo}
-        />
+        <div key={i} className="my-4">
+          <VideoInfoTile
+            key={`${video.id.videoId}${i}`}
+            isLoading={searchLoading}
+            videoId={video.id.videoId}
+            videoName={video.snippet.title}
+            videoMetaData={convertMillisToMinutes(video.duration)}
+            thumbnail={video.snippet.thumbnails.high.url}
+            showControls={!searchLoading}
+            playVideo={handlePlayVideo}
+          />
+        </div>
       ))}
     </InfiniteScroll>
   );

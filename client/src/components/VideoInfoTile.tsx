@@ -24,7 +24,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
 }) => {
   const [playMarquee, setPlayMarquee] = useState(true);
   return (
-    <div className="flex flex-row w-full my-2">
+    <div className="flex flex-row w-full">
       {!isLoading ? (
         <div className="rounded-xl h-fit p-0">
           <img src={thumbnail} alt={videoName} className="aspect-square min-w-16 max-w-16 object-cover rounded-xl" />

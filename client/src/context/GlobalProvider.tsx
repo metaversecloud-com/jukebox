@@ -11,6 +11,7 @@ const initialState: InitialState = {
   searchResults: [],
   nextPageToken: "",
   searchLoading: false,
+  nextPageLoading: false,
   searchStatus: "",
   catalogLoading: false,
   catalogStatus: "",

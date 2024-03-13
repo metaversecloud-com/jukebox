@@ -63,7 +63,7 @@ const Home = () => {
       dispatch!({ type: SET_CATALOG, payload: { catalog: media, currentPlayIndex } });
     }
 
-    if (hasInteractiveParams) {
+    if (hasInteractiveParams && !catalogLoading && catalog[0].id.videoId === "") {
       loadCatalog();
     }
   }, [hasInteractiveParams, dispatch]);
@@ -121,10 +121,10 @@ const Home = () => {
           }
         },
         onmessage(event) {
-          console.log("EVENT", event.data);
+          // console.log("EVENT", event.data);
           const nowPlaying = JSON.parse(event.data);
           dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying } });
-          console.log("NOW PLAYING", nowPlaying);
+          // console.log("NOW PLAYING", nowPlaying);
           setCurrentVideo(nowPlaying);
 
           // const parsedData = JSON.parse(event.data);
