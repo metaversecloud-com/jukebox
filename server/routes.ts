@@ -10,9 +10,10 @@ import {
   handleRemoveDroppedAssets,
 } from "./controllers/index.ts"
 import { getVersion } from "./utils/getVersion.ts"
-import { playVideo, searchVideos } from "./external/google.ts";
 import getCatalog from "./controllers/getCatalog.ts";
 import sendNextSongInfo from "./controllers/media/sendNextSongInfo.ts";
+import SearchVideos from "./controllers/media/SearchVideos.ts";
+import PlayVideo from "./controllers/media/PlayVideo.ts";
 
 const router = express.Router();
 
@@ -42,8 +43,8 @@ router.get("/world", handleGetWorldDetails);
 router.put("/world/data-object", handleUpdateWorldDataObject);
 
 // YouTube
-router.post("/search", searchVideos);
-router.post("/play", playVideo);
+router.post("/search", SearchVideos);
+router.post("/play", PlayVideo);
 
 router.get('/catalog', getCatalog)
 

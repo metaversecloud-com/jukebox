@@ -1,4 +1,5 @@
 import { AxiosInstance } from "axios";
+import { Video } from "./types";
 
 const searchCatalog = async (backendAPI: AxiosInstance, searchTerm: string, nextPageToken: string) => {
   try {
@@ -18,9 +19,9 @@ const fetchCatalog = async (backendAPI: AxiosInstance) => {
   }
 };
 
-const playVideo = async (backendAPI: AxiosInstance, videoId: string) => {
+const playVideo = async (backendAPI: AxiosInstance, video: Video) => {
   try {
-    const result = await backendAPI.post("/play", { videoId });
+    const result = await backendAPI.post("/play", { video });
     return result.data;
   } catch (error) {
     console.error(error);

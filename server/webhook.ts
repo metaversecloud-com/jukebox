@@ -1,8 +1,8 @@
 import express from "express";
 import { getDroppedAsset } from "./utils";
-import { nextSong } from "./controllers/media";
+import NextSong from "./controllers/media/NextSong";
 const webhookRouter = express.Router();
 
-webhookRouter.post("/next", nextSong);
+webhookRouter.post("/next", NextSong);
 
 export default webhookRouter;

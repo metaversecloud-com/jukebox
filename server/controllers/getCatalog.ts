@@ -13,7 +13,7 @@ const getCatalog = async (req, res) => {
     //   };
     // });
     if (droppedAsset) {
-      res.json(droppedAsset.dataObject);
+      res.status(200).json(droppedAsset.dataObject);
     }
   } catch (err) {
     console.log(err);

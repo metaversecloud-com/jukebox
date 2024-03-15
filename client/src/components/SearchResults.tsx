@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import VideoInfoTile from "./VideoInfoTile";
-import { GlobalStateContext } from "@/context/GlobalContext";
-import { InitialState, Video } from "@/context/types";
+import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
+import { InitialState, SET_CURRENT_MEDIA, Video } from "@/context/types";
 import InfiniteScroll from "react-infinite-scroller";
 import { playVideo } from "@/context/actions";
 import { convertMillisToMinutes } from "@/utils/duration";
@@ -12,15 +12,16 @@ interface SearchResultsProps {
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
-  const {
-    searchResults,
-    searchLoading,
-    nextPageToken,
-    backendAPI
-  } = useContext(GlobalStateContext) as InitialState;
+  const { searchResults, searchLoading, nextPageToken, backendAPI } = useContext(GlobalStateContext) as InitialState;
+  
+  const dispatch = useContext(GlobalDispatchContext);
 
   const handlePlayVideo = async (videoId: string) => {
-    await playVideo(backendAPI as AxiosInstance, videoId);
+    const video = searchResults.find((video) => video.id.videoId === videoId) as Video;
+    const res = await playVideo(backendAPI as AxiosInstance, video);
+    if (res) {
+      dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: video } });
+    }
   };
 
   return (
@@ -55,13 +56,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
       }
     >
       {searchResults.map((video: Video, i: number) => (
-        <div key={i} className="my-4">
+        <div key={`result-${video.id.videoId}-${i}`} className="my-4">
           <VideoInfoTile
-            key={`${video.id.videoId}${i}`}
+            key={`${video.id.videoId}-${i}`}
             isLoading={searchLoading}
             videoId={video.id.videoId}
             videoName={video.snippet.title}
-            videoMetaData={convertMillisToMinutes(video.duration)}
+            videoDuration={convertMillisToMinutes(video.duration)}
             thumbnail={video.snippet.thumbnails.high.url}
             showControls={!searchLoading}
             playVideo={handlePlayVideo}

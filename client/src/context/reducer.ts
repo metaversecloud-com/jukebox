@@ -13,6 +13,7 @@ import {
   SET_SEARCH_LOADING,
   SET_SEARCH_RESULTS,
   SET_SEARCH_STATUS,
+  UPDATE_PLAY_INDEX
 } from "./types";
 
 const globalReducer = (state: InitialState, action: ActionType) => {
@@ -44,6 +45,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         catalog: payload.catalog,
         currentPlayIndex: payload.currentPlayIndex,
+        nowPlaying: payload.nowPlaying,
         catalogLoading: false,
         catalogStatus: "SUCCESS",
       };
@@ -85,6 +87,12 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         searchResults: [],
         nextPageToken: "",
+      };
+    case UPDATE_PLAY_INDEX: 
+      return {
+        ...state,
+        currentPlayIndex: payload.currentPlayIndex,
+        nowPlaying: state.catalog[payload.currentPlayIndex],
       };
     default: {
       throw new Error(`Unhandled action type: ${type}`);

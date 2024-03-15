@@ -12,6 +12,7 @@ export const GENERATE_SKELETON = "GENERATE_SKELETON";
 export const SET_CURRENT_MEDIA = "SET_CURRENT_MEDIA";
 export const SET_NEXT_PAGE_LOADING = "SET_NEXT_PAGE_LOADING";
 export const SET_BACKEND_API = "SET_BACKEND_API";
+export const UPDATE_PLAY_INDEX = "UPDATE_PLAY_INDEX";
 
 export type InteractiveParams = {
   assetId: string | null;

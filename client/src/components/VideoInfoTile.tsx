@@ -6,7 +6,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 interface VideoInfoTileProps {
   videoId: string;
   videoName: string;
-  videoMetaData: string;
+  videoDuration: string;
   thumbnail: string;
   isLoading: boolean;
   showControls?: boolean;
@@ -16,7 +16,7 @@ interface VideoInfoTileProps {
 const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
   videoId,
   videoName,
-  videoMetaData,
+  videoDuration,
   thumbnail,
   showControls,
   isLoading,
@@ -54,7 +54,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
           ) : (
             <Skeleton width={200} className="self-start" />
           )}
-          {!isLoading ? <p className="p1">{videoMetaData}</p> : <Skeleton count={1} width={100}/>}
+          {!isLoading ? <p className="p1">{videoDuration}</p> : <Skeleton count={1} width={100} />}
         </div>
         {showControls && playVideo && (
           <div className="w-1/2 flex items-center justify-end">
