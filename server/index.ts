@@ -8,12 +8,10 @@ import { cleanReturnPayload } from "./utils/cleanReturnPayload.ts";
 import { fileURLToPath } from "url";
 import webhookRouter from "./webhook.ts";
 
-import EventEmitter from 'events'
 
 // import youtubeRouter from "./youtubeRoutes.ts";
 dotenv.config({ path: "../.env"});
 
-export const eventEmitter = new EventEmitter()
 
 function checkEnvVariables() {
   const requiredEnvVariables = ["INTERACTIVE_KEY", "INTERACTIVE_SECRET"];

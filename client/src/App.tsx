@@ -2,7 +2,7 @@ import { Route, Routes, useSearchParams } from "react-router-dom";
 
 import Home from "@pages/Home";
 import Error from "@pages/Error";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { GlobalDispatchContext, GlobalStateContext } from "./context/GlobalContext";
 import { setupBackendAPI } from "./utils/backendAPI";
 import {
@@ -23,6 +23,8 @@ const App = () => {
   const [connectionEstablished, setConnectionEstablished] = useState(false);
 
   const dispatch = useContext(GlobalDispatchContext);
+  // const abortController = useRef(new AbortController());
+  // const [lastHeartbeatTime, setLastHeartbeatTime] = useState(Date.now());
 
   const interactiveParams = useMemo(() => {
     const assetId = searchParams.get("assetId");
@@ -35,6 +37,7 @@ const App = () => {
     const urlSlug = searchParams.get("urlSlug") as string;
     const username = searchParams.get("username") as string;
     const visitorId = searchParams.get("visitorId");
+
 
     const isInteractiveIframe =
       visitorId !== null && interactiveNonce !== null && interactivePublicKey !== null && assetId !== null;
@@ -103,73 +106,91 @@ const App = () => {
     }
   }, [backendAPI, interactiveParams, dispatch]);
 
+  const fetchData = useCallback(async () => {
+    await fetchEventSource(`${import.meta.env.VITE_API_URL}/api/sse`, {
+      method: "POST",
+      headers: {
+        "Accept": "text/event-stream",
+        "Content-Type": "application/json",
+      },
+      // signal: abortController.current.signal,
+      body: JSON.stringify({
+        assetId: interactiveParams?.assetId,
+        displayName: interactiveParams?.displayName,
+        interactiveNonce: interactiveParams?.interactiveNonce,
+        interactivePublicKey: interactiveParams?.interactivePublicKey,
+        isInteractiveIframe: interactiveParams?.isInteractiveIframe,
+        profileId: interactiveParams?.profileId,
+        sceneDropId: interactiveParams?.sceneDropId,
+        uniqueName: interactiveParams?.uniqueName,
+        urlSlug: interactiveParams?.urlSlug,
+        username: interactiveParams?.username,
+        visitorId: interactiveParams?.visitorId,
+      }),
+      // onopen(response) {
+      //   console.log("Connection opened");
+      //   if (response.ok && response.status === 200) {
+      //     console.log("Connection made ", response);
+      //   } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+      //     console.log("Client side error ", response);
+      //   }
+      // },
+      onmessage(event) {
+        // console.log("EVENT", event.data);
+        const nowPlaying = JSON.parse(event.data);
+        console.log("RECEIVED EVENT", nowPlaying);
+        if (nowPlaying.currentPlayIndex !== undefined) {
+          console.log("NEXT SONG WEBHOOK");
+          // const newMedia = catalog[nowPlaying.currentPlayIndex];
+          dispatch!({ type: UPDATE_PLAY_INDEX, payload: { currentPlayIndex: nowPlaying.currentPlayIndex } });
+          // dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: newMedia } });
+        } else {
+          console.log("MANUAL NEW SONG");
+          dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying } });
+        }
+      },
+      // onclose() {
+      //   console.log("Connection closed by the server");
+      // },
+      // onerror(err) {
+      //   console.log("There was an error from server", err);
+      // },
+    });
+  }, [interactiveParams, dispatch]);
+
   useEffect(() => {
-    const controller = new AbortController();
-    const fetchData = async () => {
-      await fetchEventSource(`${import.meta.env.VITE_API_URL}/api/sse`, {
-        method: "POST",
-        headers: {
-          "Accept": "text/event-stream",
-          "Content-Type": "application/json",
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          assetId: interactiveParams?.assetId,
-          displayName: interactiveParams?.displayName,
-          interactiveNonce: interactiveParams?.interactiveNonce,
-          interactivePublicKey: interactiveParams?.interactivePublicKey,
-          isInteractiveIframe: interactiveParams?.isInteractiveIframe,
-          profileId: interactiveParams?.profileId,
-          sceneDropId: interactiveParams?.sceneDropId,
-          uniqueName: interactiveParams?.uniqueName,
-          urlSlug: interactiveParams?.urlSlug,
-          username: interactiveParams?.username,
-          visitorId: interactiveParams?.visitorId,
-        }),
-        onopen(res) {
-          if (res.ok && res.status === 200) {
-            console.log("Connection made ", res);
-          } else if (res.status >= 400 && res.status < 500 && res.status !== 429) {
-            console.log("Client side error ", res);
-          }
-        },
-        onmessage(event) {
-          // console.log("EVENT", event.data);
-          const nowPlaying = JSON.parse(event.data);
-          console.log("RECEIVED EVENT", nowPlaying);
-          if (nowPlaying.currentPlayIndex !== undefined) {
-            console.log("NEXT SONG WEBHOOK");
-            // const newMedia = catalog[nowPlaying.currentPlayIndex];
-            dispatch!({ type: UPDATE_PLAY_INDEX, payload: { currentPlayIndex: nowPlaying.currentPlayIndex } });
-            // dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: newMedia } });
-          } else {
-            console.log("MANUAL NEW SONG");
-            dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying } });
-          }
-        },
-        onclose() {
-          console.log("Connection closed by the server");
-        },
-        onerror(err) {
-          console.log("There was an error from server", err);
-        },
-      });
-    };
+    // const controller = new AbortController();
 
-    if (hasInteractiveParams && interactiveParams !== null && !connectionEstablished) {
+    if (hasInteractiveParams && !connectionEstablished) {
       console.log("Establishing connection...");
-      setConnectionEstablished(true);
       fetchData();
+      setConnectionEstablished(true);
     }
+  }, [hasInteractiveParams, interactiveParams, connectionEstablished, fetchData, dispatch]);
 
-    return () => {
-      console.log("Bye Bye");
-      if (connectionEstablished) {
-        console.log("Aborting...");
-        controller.abort();
+  // useEffect(() => {
+  //   let controller = abortController.current;
+  //   return () => {
+  //       console.log("Aborting...");
+  //       controller.abort();
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    const sendHeartbeat = async () => {
+      try {
+        if (backendAPI) {
+          await backendAPI.post("/heartbeat", {});
+          // setLastHeartbeatTime(Date.now());
+        }
+      } catch (error) {
+        console.error("Error sending heartbeat:", error);
       }
     };
-  }, [hasInteractiveParams, interactiveParams, connectionEstablished, dispatch]);
+
+    const intervalId = setInterval(sendHeartbeat, 1000 * 60 * 5);
+    return () => clearInterval(intervalId);
+  }, [backendAPI]);
 
   return (
     <div className="flex flex-col p-6 items-center justify-center w-full">

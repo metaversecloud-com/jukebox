@@ -1,7 +1,19 @@
-import { eventEmitter } from "../..";
+import emitterObj from "../../emitter";
+
+// let connectedClients = [];
+
+// const sendDisconnectMessage = (res) => {
+//   console.log("SENDING DISCONNECT MESSAGE", res.body);
+//   res.write(`data: Disconnected from server\n\n`);
+//   res.writeHead(200, { "Content-Type": "text/plain" });
+//   res.end();
+// };
 
 export default async function sendNextSongInfo(req, res) {
-  const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body;
+  console.log("New Connection", res.req.body.interactiveNonce);
+  if (!res.req.body.interactiveNonce) return res.status(400).json({ message: "Invalid" });
+
+  emitterObj.addConn({ res, lastHeartbeatTime: Date.now() });
 
   res.writeHead(200, {
     "Connection": "keep-alive",
@@ -9,20 +21,6 @@ export default async function sendNextSongInfo(req, res) {
     "Cache-Control": "no-cache",
   });
 
-  // req.on("close", () => {
-  //   console.log("CLOSED");
-  //   // res.end();
-  // });
+  emitterObj.listenFunc;
 
-  eventEmitter.on("nowPlaying", (data) => {
-    if (
-      data.assetId === assetId &&
-      (data.vistorId === undefined || data.visitorId !== visitorId) &&
-      (data.interactiveNonce === undefined || data.interactiveNonce !== interactiveNonce)
-    ) {
-      const dataToSend = data.interactiveNonce === undefined ? { currentPlayIndex: data.currentPlayIndex } : data.video;
-      console.log("SEND", interactiveNonce)
-      res.write(`retry: 5000\ndata: ${JSON.stringify(dataToSend)}\n\n`);
-    }
-  });
 }

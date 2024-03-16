@@ -1,4 +1,4 @@
-import { eventEmitter } from "../..";
+import emitterObj from "../../emitter";
 import { getDroppedAsset } from "../../utils";
 
 export default async function PlayVideo(req, res) {
@@ -36,7 +36,7 @@ export default async function PlayVideo(req, res) {
         syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
       });
 
-      eventEmitter.emit("nowPlaying", { video, assetId: jukeboxAsset.id, interactiveNonce, visitorId });
+      emitterObj.emitFunc("nowPlaying", { video, assetId: jukeboxAsset.id, interactiveNonce, visitorId });
 
       return res.status(200).json({ videoId: video.id.videoId });
     } catch (e) {

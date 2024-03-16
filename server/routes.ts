@@ -14,6 +14,7 @@ import getCatalog from "./controllers/getCatalog.ts";
 import sendNextSongInfo from "./controllers/media/sendNextSongInfo.ts";
 import SearchVideos from "./controllers/media/SearchVideos.ts";
 import PlayVideo from "./controllers/media/PlayVideo.ts";
+import setHeartbeat from "./controllers/setHeartbeat.ts";
 
 const router = express.Router();
 
@@ -49,4 +50,6 @@ router.post("/play", PlayVideo);
 router.get('/catalog', getCatalog)
 
 router.post("/sse", sendNextSongInfo);
+
+router.post("/heartbeat", setHeartbeat);
 export default router;
