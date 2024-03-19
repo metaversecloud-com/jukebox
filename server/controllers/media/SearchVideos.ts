@@ -1,4 +1,5 @@
 import yt from "../../external/google";
+import { getVisitor } from "../../utils";
 import { YTDurationToMilliseconds } from "../../utils/youtube";
 
 async function getVideoDuration(videos) {
@@ -14,11 +15,15 @@ async function getVideoDuration(videos) {
 }
 
 export default async function SearchVideos(req, res) {
-  try {
+  const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
 
+  // const visitor = await getVisitor({ interactivePublicKey, interactiveNonce, urlSlug, visitorId });
+  // if (!visitor || !visitor.isAdmin) {
+  //   return res.status(401).json({ message: "Unauthorized" });
+  // }
+  try {
     // Create a YouTube service object
     const { q, nextPageToken } = req.body;
-
 
     // await sleep(5000);
 
@@ -45,6 +50,6 @@ export default async function SearchVideos(req, res) {
     return res.status(200).json({ searchResults: videosWithDuration, newNextPageToken });
   } catch (error) {
     console.error("Error:", error);
-    return res.status(500).json({ message: "Something went wrong"});
+    return res.status(500).json({ message: "Something went wrong" });
   }
 }

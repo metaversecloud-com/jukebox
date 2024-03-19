@@ -1,5 +1,9 @@
 import EventEmitter from "events";
 
+const shouldSend = (data, assetId, visitorId) => {
+  return data.assetId === assetId && (data.visitorId === undefined || data.visitorId !== visitorId);
+};
+
 const emitterObj = {
   emitter: new EventEmitter(),
   connections: [],
@@ -33,23 +37,34 @@ const emitterObj = {
   },
   deleteConn: function () {
     // Remove inactive connections older than 1 hour
+    console.log("Removing Inactive", this.connections.length);
     this.connections = this.connections.filter(
       ({ lastHeartbeatTime }) => lastHeartbeatTime > Date.now() - 30 * 60 * 1000,
     );
+    console.log("Done", this.connections.length);
   },
 };
 
-emitterObj.listenFunc = emitterObj.emitter.on("nowPlaying", (data) => {
+emitterObj.listenNowPlaying = emitterObj.emitter.on("nowPlaying", (data) => {
   emitterObj.connections.forEach(({ res: existingConnection }) => {
-    const { assetId, visitorId, interactiveNonce } = existingConnection.req.body;
-    if (
-      data.assetId === assetId &&
-      (data.vistorId === undefined || data.visitorId !== visitorId) &&
-      (data.interactiveNonce === undefined || data.interactiveNonce !== interactiveNonce)
-    ) {
-      const dataToSend = data.interactiveNonce === undefined ? { currentPlayIndex: data.currentPlayIndex } : data.video;
-      console.log("SEND", interactiveNonce);
+    const { assetId, visitorId } = existingConnection.req.body;
+    if (shouldSend(data, assetId, visitorId)) {
+      const dataToSend = !data.visitorId
+        ? { data: { currentPlayIndex: data.currentPlayIndex } }
+        : { data: { video: data.video } };
+      dataToSend.kind = "nowPlaying";
       existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataToSend)}\n\n`);
+    }
+  });
+});
+
+emitterObj.listenQueue = emitterObj.emitter.on("addedToQueue", (data) => {
+  emitterObj.connections.forEach(({ res: existingConnection }) => {
+    const { assetId, visitorId } = existingConnection.req.body;
+    if (shouldSend(data, assetId, visitorId)) {
+      const dataWithKind = { videos: data.videos, kind: "addedToQueue" };
+      // console.log("SENDING QUEUE EVENT", dataWithKind);
+      existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataWithKind)}\n\n`);
     }
   });
 });

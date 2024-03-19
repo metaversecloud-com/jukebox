@@ -16,14 +16,14 @@ import { AxiosInstance } from "axios";
 
 const Search = () => {
   const location = useLocation();
-  const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useContext(GlobalDispatchContext);
-  const { nextPageToken, searchLoading, nextPageLoading, searchStatus, backendAPI } = useContext(
+  const { searchTermGlobal, nextPageToken, searchLoading, nextPageLoading, searchStatus, backendAPI } = useContext(
     GlobalStateContext,
   ) as InitialState;
 
   const currentPath = location.pathname;
 
+  const [searchTerm, setSearchTerm] = useState(searchTermGlobal);
   const searchVideo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchLoading || searchTerm == "") return;
@@ -32,7 +32,7 @@ const Search = () => {
 
     dispatch!({ type: SET_SEARCH_LOADING, payload: { searchLoading: true } });
     const { searchResults, newNextPageToken } = await searchCatalog(backendAPI as AxiosInstance, searchTerm, "");
-    dispatch!({ type: SET_SEARCH_RESULTS, payload: { searchResults, newNextPageToken } });
+    dispatch!({ type: SET_SEARCH_RESULTS, payload: { searchResults, newNextPageToken, searchTermGlobal: searchTerm } });
   };
 
   const fetchNextPage = async () => {

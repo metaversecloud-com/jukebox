@@ -1,11 +1,12 @@
 import emitterObj from "../../emitter";
-import { getDroppedAsset } from "../../utils";
+import { getDroppedAsset, getVisitor } from "../../utils";
 import he from "he";
 
 export default async function PlayVideo(req, res) {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
     const { video, fromTrack } = req.body;
+
     const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
     const jukeboxAsset = await getDroppedAsset(credentials);
 
@@ -38,7 +39,7 @@ export default async function PlayVideo(req, res) {
         syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
       });
 
-      emitterObj.emitFunc("nowPlaying", { video, assetId: jukeboxAsset.id, interactiveNonce, visitorId });
+      emitterObj.emitFunc("nowPlaying", { video, assetId: jukeboxAsset.id, interactiveNonce, visitorId, urlSlug });
 
       return res.status(200).json({ videoId: video.id.videoId });
     } catch (e) {

@@ -4,22 +4,34 @@ import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalConte
 import { fetchCatalog, playVideo } from "@/context/actions";
 import { InitialState, SET_CATALOG, SET_CATALOG_LOADING, SET_CURRENT_MEDIA, Video } from "@/context/types";
 import { convertMillisToMinutes } from "@/utils/duration";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AxiosInstance } from "axios";
+import CircularLoader from "@/components/CircularLoader";
 
 const Home = () => {
-  const { hasInteractiveParams, catalog, catalogLoading, nowPlaying, backendAPI, currentPlayIndex, fromTrack } =
-    useContext(GlobalStateContext) as InitialState;
+  const {
+    hasInteractiveParams,
+    catalog,
+    catalogLoading,
+    nowPlaying,
+    backendAPI,
+    currentPlayIndex,
+    fromTrack,
+    isAdmin,
+  } = useContext(GlobalStateContext) as InitialState;
 
+  const [playLoading, setPlayLoading] = useState(false);
   const dispatch = useContext(GlobalDispatchContext);
 
   const handlePlayVideo = async (videoId: string) => {
+    setPlayLoading(true);
     const video = catalog.find((video) => video.id.videoId === videoId) as Video;
     const res = await playVideo(backendAPI as AxiosInstance, video, true);
     if (res) {
       dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: video } });
     }
+    setPlayLoading(false);
   };
 
   useEffect(() => {
@@ -34,13 +46,27 @@ const Home = () => {
       });
     }
 
-    if (hasInteractiveParams && !catalogLoading && catalog[0].id.videoId === "" && backendAPI !== null) {
+    if (
+      hasInteractiveParams &&
+      !catalogLoading &&
+      catalog.length > 0 &&
+      catalog[0].id.videoId === "" &&
+      backendAPI !== null
+    ) {
       loadCatalog();
     }
   }, [hasInteractiveParams, dispatch, catalogLoading, catalog, backendAPI]);
 
   return (
     <>
+      {playLoading && (
+        <>
+          <div className="backdrop-brightness-90 blur-sm fixed top-0 z-10 w-full h-full"></div>
+          <div className="fixed top-0 z-10 flex w-full h-full justify-center items-center select-none">
+            <CircularLoader />
+          </div>
+        </>
+      )}
       <Header />
       <div className="flex flex-col w-full justify-start">
         {nowPlaying && (
@@ -78,10 +104,10 @@ const Home = () => {
                 videoDuration={convertMillisToMinutes(video.duration)}
                 thumbnail={video.snippet.thumbnails.high.url}
                 showControls={
-                  !catalogLoading
+                  !catalogLoading && isAdmin
                     ? {
                         play: true,
-                        add: false,
+                        plusminus: false,
                       }
                     : false
                 }
@@ -91,9 +117,11 @@ const Home = () => {
           ));
         })()}
       </div>
-      <Link className="btn btn-enhanced w-full my-2" to={"/search"}>
-        Add a Song
-      </Link>
+      {isAdmin && (
+        <Link className="btn btn-enhanced w-full my-2" to={"/search"}>
+          Add a Song
+        </Link>
+      )}
     </>
   );
 };

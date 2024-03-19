@@ -13,6 +13,8 @@ export const SET_CURRENT_MEDIA = "SET_CURRENT_MEDIA";
 export const SET_NEXT_PAGE_LOADING = "SET_NEXT_PAGE_LOADING";
 export const SET_BACKEND_API = "SET_BACKEND_API";
 export const UPDATE_PLAY_INDEX = "UPDATE_PLAY_INDEX";
+export const SET_IS_ADMIN = "SET_IS_ADMIN";
+export const ADD_TO_QUEUE = "ADD_TO_QUEUE";
 
 export type InteractiveParams = {
   assetId: string | null;
@@ -31,6 +33,7 @@ export type InteractiveParams = {
 export interface InitialState {
   backendAPI: AxiosInstance | null;
   catalog: Video[];
+  isAdmin: boolean;
   nowPlaying: Video;
   currentPlayIndex: number;
   fromTrack: boolean;
@@ -44,6 +47,7 @@ export interface InitialState {
   hasInteractiveParams: boolean;
   interactiveParams: InteractiveParams | null;
   selectedWorld: { [key: string]: any };
+  searchTermGlobal: string;
 }
 
 export type ActionType = {

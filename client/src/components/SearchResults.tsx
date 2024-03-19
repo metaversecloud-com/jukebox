@@ -1,18 +1,23 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import VideoInfoTile from "./VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
-import { InitialState, SET_CURRENT_MEDIA, Video } from "@/context/types";
+import { ADD_TO_QUEUE, InitialState, SET_CURRENT_MEDIA, Video } from "@/context/types";
 import InfiniteScroll from "react-infinite-scroller";
-import { playVideo } from "@/context/actions";
+import { addToQueue, playVideo } from "@/context/actions";
 import { convertMillisToMinutes } from "@/utils/duration";
 import { AxiosInstance } from "axios";
+import CircularLoader from "./CircularLoader";
 
 interface SearchResultsProps {
   loadNextSet: () => void;
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
-  const { searchResults, searchLoading, nextPageToken, backendAPI } = useContext(GlobalStateContext) as InitialState;
+  const { searchResults, searchLoading, nextPageToken, backendAPI, isAdmin } = useContext(
+    GlobalStateContext,
+  ) as InitialState;
+  const [selectedVideos, setSelectedVideos] = useState([]);
+  const [addLoading, setAddLoading] = useState(false);
 
   const dispatch = useContext(GlobalDispatchContext);
 
@@ -24,59 +29,66 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
     }
   };
 
+  const handleAddToQueue = async () => {
+    setAddLoading(true);
+    const toAdd = searchResults.filter((video) => selectedVideos.includes(video.id.videoId));
+    const res = await addToQueue(backendAPI as AxiosInstance, toAdd);
+    if (res) {
+      setSelectedVideos([]);
+      dispatch!({ type: ADD_TO_QUEUE, payload: { videos: toAdd } });
+    }
+    setAddLoading(false);
+  };
+
   return (
-    <InfiniteScroll
-      loadMore={loadNextSet}
-      initialLoad={false}
-      hasMore={searchResults.length > 0 && searchResults[0].id.videoId !== "" && nextPageToken !== null}
-      loader={
-        <div className="flex items-center justify-center w-full my-2">
-          <div className="text-center">
-            <div role="status">
-              <svg
-                aria-hidden="true"
-                className={`fill-[#3b5166] inline w-8 h-8 text-slate-300 animate-spin`}
-                viewBox="0 0 100 101"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                  fill="currentFill"
-                />
-              </svg>
-              <span className="sr-only">Loading...</span>
-            </div>
+    <div className="w-full h-full">
+      {selectedVideos.length > 0 && (
+        <button
+          disabled={addLoading}
+          onClick={handleAddToQueue}
+          className="fixed right-5 bottom-5 btn btn-enhanced w-fit z-10"
+        >
+          {!addLoading ? `Add (${selectedVideos.length})` : "Adding..."}
+        </button>
+      )}
+      <InfiniteScroll
+        loadMore={loadNextSet}
+        initialLoad={false}
+        hasMore={searchResults.length > 0 && searchResults[0].id.videoId !== "" && nextPageToken !== null}
+        loader={<CircularLoader />}
+      >
+        {searchResults.map((video: Video, i: number) => (
+          <div key={`result-${video.id.videoId}-${i}`} className="my-4">
+            <VideoInfoTile
+              key={`${video.id.videoId}-${i}`}
+              isLoading={searchLoading}
+              videoId={video.id.videoId}
+              videoName={video.snippet.title}
+              videoDuration={convertMillisToMinutes(video.duration)}
+              thumbnail={video.snippet.thumbnails.high.url}
+              showControls={
+                !searchLoading && isAdmin
+                  ? {
+                      play: false,
+                      plusminus:
+                        selectedVideos.length > 0 && selectedVideos.find((v) => v === video.id.videoId)
+                          ? "minus"
+                          : "plus",
+                    }
+                  : false
+              }
+              playVideo={handlePlayVideo}
+              addVideo={(videoId) => {
+                setSelectedVideos([...selectedVideos, videoId]);
+              }}
+              removeVideo={(videoId) => {
+                setSelectedVideos(selectedVideos.filter((v) => v !== videoId));
+              }}
+            />
           </div>
-        </div>
-      }
-    >
-      {searchResults.map((video: Video, i: number) => (
-        <div key={`result-${video.id.videoId}-${i}`} className="my-4">
-          <VideoInfoTile
-            key={`${video.id.videoId}-${i}`}
-            isLoading={searchLoading}
-            videoId={video.id.videoId}
-            videoName={video.snippet.title}
-            videoDuration={convertMillisToMinutes(video.duration)}
-            thumbnail={video.snippet.thumbnails.high.url}
-            showControls={
-              !searchLoading
-                ? {
-                    play: true,
-                    add: true,
-                  }
-                : false
-            }
-            playVideo={handlePlayVideo}
-          />
-        </div>
-      ))}
-    </InfiniteScroll>
+        ))}
+      </InfiniteScroll>
+    </div>
   );
 };
 

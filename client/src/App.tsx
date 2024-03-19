@@ -6,11 +6,13 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "r
 import { GlobalDispatchContext, GlobalStateContext } from "./context/GlobalContext";
 import { setupBackendAPI } from "./utils/backendAPI";
 import {
+  ADD_TO_QUEUE,
   InitialState,
   InteractiveParams,
   SET_BACKEND_API,
   SET_CURRENT_MEDIA,
   SET_INTERACTIVE_PARAMS,
+  SET_IS_ADMIN,
   UPDATE_PLAY_INDEX,
 } from "./context/types";
 import Search from "./pages/Search";
@@ -19,7 +21,7 @@ import { fetchEventSource } from "@microsoft/fetch-event-source";
 const App = () => {
   const [searchParams] = useSearchParams();
 
-  const { backendAPI, hasInteractiveParams, catalog } = useContext(GlobalStateContext) as InitialState;
+  const { backendAPI, hasInteractiveParams, isAdmin } = useContext(GlobalStateContext) as InitialState;
   const [connectionEstablished, setConnectionEstablished] = useState(false);
 
   const dispatch = useContext(GlobalDispatchContext);
@@ -37,7 +39,6 @@ const App = () => {
     const urlSlug = searchParams.get("urlSlug") as string;
     const username = searchParams.get("username") as string;
     const visitorId = searchParams.get("visitorId");
-
 
     const isInteractiveIframe =
       visitorId !== null && interactiveNonce !== null && interactivePublicKey !== null && assetId !== null;
@@ -137,16 +138,29 @@ const App = () => {
       // },
       onmessage(event) {
         // console.log("EVENT", event.data);
-        const nowPlaying = JSON.parse(event.data);
-        console.log("RECEIVED EVENT", nowPlaying);
-        if (nowPlaying.currentPlayIndex !== undefined) {
-          console.log("NEXT SONG WEBHOOK");
-          // const newMedia = catalog[nowPlaying.currentPlayIndex];
-          dispatch!({ type: UPDATE_PLAY_INDEX, payload: { currentPlayIndex: nowPlaying.currentPlayIndex, fromTrack: true } });
-          // dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: newMedia } });
-        } else {
-          console.log("MANUAL NEW SONG");
-          dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying, fromTrack: false } });
+        const sse = JSON.parse(event.data);
+        if (sse.kind === "nowPlaying") {
+          const nowPlaying = sse.data.video;
+          console.log("RECEIVED EVENT", nowPlaying);
+          if (nowPlaying.currentPlayIndex !== undefined) {
+            console.log("NEXT SONG WEBHOOK");
+            // const newMedia = catalog[nowPlaying.currentPlayIndex];
+            dispatch!({
+              type: UPDATE_PLAY_INDEX,
+              payload: { currentPlayIndex: nowPlaying.currentPlayIndex, fromTrack: true },
+            });
+            // dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: newMedia } });
+          } else {
+            console.log("MANUAL NEW SONG");
+            dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying, fromTrack: false } });
+          }
+        } else if (sse.kind === "addedToQueue") {
+          const videos = sse.videos;
+          console.log("ADD TO QUEUE EVENT", sse, videos);
+          dispatch!({
+            type: ADD_TO_QUEUE,
+            payload: { videos },
+          });
         }
       },
       // onclose() {
@@ -168,14 +182,6 @@ const App = () => {
     }
   }, [hasInteractiveParams, interactiveParams, connectionEstablished, fetchData, dispatch]);
 
-  // useEffect(() => {
-  //   let controller = abortController.current;
-  //   return () => {
-  //       console.log("Aborting...");
-  //       controller.abort();
-  //   };
-  // }, []);
-
   useEffect(() => {
     const sendHeartbeat = async () => {
       try {
@@ -188,9 +194,19 @@ const App = () => {
       }
     };
 
+    const getIsAdmin = async () => {
+      if (backendAPI) {
+        const { data } = await backendAPI.get("/is-admin");
+        console.log("IS AMDIN", data.isAdmin);
+        dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: data.isAdmin } });
+      }
+    };
+
+    getIsAdmin();
+
     const intervalId = setInterval(sendHeartbeat, 1000 * 60 * 5);
     return () => clearInterval(intervalId);
-  }, [backendAPI]);
+  }, [backendAPI, dispatch]);
 
   return (
     <div className="flex flex-col p-4 items-center justify-center w-full">

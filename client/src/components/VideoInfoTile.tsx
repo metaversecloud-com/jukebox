@@ -13,10 +13,12 @@ interface VideoInfoTileProps {
   showControls?:
     | {
         play: boolean;
-        add: boolean;
+        plusminus: string | false;
       }
     | false;
   playVideo?: (videoId: string) => void;
+  addVideo?: (videoId: string) => void;
+  removeVideo?: (videoId: string) => void;
 }
 
 const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
@@ -27,16 +29,21 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
   showControls,
   isLoading,
   playVideo,
+  addVideo,
+  removeVideo,
 }) => {
   const [playMarquee, setPlayMarquee] = useState(true);
+
   return (
-    <div className="flex flex-row w-full">
+    <div
+      className={`flex flex-row w-full rounded-l-xl ${showControls && showControls.plusminus !== false ? showControls.plusminus === "minus" && "bg-gray-300" : ""}`}
+    >
       {!isLoading ? (
         <div className="rounded-xl h-fit p-0">
           <img
-            title={videoName}
+            title={he.decode(videoName)}
             src={thumbnail}
-            alt={videoName}
+            alt={he.decode(videoName)}
             className="aspect-square min-w-16 max-w-16 object-cover rounded-xl"
           />
         </div>
@@ -45,25 +52,27 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
       )}
 
       <div className="flex justify-between pl-3 items-center w-full">
-        <div
-          className={`flex flex-col items-start self-start mr-1 ${showControls ? (showControls.add ? "w-36" : "w-44") : "w-52"}`}
-        >
+        <div className={`flex flex-col items-start self-start mr-1 ${showControls ? "w-44" : "w-52"}`}>
           {!isLoading ? (
-            <Marquee
-              gradient={false}
-              speed={50}
-              delay={3}
-              play={playMarquee}
-              pauseOnHover
-              onCycleComplete={() => {
-                setPlayMarquee(false);
-                setTimeout(() => {
-                  setPlayMarquee(true);
-                }, 3000);
-              }}
-            >
+            he.decode(videoName).length > 25 ? (
+              <Marquee
+                gradient={false}
+                speed={50}
+                delay={3}
+                play={playMarquee}
+                pauseOnHover
+                onCycleComplete={() => {
+                  setPlayMarquee(false);
+                  setTimeout(() => {
+                    setPlayMarquee(true);
+                  }, 3000);
+                }}
+              >
+                <p className="p1 font-semibold">{he.decode(`${videoName}&#160;`)}</p>
+              </Marquee>
+            ) : (
               <p className="p1 font-semibold">{he.decode(`${videoName}&#160;`)}</p>
-            </Marquee>
+            )
           ) : (
             <Skeleton width={200} className="self-start" />
           )}
@@ -74,11 +83,23 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
             {/* <button className="btn-icon flex items-center justify-center">
               <i className="icon pause-icon h-4 w-4" />
             </button> */}
-            {showControls.add && (
-              <button onClick={() => {}} className="btn-icon flex items-center justify-center mx-[1px]">
-                <i className="icon add-icon h-4 w-4" />
-              </button>
-            )}
+            {showControls.plusminus &&
+              (showControls.plusminus === "plus" ? (
+                <button
+                  onClick={() => addVideo && addVideo(videoId)}
+                  className="btn-icon flex items-center justify-center mx-[1px]"
+                >
+                  <i className="icon add-icon h-4 w-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => removeVideo && removeVideo(videoId)}
+                  className="btn-icon flex items-center justify-center mx-[1px]"
+                >
+                  <i className="icon minus-icon h-4 w-4" />
+                </button>
+              ))}
+
             {showControls.play && (
               <button
                 onClick={() => playVideo(videoId)}

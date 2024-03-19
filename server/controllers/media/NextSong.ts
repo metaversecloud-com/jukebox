@@ -1,9 +1,10 @@
 import emitterObj from "../../emitter";
-import { getDroppedAsset } from "../../utils";
+import { getDroppedAsset, getVisitor } from "../../utils";
 import he from "he";
 
 export default async function NextSong(req, res) {
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body;
+
   const jukeboxAsset = await getDroppedAsset({ assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId });
   const { currentPlayIndex, media } = jukeboxAsset.dataObject;
   const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}`;
@@ -16,7 +17,7 @@ export default async function NextSong(req, res) {
         ...jukeboxAsset.dataObject,
         currentPlayIndex: newPlayIndex,
         currentPlayingMedia: media[newPlayIndex],
-        fromTrack: true
+        fromTrack: true,
       },
       {
         lock: {
@@ -40,8 +41,8 @@ export default async function NextSong(req, res) {
       audioRadius: jukeboxAsset.audioRadius || 2, // Far
       syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
     });
-    console.log("ONCE")
-    emitterObj.emitFunc("nowPlaying", { assetId: jukeboxAsset.id, currentPlayIndex: newPlayIndex});
+    console.log("ONCE");
+    emitterObj.emitFunc("nowPlaying", { assetId: jukeboxAsset.id, currentPlayIndex: newPlayIndex });
 
     res.json({ message: "OK" });
   } catch (e) {

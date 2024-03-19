@@ -8,13 +8,16 @@ import {
   handleUpdateWorldDataObject,
   moveVisitor,
   handleRemoveDroppedAssets,
-} from "./controllers/index.ts"
-import { getVersion } from "./utils/getVersion.ts"
+} from "./controllers/index.ts";
+import { getVersion } from "./utils/getVersion.ts";
 import getCatalog from "./controllers/getCatalog.ts";
 import sendNextSongInfo from "./controllers/media/sendNextSongInfo.ts";
 import SearchVideos from "./controllers/media/SearchVideos.ts";
 import PlayVideo from "./controllers/media/PlayVideo.ts";
 import setHeartbeat from "./controllers/setHeartbeat.ts";
+import isAdminCheck from "./controllers/isAdminCheck.ts";
+import { isAdmin } from "./middleware/isAdmin.ts";
+import AddToQueue from "./controllers/media/AddToQueue.ts";
 
 const router = express.Router();
 
@@ -44,12 +47,13 @@ router.get("/world", handleGetWorldDetails);
 router.put("/world/data-object", handleUpdateWorldDataObject);
 
 // YouTube
-router.post("/search", SearchVideos);
-router.post("/play", PlayVideo);
+router.post("/search", isAdmin, SearchVideos);
+router.post("/play", isAdmin, PlayVideo);
 
-router.get('/catalog', getCatalog)
-
+router.get("/catalog", getCatalog);
 router.post("/sse", sendNextSongInfo);
-
 router.post("/heartbeat", setHeartbeat);
+router.get("/is-admin", isAdminCheck);
+router.post("/add-to-queue", isAdmin, AddToQueue);
+
 export default router;

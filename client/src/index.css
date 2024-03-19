@@ -31,3 +31,7 @@ p {
 .add-icon {
   background-image: url('plus.svg');
 }
+
+.minus-icon {
+  background-image: url('minus.svg');
+}

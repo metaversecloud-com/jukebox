@@ -13,7 +13,9 @@ import {
   SET_SEARCH_LOADING,
   SET_SEARCH_RESULTS,
   SET_SEARCH_STATUS,
-  UPDATE_PLAY_INDEX
+  UPDATE_PLAY_INDEX,
+  SET_IS_ADMIN,
+  ADD_TO_QUEUE
 } from "./types";
 
 const globalReducer = (state: InitialState, action: ActionType) => {
@@ -50,6 +52,11 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         catalogLoading: false,
         catalogStatus: "SUCCESS",
       };
+    case SET_IS_ADMIN: 
+      return {
+        ...state,
+        isAdmin: payload.isAdmin,
+      };
     case SET_BACKEND_API:
       return {
         ...state,
@@ -69,6 +76,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         searchResults: [...searchResults, ...payload.searchResults],
         searchLoading: false,
+        searchTermGlobal: payload.searchTermGlobal ? payload.searchTermGlobal : state.searchTermGlobal,
         nextPageLoading: false,
         searchStatus: "SUCCESS",
         nextPageToken: payload.newNextPageToken,
@@ -95,6 +103,11 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         currentPlayIndex: payload.currentPlayIndex,
         nowPlaying: state.catalog[payload.currentPlayIndex],
         fromTrack: payload.fromTrack,
+      };
+    case ADD_TO_QUEUE: 
+      return {
+        ...state,
+        catalog: [...state.catalog, ...payload.videos],
       };
     default: {
       throw new Error(`Unhandled action type: ${type}`);

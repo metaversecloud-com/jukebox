@@ -7,6 +7,7 @@ import { skeleton, videoSample } from "./constants";
 const initialState: InitialState = {
   catalog: skeleton,
   currentPlayIndex: 0,
+  isAdmin: false,
   fromTrack: true,
   nowPlaying: videoSample,
   searchResults: [],
@@ -20,6 +21,7 @@ const initialState: InitialState = {
   selectedWorld: {},
   interactiveParams: null,
   backendAPI: null,
+  searchTermGlobal: '',
 };
 
 const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

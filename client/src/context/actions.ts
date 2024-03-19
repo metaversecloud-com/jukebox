@@ -28,4 +28,22 @@ const playVideo = async (backendAPI: AxiosInstance, video: Video, fromTrack: boo
   }
 };
 
-export { searchCatalog, fetchCatalog, playVideo };
+const checkIsAdmin = async (backendAPI: AxiosInstance) => {
+  try {
+    const result = await backendAPI.get("/is-admin");
+    return result.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const addToQueue = async (backendAPI: AxiosInstance, videos: Video[]) => {
+  try {
+    const result = await backendAPI.post("/add-to-queue", { videos });
+    return result.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export { searchCatalog, fetchCatalog, playVideo, checkIsAdmin, addToQueue };

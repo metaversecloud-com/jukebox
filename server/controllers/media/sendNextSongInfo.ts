@@ -21,6 +21,7 @@ export default async function sendNextSongInfo(req, res) {
     "Cache-Control": "no-cache",
   });
 
-  emitterObj.listenFunc;
+  emitterObj.listenNowPlaying;
+  emitterObj.listenQueue;
 
 }
