@@ -2,7 +2,7 @@ import emitterObj from "../../emitter";
 import { getDroppedAsset, getVisitor } from "../../utils";
 import he from "he";
 
-export default async function PlayVideo(req, res) {
+export default async function PlayVideo(req: Express.Request, res: Express.Response) {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
     const { video, fromTrack } = req.body;

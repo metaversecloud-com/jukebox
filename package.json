@@ -1,36 +1,26 @@
 {
   "name": "jukebox",
   "author": "metaversecloud.com | topia.io",
-  "version": "1.0.0",
-  "description": "",
-  "type": "module",
-  "main": "./server/index.ts",
+  "version": "0.1.0",
   "scripts": {
-    "build": "npm run build -w client",
-    "link-sdk": "yalc link @rtsdk/topia",
-    "unlink-sdk": "yalc remove @rtsdk/topia",
-    "server": "npm run start --prefix server",
-    "client": "npm start --prefix client",
-    "start": "npm start --workspace=server",
+    "build": "npm run build -ws",
+    "start": "npm run start --workspace=server",
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
     "dev-server": "npm run dev --prefix server",
-    "dev-client": "npm run start --prefix client"
-  },
-  "dependencies": {
-    "@rtsdk/topia": "^0.8.5",
-    "concurrently": "^8.2.2",
-    "dotenv": "^16.4.5",
-    "he": "^1.2.0",
-    "yalc": "^1.0.0-pre.53"
-  },
-  "license": "ISC",
-  "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/he": "^1.2.3",
-    "prettier": "3.2.5"
+    "dev-client": "npm run dev --prefix client"
   },
   "workspaces": [
     "client",
     "server"
-  ]
+  ],
+  "dependencies": {
+    "@rtsdk/topia": "^0.8.5",
+    "dotenv": "^16.4.5",
+    "he": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/he": "^1.2.3",
+    "prettier": "3.2.5"
+  }
 }

@@ -33,15 +33,12 @@ const emitterObj = {
     } else {
       this.connections.push(connection);
     }
-    console.log("CONNECTION ADDED", this.connections.length);
   },
   deleteConn: function () {
     // Remove inactive connections older than 1 hour
-    console.log("Removing Inactive", this.connections.length);
     this.connections = this.connections.filter(
       ({ lastHeartbeatTime }) => lastHeartbeatTime > Date.now() - 30 * 60 * 1000,
     );
-    console.log("Done", this.connections.length);
   },
 };
 
@@ -63,7 +60,6 @@ emitterObj.listenQueue = emitterObj.emitter.on("addedToQueue", (data) => {
     const { assetId, visitorId } = existingConnection.req.body;
     if (shouldSend(data, assetId, visitorId)) {
       const dataWithKind = { videos: data.videos, kind: "addedToQueue" };
-      // console.log("SENDING QUEUE EVENT", dataWithKind);
       existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataWithKind)}\n\n`);
     }
   });

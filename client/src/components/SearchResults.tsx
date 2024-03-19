@@ -55,7 +55,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
         loadMore={loadNextSet}
         initialLoad={false}
         hasMore={searchResults.length > 0 && searchResults[0].id.videoId !== "" && nextPageToken !== null}
-        loader={<CircularLoader color="#3b5166" />}
+        loader={<CircularLoader />}
       >
         {searchResults.map((video: Video, i: number) => (
           <div key={`result-${video.id.videoId}-${i}`} className="my-4">

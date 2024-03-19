@@ -1,6 +1,6 @@
-import emitterObj from "../emitter";
+import emitterObj from "../../emitter";
 
-export default async function setHeartbeat(req, res) {
+export default async function setHeartbeat(req: Express.Request, res: Express.Response) {
   const { interactiveNonce, visitorId } = req.query;
   emitterObj.connections.forEach((existingConnection) => {
     if (

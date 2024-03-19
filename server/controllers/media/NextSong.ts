@@ -1,16 +1,15 @@
 import emitterObj from "../../emitter";
-import { getDroppedAsset, getVisitor } from "../../utils";
+import { getDroppedAsset } from "../../utils";
 import he from "he";
 
-export default async function NextSong(req, res) {
+export default async function NextSong(req: Express.Request, res: Express.Response) {
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body;
 
   const jukeboxAsset = await getDroppedAsset({ assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId });
   const { currentPlayIndex, media } = jukeboxAsset.dataObject;
   const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}`;
   const newPlayIndex = media.length === currentPlayIndex + 1 ? 0 : currentPlayIndex + 1;
-  // const newPlayIndex = 0;
-  // console.log("CURRENT", currentPlayIndex, newPlayIndex, media.length)
+
   try {
     await jukeboxAsset.updateDataObject(
       {
@@ -26,7 +25,6 @@ export default async function NextSong(req, res) {
         },
       },
     );
-    console.log("UPDATE IN PROGRESS");
     const videoId = media[newPlayIndex].id.videoId;
     const videoTitle = media[newPlayIndex].snippet.title;
 
@@ -41,7 +39,6 @@ export default async function NextSong(req, res) {
       audioRadius: jukeboxAsset.audioRadius || 2, // Far
       syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
     });
-    console.log("ONCE");
     emitterObj.emitFunc("nowPlaying", { assetId: jukeboxAsset.id, currentPlayIndex: newPlayIndex });
 
     res.json({ message: "OK" });

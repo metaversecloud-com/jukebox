@@ -1,15 +1,16 @@
 import emitterObj from "../../emitter";
-import { getDroppedAsset, getVisitor } from "../../utils";
+import { Credentials } from "../../types";
+import { getDroppedAsset } from "../../utils";
 
-export default async function AddToQueue(req, res) {
-  const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+export default async function AddToQueue(req: Express.Request, res: Express.Response) {
+  const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query as Credentials;
 
   const { videos } = req.body;
   const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
   const jukeboxAsset = await getDroppedAsset(credentials);
-  const timeFactor = new Date(Math.round(new Date().getTime() / 10000) * 10000)
+  const timeFactor = new Date(Math.round(new Date().getTime() / 10000) * 10000);
   const lockId = `${jukeboxAsset.id}_${timeFactor}`;
-  // ${assetId}-${resetCount}-${new Date(Math.round(new Date().getTime() / 10000) * 10000)}
+  
   try {
     await jukeboxAsset.updateDataObject(
       {

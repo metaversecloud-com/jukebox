@@ -63,7 +63,7 @@ const Home: React.FC = () => {
         <>
           <div className="backdrop-brightness-90 blur-sm fixed top-0 z-10 w-full h-full"></div>
           <div className="fixed top-0 z-10 flex w-full h-full justify-center items-center select-none">
-            <CircularLoader color="#0a2540" />
+            <CircularLoader />
           </div>
         </>
       )}
