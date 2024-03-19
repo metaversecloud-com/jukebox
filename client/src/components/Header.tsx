@@ -1,5 +1,4 @@
-
-const Header = () => {
+const Header: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center mt-2">
       <img src="Gramophone_Front.png" alt="Gramophone" className="w-96 h-52 object-cover" />

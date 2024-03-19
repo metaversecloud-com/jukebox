@@ -46,7 +46,6 @@ export interface InitialState {
   nextPageLoading: boolean;
   hasInteractiveParams: boolean;
   interactiveParams: InteractiveParams | null;
-  selectedWorld: { [key: string]: any };
   searchTermGlobal: string;
 }
 

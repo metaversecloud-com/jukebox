@@ -2,7 +2,7 @@ import { Route, Routes, useSearchParams } from "react-router-dom";
 
 import Home from "@pages/Home";
 import Error from "@pages/Error";
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { GlobalDispatchContext, GlobalStateContext } from "./context/GlobalContext";
 import { setupBackendAPI } from "./utils/backendAPI";
 import {
@@ -21,12 +21,11 @@ import { fetchEventSource } from "@microsoft/fetch-event-source";
 const App = () => {
   const [searchParams] = useSearchParams();
 
-  const { backendAPI, hasInteractiveParams, isAdmin } = useContext(GlobalStateContext) as InitialState;
+  const { backendAPI, hasInteractiveParams, } = useContext(GlobalStateContext) as InitialState;
   const [connectionEstablished, setConnectionEstablished] = useState(false);
 
   const dispatch = useContext(GlobalDispatchContext);
   // const abortController = useRef(new AbortController());
-  // const [lastHeartbeatTime, setLastHeartbeatTime] = useState(Date.now());
 
   const interactiveParams = useMemo(() => {
     const assetId = searchParams.get("assetId");
@@ -128,53 +127,30 @@ const App = () => {
         username: interactiveParams?.username,
         visitorId: interactiveParams?.visitorId,
       }),
-      // onopen(response) {
-      //   console.log("Connection opened");
-      //   if (response.ok && response.status === 200) {
-      //     console.log("Connection made ", response);
-      //   } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
-      //     console.log("Client side error ", response);
-      //   }
-      // },
       onmessage(event) {
-        // console.log("EVENT", event.data);
         const sse = JSON.parse(event.data);
         if (sse.kind === "nowPlaying") {
           const nowPlaying = sse.data.video;
-          console.log("RECEIVED EVENT", nowPlaying);
           if (nowPlaying.currentPlayIndex !== undefined) {
-            console.log("NEXT SONG WEBHOOK");
-            // const newMedia = catalog[nowPlaying.currentPlayIndex];
             dispatch!({
               type: UPDATE_PLAY_INDEX,
               payload: { currentPlayIndex: nowPlaying.currentPlayIndex, fromTrack: true },
             });
-            // dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: newMedia } });
           } else {
-            console.log("MANUAL NEW SONG");
             dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying, fromTrack: false } });
           }
         } else if (sse.kind === "addedToQueue") {
           const videos = sse.videos;
-          console.log("ADD TO QUEUE EVENT", sse, videos);
           dispatch!({
             type: ADD_TO_QUEUE,
             payload: { videos },
           });
         }
-      },
-      // onclose() {
-      //   console.log("Connection closed by the server");
-      // },
-      // onerror(err) {
-      //   console.log("There was an error from server", err);
-      // },
+      }
     });
   }, [interactiveParams, dispatch]);
 
   useEffect(() => {
-    // const controller = new AbortController();
-
     if (hasInteractiveParams && !connectionEstablished) {
       console.log("Establishing connection...");
       fetchData();
@@ -187,7 +163,6 @@ const App = () => {
       try {
         if (backendAPI) {
           await backendAPI.post("/heartbeat", {});
-          // setLastHeartbeatTime(Date.now());
         }
       } catch (error) {
         console.error("Error sending heartbeat:", error);
@@ -213,7 +188,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
-
+        
         <Route path="*" element={<Error />} />
       </Routes>
     </div>

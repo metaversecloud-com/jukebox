@@ -68,6 +68,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         nextPageLoading: payload.nextPageLoading,
       };
     case SET_SEARCH_RESULTS:
+      // eslint-disable-next-line no-case-declarations
       let searchResults = state.searchResults;
       if (state.searchResults[0].id.videoId === "") {
         searchResults = [];

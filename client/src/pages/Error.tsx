@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const Error = () => {
+const Error: React.FC = () => {
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center">
       <div className="flex flex-col items-center p-16 max-w-96 shadow-lg border rounded-3xl">

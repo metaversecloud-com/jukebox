@@ -1,13 +1,11 @@
-import React from "react";
-
-const CircularLoader = () => {
+const CircularLoader: React.FC<{ color: string }> = ({ color }) => {
   return (
     <div className="flex items-center justify-center w-full my-2 z-50">
       <div className="text-center">
         <div role="status">
           <svg
             aria-hidden="true"
-            className={`fill-[#3b5166] inline w-8 h-8 text-slate-300 animate-spin`}
+            className={`fill-[${color}] inline w-8 h-8 text-slate-300 animate-spin`}
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

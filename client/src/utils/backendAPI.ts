@@ -1,4 +1,3 @@
-// TODO - Remove ts-nocheck and fix types
 import { InteractiveParams } from "@/context/types";
 import axios from "axios";
 

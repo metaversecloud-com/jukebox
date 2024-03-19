@@ -14,10 +14,10 @@ import React, { useContext, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AxiosInstance } from "axios";
 
-const Search = () => {
+const Search: React.FC = () => {
   const location = useLocation();
   const dispatch = useContext(GlobalDispatchContext);
-  const { searchTermGlobal, nextPageToken, searchLoading, nextPageLoading, searchStatus, backendAPI } = useContext(
+  const { searchTermGlobal, nextPageToken, searchLoading, nextPageLoading, backendAPI } = useContext(
     GlobalStateContext,
   ) as InitialState;
 

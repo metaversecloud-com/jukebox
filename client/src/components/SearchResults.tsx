@@ -16,7 +16,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
   const { searchResults, searchLoading, nextPageToken, backendAPI, isAdmin } = useContext(
     GlobalStateContext,
   ) as InitialState;
-  const [selectedVideos, setSelectedVideos] = useState([]);
+  const [selectedVideos, setSelectedVideos] = useState<string[]>([]);
   const [addLoading, setAddLoading] = useState(false);
 
   const dispatch = useContext(GlobalDispatchContext);
@@ -55,7 +55,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
         loadMore={loadNextSet}
         initialLoad={false}
         hasMore={searchResults.length > 0 && searchResults[0].id.videoId !== "" && nextPageToken !== null}
-        loader={<CircularLoader />}
+        loader={<CircularLoader color="#3b5166" />}
       >
         {searchResults.map((video: Video, i: number) => (
           <div key={`result-${video.id.videoId}-${i}`} className="my-4">

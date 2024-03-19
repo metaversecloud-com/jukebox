@@ -18,7 +18,6 @@ const initialState: InitialState = {
   catalogLoading: false,
   catalogStatus: "",
   hasInteractiveParams: false,
-  selectedWorld: {},
   interactiveParams: null,
   backendAPI: null,
   searchTermGlobal: '',

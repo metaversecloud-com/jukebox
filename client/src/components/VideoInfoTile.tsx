@@ -80,9 +80,6 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
         </div>
         {showControls && (
           <div className="flex items-center justify-end">
-            {/* <button className="btn-icon flex items-center justify-center">
-              <i className="icon pause-icon h-4 w-4" />
-            </button> */}
             {showControls.plusminus &&
               (showControls.plusminus === "plus" ? (
                 <button
@@ -102,16 +99,12 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
 
             {showControls.play && (
               <button
-                onClick={() => playVideo(videoId)}
-                className={`btn-icon flex items-center justify-center ${showControls.add ? "mx-[1px]" : "mx-0"}`}
+                onClick={() => playVideo!(videoId)}
+                className={`btn-icon flex items-center justify-center mx-[1px]`}
               >
                 <i className="icon play-icon h-4 w-4" />
               </button>
             )}
-
-            {/* <button className="btn-icon flex items-center justify-center">
-              <i className="icon stop-icon h-4 w-4" />
-            </button> */}
           </div>
         )}
       </div>
