@@ -1,5 +1,6 @@
 import emitterObj from "../../emitter";
 import { getDroppedAsset } from "../../utils";
+import he from "he";
 
 export default async function NextSong(req, res) {
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body;
@@ -15,6 +16,7 @@ export default async function NextSong(req, res) {
         ...jukeboxAsset.dataObject,
         currentPlayIndex: newPlayIndex,
         currentPlayingMedia: media[newPlayIndex],
+        fromTrack: true
       },
       {
         lock: {
@@ -32,7 +34,7 @@ export default async function NextSong(req, res) {
     await jukeboxAsset.updateMediaType({
       mediaLink,
       isVideo: true,
-      mediaName: videoTitle,
+      mediaName: he.decode(videoTitle),
       mediaType: "link",
       audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
       audioRadius: jukeboxAsset.audioRadius || 2, // Far

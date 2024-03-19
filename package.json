@@ -20,11 +20,13 @@
     "@rtsdk/topia": "^0.8.5",
     "concurrently": "^8.2.2",
     "dotenv": "^16.4.5",
+    "he": "^1.2.0",
     "yalc": "^1.0.0-pre.53"
   },
   "license": "ISC",
   "devDependencies": {
     "@types/cors": "^2.8.17",
+    "@types/he": "^1.2.3",
     "prettier": "3.2.5"
   },
   "workspaces": [

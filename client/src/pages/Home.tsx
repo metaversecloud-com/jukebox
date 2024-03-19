@@ -9,15 +9,14 @@ import { Link } from "react-router-dom";
 import { AxiosInstance } from "axios";
 
 const Home = () => {
-  const { hasInteractiveParams, catalog, catalogLoading, nowPlaying, backendAPI, currentPlayIndex } = useContext(
-    GlobalStateContext,
-  ) as InitialState;
+  const { hasInteractiveParams, catalog, catalogLoading, nowPlaying, backendAPI, currentPlayIndex, fromTrack } =
+    useContext(GlobalStateContext) as InitialState;
 
   const dispatch = useContext(GlobalDispatchContext);
 
   const handlePlayVideo = async (videoId: string) => {
     const video = catalog.find((video) => video.id.videoId === videoId) as Video;
-    const res = await playVideo(backendAPI as AxiosInstance, video);
+    const res = await playVideo(backendAPI as AxiosInstance, video, true);
     if (res) {
       dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: video } });
     }
@@ -26,8 +25,13 @@ const Home = () => {
   useEffect(() => {
     async function loadCatalog() {
       dispatch!({ type: SET_CATALOG_LOADING, payload: { catalogLoading: true } });
-      const { currentPlayIndex, media, currentPlayingMedia } = await fetchCatalog(backendAPI as AxiosInstance);
-      dispatch!({ type: SET_CATALOG, payload: { catalog: media, currentPlayIndex, nowPlaying: currentPlayingMedia } });
+      const { currentPlayIndex, media, currentPlayingMedia, fromTrack } = await fetchCatalog(
+        backendAPI as AxiosInstance,
+      );
+      dispatch!({
+        type: SET_CATALOG,
+        payload: { catalog: media, currentPlayIndex, nowPlaying: currentPlayingMedia, fromTrack },
+      });
     }
 
     if (hasInteractiveParams && !catalogLoading && catalog[0].id.videoId === "" && backendAPI !== null) {
@@ -39,21 +43,31 @@ const Home = () => {
     <>
       <Header />
       <div className="flex flex-col w-full justify-start">
-        <p className="p1 font-semibold">Now Playing: </p>
-        <div className="my-4">
-          <VideoInfoTile
-            isLoading={catalogLoading}
-            videoId={nowPlaying.id.videoId}
-            videoName={nowPlaying.snippet.title}
-            videoDuration={convertMillisToMinutes(nowPlaying.duration)}
-            thumbnail={nowPlaying.snippet.thumbnails.high.url}
-            // showControls
-            // playVideo={handlePlayVideo}
-          ></VideoInfoTile>
-        </div>
+        {nowPlaying && (
+          <>
+            <p className="p1 font-semibold">Now Playing: </p>
+            <div className="my-4">
+              <VideoInfoTile
+                isLoading={catalogLoading}
+                videoId={nowPlaying.id.videoId}
+                videoName={nowPlaying.snippet.title}
+                videoDuration={convertMillisToMinutes(nowPlaying.duration)}
+                thumbnail={nowPlaying.snippet.thumbnails.high.url}
+              ></VideoInfoTile>
+            </div>
+          </>
+        )}
         <p className="p1 font-semibold">Next Up: </p>
         {(() => {
-          const queue = catalog.slice(currentPlayIndex + 1).concat(catalog.slice(0, currentPlayIndex));
+          const queue = nowPlaying
+            ? (() => {
+                let offset = 1;
+                if (fromTrack === false) {
+                  offset = 0;
+                }
+                return catalog.slice(currentPlayIndex + offset).concat(catalog.slice(0, currentPlayIndex));
+              })()
+            : catalog;
           return queue.map((video, i) => (
             <div key={i} className="my-4">
               <VideoInfoTile
@@ -63,7 +77,14 @@ const Home = () => {
                 videoName={video.snippet.title}
                 videoDuration={convertMillisToMinutes(video.duration)}
                 thumbnail={video.snippet.thumbnails.high.url}
-                showControls={!catalogLoading}
+                showControls={
+                  !catalogLoading
+                    ? {
+                        play: true,
+                        add: false,
+                      }
+                    : false
+                }
                 playVideo={handlePlayVideo}
               ></VideoInfoTile>
             </div>

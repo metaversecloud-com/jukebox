@@ -1,10 +1,11 @@
 import emitterObj from "../../emitter";
 import { getDroppedAsset } from "../../utils";
+import he from "he";
 
 export default async function PlayVideo(req, res) {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
-    const { video } = req.body;
+    const { video, fromTrack } = req.body;
     const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
     const jukeboxAsset = await getDroppedAsset(credentials);
 
@@ -17,6 +18,7 @@ export default async function PlayVideo(req, res) {
         {
           ...jukeboxAsset.dataObject,
           currentPlayingMedia: video,
+          fromTrack,
         },
         {
           lock: {
@@ -29,7 +31,7 @@ export default async function PlayVideo(req, res) {
       await jukeboxAsset.updateMediaType({
         mediaLink,
         isVideo: true,
-        mediaName: video.snippet.title, // Will only change media name if one is sent from the frontend.
+        mediaName: he.decode(video.snippet.title), // Will only change media name if one is sent from the frontend.
         mediaType: "link",
         audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
         audioRadius: jukeboxAsset.audioRadius || 2, // Far

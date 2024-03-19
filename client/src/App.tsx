@@ -142,11 +142,11 @@ const App = () => {
         if (nowPlaying.currentPlayIndex !== undefined) {
           console.log("NEXT SONG WEBHOOK");
           // const newMedia = catalog[nowPlaying.currentPlayIndex];
-          dispatch!({ type: UPDATE_PLAY_INDEX, payload: { currentPlayIndex: nowPlaying.currentPlayIndex } });
+          dispatch!({ type: UPDATE_PLAY_INDEX, payload: { currentPlayIndex: nowPlaying.currentPlayIndex, fromTrack: true } });
           // dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: newMedia } });
         } else {
           console.log("MANUAL NEW SONG");
-          dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying } });
+          dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying, fromTrack: false } });
         }
       },
       // onclose() {
@@ -193,7 +193,7 @@ const App = () => {
   }, [backendAPI]);
 
   return (
-    <div className="flex flex-col p-6 items-center justify-center w-full">
+    <div className="flex flex-col p-4 items-center justify-center w-full">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />

@@ -45,6 +45,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         catalog: payload.catalog,
         currentPlayIndex: payload.currentPlayIndex,
+        fromTrack: payload.fromTrack,
         nowPlaying: payload.nowPlaying,
         catalogLoading: false,
         catalogStatus: "SUCCESS",
@@ -93,6 +94,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         currentPlayIndex: payload.currentPlayIndex,
         nowPlaying: state.catalog[payload.currentPlayIndex],
+        fromTrack: payload.fromTrack,
       };
     default: {
       throw new Error(`Unhandled action type: ${type}`);

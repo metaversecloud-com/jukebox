@@ -7,6 +7,7 @@ export default async function setHeartbeat(req, res) {
       existingConnection.res.req.body.visitorId === visitorId &&
       existingConnection.res.req.body.interactiveNonce === interactiveNonce
     ) {
+      console.log("Heartbeat Acknowledged", interactiveNonce);
       existingConnection.lastHeartbeatTime = Date.now();
     }
   });

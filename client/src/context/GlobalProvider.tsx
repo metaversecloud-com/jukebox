@@ -7,6 +7,7 @@ import { skeleton, videoSample } from "./constants";
 const initialState: InitialState = {
   catalog: skeleton,
   currentPlayIndex: 0,
+  fromTrack: true,
   nowPlaying: videoSample,
   searchResults: [],
   nextPageToken: "",

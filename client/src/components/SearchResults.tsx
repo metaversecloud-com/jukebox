@@ -13,12 +13,12 @@ interface SearchResultsProps {
 
 const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
   const { searchResults, searchLoading, nextPageToken, backendAPI } = useContext(GlobalStateContext) as InitialState;
-  
+
   const dispatch = useContext(GlobalDispatchContext);
 
   const handlePlayVideo = async (videoId: string) => {
     const video = searchResults.find((video) => video.id.videoId === videoId) as Video;
-    const res = await playVideo(backendAPI as AxiosInstance, video);
+    const res = await playVideo(backendAPI as AxiosInstance, video, false);
     if (res) {
       dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: video } });
     }
@@ -64,7 +64,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
             videoName={video.snippet.title}
             videoDuration={convertMillisToMinutes(video.duration)}
             thumbnail={video.snippet.thumbnails.high.url}
-            showControls={!searchLoading}
+            showControls={
+              !searchLoading
+                ? {
+                    play: true,
+                    add: true,
+                  }
+                : false
+            }
             playVideo={handlePlayVideo}
           />
         </div>

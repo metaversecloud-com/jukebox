@@ -33,6 +33,7 @@ export interface InitialState {
   catalog: Video[];
   nowPlaying: Video;
   currentPlayIndex: number;
+  fromTrack: boolean;
   searchResults: Video[];
   searchLoading: boolean;
   searchStatus: string;

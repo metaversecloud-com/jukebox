@@ -27,3 +27,7 @@ p {
 .pause-icon {
   background-image: url('pause.svg');
 }
+
+.add-icon {
+  background-image: url('plus.svg');
+}
