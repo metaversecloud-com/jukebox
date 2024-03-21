@@ -1,4 +1,4 @@
-import emitterObj from "../../emitter";
+import emitterObj from "../../emitter/index.js";
 import { Request, Response } from "express";
 
 export default async function setHeartbeat(req: Request, res: Response) {

@@ -1,5 +1,5 @@
-import { Credentials } from "../../types";
-import { getVisitor } from "../../utils";
+import { Credentials } from "../../types/index.js";
+import { getVisitor } from "../../utils/index.js";
 import { Request, Response } from "express";
 
 export default async function isAdminCheck(req: Request, res: Response) {

@@ -1,12 +1,12 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import router from "./router/routes";
+import router from "./router/routes.js";
 import path from "path";
 
-import { cleanReturnPayload } from "./utils/cleanReturnPayload";
+import { cleanReturnPayload } from "./utils/cleanReturnPayload.js";
 import { fileURLToPath } from "url";
-import webhookRouter from "./router/webhook";
+import webhookRouter from "./router/webhook.js";
 
 
 // import youtubeRouter from "./youtubeRoutes";
@@ -68,11 +68,11 @@ if (process.env.NODE_ENV !== "development") {
   // Node serves the files for the React app
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  app.use(express.static(path.resolve(__dirname, "../client/build")));
+  app.use(express.static(path.resolve(__dirname, "../../client/build")));
 
   // All other GET requests not handled before will return our React app
   app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
+    res.sendFile(path.resolve(__dirname, "../../client/build", "index.html"));
   });
 }
 

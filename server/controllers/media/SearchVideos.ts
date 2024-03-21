@@ -1,7 +1,7 @@
 import { youtube_v3 } from "@googleapis/youtube";
-import initializeYouTube from "../../external/google";
+import initializeYouTube from "../../external/google.js";
 import { Video } from "../../types";
-import { YTDurationToMilliseconds } from "../../utils/youtube";
+import { YTDurationToMilliseconds } from "../../utils/youtube/index.js";
 import { Request, Response } from "express";
 
 async function getVideoDuration(videos: Video[], yt: youtube_v3.Youtube) {

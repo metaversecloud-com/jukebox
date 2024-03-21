@@ -1,5 +1,5 @@
 import express from "express";
-import NextSong from "../controllers/media/NextSong";
+import NextSong from "../controllers/media/NextSong.js";
 // import { isAdmin } from "../middleware/isAdmin";
 const webhookRouter = express.Router();
 

@@ -1,6 +1,6 @@
-import { Visitor } from "../topiaInit"
-import { errorHandler } from "../errorHandler"
-import { Credentials } from "../../types/index";
+import { Visitor } from "../topiaInit.js"
+import { errorHandler } from "../errorHandler.js"
+import { Credentials } from "../../types/index.js";
 
 export const getVisitor = async (credentials: Credentials) => {
   try {

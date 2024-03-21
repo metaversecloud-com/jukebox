@@ -1,5 +1,5 @@
-import { Credentials } from "../../types/index";
-import { DroppedAsset, errorHandler } from "../index";
+import { Credentials } from "../../types/index.js";
+import { DroppedAsset, errorHandler } from "../index.js";
 
 export const getDroppedAsset = async (credentials: Credentials) => {
   try {

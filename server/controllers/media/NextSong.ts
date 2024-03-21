@@ -1,8 +1,8 @@
-import emitterObj from "../../emitter";
-import { getDroppedAsset } from "../../utils";
+import emitterObj from "../../emitter/index.js";
+import { getDroppedAsset } from "../../utils/index.js";
 import he from "he";
 import { Request, Response } from "express";
-import { Credentials } from "../../types";
+import { Credentials } from "../../types/index.js";
 
 export default async function NextSong(req: Request, res: Response) {
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body as Credentials;

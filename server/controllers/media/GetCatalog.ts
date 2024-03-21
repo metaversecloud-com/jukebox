@@ -1,5 +1,5 @@
-import { Credentials } from "../../types";
-import { getDroppedAsset } from "../../utils";
+import { Credentials } from "../../types/index.js";
+import { getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
 
 export default async function GetCatalog(req: Request, res: Response) {

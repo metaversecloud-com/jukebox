@@ -1,8 +1,8 @@
-import emitterObj from "../../emitter";
-import { getDroppedAsset, getVisitor } from "../../utils";
+import emitterObj from "../../emitter/index.js";
+import { getDroppedAsset, getVisitor } from "../../utils/index.js";
 import he from "he";
 import { Request, Response } from "express";
-import { Credentials } from "../../types";
+import { Credentials } from "../../types/index.js";
 
 export default async function PlayVideo(req: Request, res: Response) {
   try {

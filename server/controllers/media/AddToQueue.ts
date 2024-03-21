@@ -1,6 +1,6 @@
-import emitterObj from "../../emitter";
-import { Credentials, Video } from "../../types";
-import { getDroppedAsset } from "../../utils";
+import emitterObj from "../../emitter/index.js";
+import { Credentials, Video } from "../../types/index.js";
+import { getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
 
 export default async function AddToQueue(req: Request, res: Response) {

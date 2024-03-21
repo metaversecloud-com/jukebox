@@ -1,14 +1,14 @@
 import express from "express";
 
-import { getVersion } from "../utils/getVersion";
-import GetCatalog from "../controllers/media/GetCatalog";
-import SearchVideos from "../controllers/media/SearchVideos";
-import PlayVideo from "../controllers/media/PlayVideo";
-import setHeartbeat from "../controllers/status/setHeartbeat";
-import isAdminCheck from "../controllers/status/isAdminCheck";
-import { isAdmin } from "../middleware/isAdmin";
-import AddToQueue from "../controllers/media/AddToQueue";
-import SendNextSongInfo from "../controllers/media/SendNextSongInfo";
+import { getVersion } from "../utils/getVersion.js";
+import GetCatalog from "../controllers/media/GetCatalog.js";
+import SearchVideos from "../controllers/media/SearchVideos.js";
+import PlayVideo from "../controllers/media/PlayVideo.js";
+import setHeartbeat from "../controllers/status/setHeartbeat.js";
+import isAdminCheck from "../controllers/status/isAdminCheck.js";
+import { isAdmin } from "../middleware/isAdmin.js";
+import AddToQueue from "../controllers/media/AddToQueue.js";
+import SendNextSongInfo from "../controllers/media/SendNextSongInfo.js";
 
 const router = express.Router();
 

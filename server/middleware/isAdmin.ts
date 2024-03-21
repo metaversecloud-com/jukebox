@@ -1,5 +1,5 @@
-import { Credentials } from "../types";
-import { getVisitor } from "../utils";
+import { Credentials } from "../types/index.js";
+import { getVisitor } from "../utils/index.js";
 import { Request, Response, NextFunction } from "express";
 
 async function isAdmin(req: Request, res: Response, next: NextFunction) {

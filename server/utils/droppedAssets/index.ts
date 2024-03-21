@@ -1,1 +1,1 @@
-export * from "./getDroppedAsset"
+export * from "./getDroppedAsset.js"
