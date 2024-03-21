@@ -5,8 +5,8 @@
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {
-    "dev": "tsx watch index.ts",
-    "start": "tsx index.ts",
+    "dev": "npx tsx watch index.ts",
+    "start": "npx tsx index.ts",
     "build": "npx tsc",
     "ts-check": "tsc --noEmit"
   },
