@@ -4,4 +4,4 @@ ADD package* ./
 ADD server ./server
 ADD client ./client
 EXPOSE 3000
-ENTRYPOINT [ "npm", "start" ]
+ENTRYPOINT [ "node", "server/dist/index.js" ]
