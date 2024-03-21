@@ -9,9 +9,9 @@ dotenv.config()
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: process.env.VITE_PORT,
+    port: parseInt(process.env.VITE_PORT as string) || 3001,
     proxy: {
-      "/api": process.env.VITE_API_URL,
+      "/api": "http://localhost:3000/",
     },
   },
   build: {

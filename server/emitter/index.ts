@@ -47,8 +47,8 @@ emitterObj.listenNowPlaying = emitterObj.emitter.on("nowPlaying", (data) => {
     const { assetId, visitorId } = existingConnection.req.body;
     if (shouldSend(data, assetId, visitorId)) {
       const dataToSend = !data.visitorId
-        ? { data: { currentPlayIndex: data.currentPlayIndex } }
-        : { data: { video: data.video } };
+      ? { data: { currentPlayIndex: data.currentPlayIndex } }
+      : { data: { video: data.video } };
       dataToSend.kind = "nowPlaying";
       existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataToSend)}\n\n`);
     }

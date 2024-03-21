@@ -1,8 +1,10 @@
+import { Credentials } from "../../types";
 import { getVisitor } from "../../utils";
+import { Request, Response } from "express";
 
-export default async function isAdminCheck(req: Express.Request, res: Express.Response) {
+export default async function isAdminCheck(req: Request, res: Response) {
   try {
-    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query as Credentials;
     const visitor = await getVisitor({ interactivePublicKey, interactiveNonce, urlSlug, visitorId });
     if (!visitor) {
       return res.status(404).json({ message: "Visitor not found" });

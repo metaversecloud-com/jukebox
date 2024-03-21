@@ -107,7 +107,7 @@ const App = () => {
   }, [backendAPI, interactiveParams, dispatch]);
 
   const fetchData = useCallback(async () => {
-    await fetchEventSource(`${import.meta.env.VITE_API_URL}/api/sse`, {
+    await fetchEventSource(`/api/sse`, {
       method: "POST",
       headers: {
         "Accept": "text/event-stream",
@@ -130,14 +130,14 @@ const App = () => {
       onmessage(event) {
         const sse = JSON.parse(event.data);
         if (sse.kind === "nowPlaying") {
-          const nowPlaying = sse.data.video;
+          const nowPlaying = sse.data;
           if (nowPlaying.currentPlayIndex !== undefined) {
             dispatch!({
               type: UPDATE_PLAY_INDEX,
               payload: { currentPlayIndex: nowPlaying.currentPlayIndex, fromTrack: true },
             });
           } else {
-            dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying, fromTrack: false } });
+            dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: nowPlaying.video, fromTrack: false } });
           }
         } else if (sse.kind === "addedToQueue") {
           const videos = sse.videos;
@@ -172,7 +172,6 @@ const App = () => {
     const getIsAdmin = async () => {
       if (backendAPI) {
         const { data } = await backendAPI.get("/is-admin");
-        console.log("IS AMDIN", data.isAdmin);
         dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: data.isAdmin } });
       }
     };

@@ -1,9 +1,10 @@
-import { Credentials } from "../../types/index.ts";
-import { DroppedAsset, errorHandler } from "../index.ts"
+import { Credentials } from "../../types/index";
+import { DroppedAsset, errorHandler } from "../index";
 
 export const getDroppedAsset = async (credentials: Credentials) => {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = credentials;
+    if (!assetId || !interactivePublicKey || !interactiveNonce || !urlSlug || !visitorId) throw "Invalid credentials";
 
     const droppedAsset = await DroppedAsset.get(assetId, urlSlug, {
       credentials: {

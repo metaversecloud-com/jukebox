@@ -1,1 +1,1 @@
-export * from "./getVisitor.ts"
+export * from "./getVisitor"

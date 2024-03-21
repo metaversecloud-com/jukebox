@@ -1,4 +1,16 @@
-export const errorHandler = ({ error, functionName, message, req, res }) => {
+export const errorHandler = ({
+  error,
+  functionName,
+  message,
+  req,
+  res,
+}: {
+  error: any;
+  functionName: string;
+  message: string;
+  req?: any;
+  res?: any;
+}) => {
   try {
     const reqQueryParams = req?.query;
     if (reqQueryParams?.interactiveNonce) delete reqQueryParams.interactiveNonce;

@@ -19,6 +19,7 @@ interface VideoInfoTileProps {
   playVideo?: (videoId: string) => void;
   addVideo?: (videoId: string) => void;
   removeVideo?: (videoId: string) => void;
+  videoInCatalog?: boolean;
 }
 
 const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
@@ -31,6 +32,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
   playVideo,
   addVideo,
   removeVideo,
+  videoInCatalog,
 }) => {
   const [playMarquee, setPlayMarquee] = useState(true);
 
@@ -80,7 +82,12 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
         </div>
         {showControls && (
           <div className="flex items-center justify-end">
-            {showControls.plusminus &&
+            {videoInCatalog ? (
+              <span className="w-[40px] h-[40px] rounded-full flex items-center justify-center mx-[1px]">
+                <i className="bg-center bg-no-repeat bg-contain check-icon h-8 w-8" />
+              </span>
+            ) : (
+              showControls.plusminus &&
               (showControls.plusminus === "plus" ? (
                 <button
                   onClick={() => addVideo && addVideo(videoId)}
@@ -95,7 +102,8 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
                 >
                   <i className="icon minus-icon h-4 w-4" />
                 </button>
-              ))}
+              ))
+            )}
 
             {showControls.play && (
               <button

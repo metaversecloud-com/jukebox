@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import VideoInfoTile from "./VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
 import { ADD_TO_QUEUE, InitialState, SET_CURRENT_MEDIA, Video } from "@/context/types";
@@ -13,7 +13,7 @@ interface SearchResultsProps {
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
-  const { searchResults, searchLoading, nextPageToken, backendAPI, isAdmin } = useContext(
+  const { searchResults, searchLoading, nextPageToken, backendAPI, isAdmin, catalog } = useContext(
     GlobalStateContext,
   ) as InitialState;
   const [selectedVideos, setSelectedVideos] = useState<string[]>([]);
@@ -39,6 +39,12 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
     }
     setAddLoading(false);
   };
+
+  useEffect(() => {
+    if (searchLoading) {
+      setSelectedVideos([]);
+    }
+  }, [searchLoading]);
 
   return (
     <div className="w-full h-full">
@@ -66,6 +72,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
               videoName={video.snippet.title}
               videoDuration={convertMillisToMinutes(video.duration)}
               thumbnail={video.snippet.thumbnails.high.url}
+              videoInCatalog={catalog.find((v) => v.id.videoId === video.id.videoId) !== undefined}
               showControls={
                 !searchLoading && isAdmin
                   ? {

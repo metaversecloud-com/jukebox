@@ -1,15 +1,15 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import router from "./routes.ts";
+import router from "./router/routes";
 import path from "path";
 
-import { cleanReturnPayload } from "./utils/cleanReturnPayload.ts";
+import { cleanReturnPayload } from "./utils/cleanReturnPayload";
 import { fileURLToPath } from "url";
-import webhookRouter from "./webhook.ts";
+import webhookRouter from "./router/webhook";
 
 
-// import youtubeRouter from "./youtubeRoutes.ts";
+// import youtubeRouter from "./youtubeRoutes";
 dotenv.config({ path: "../.env"});
 
 

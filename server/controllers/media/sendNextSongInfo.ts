@@ -1,6 +1,7 @@
 import emitterObj from "../../emitter";
+import { Request, Response } from "express";
 
-export default async function SendNextSongInfo(req: Express.Request, res: Express.Response) {
+export default async function SendNextSongInfo(req: Request, res: Response) {
   if (!res.req.body.interactiveNonce) return res.status(400).json({ message: "Invalid" });
 
   emitterObj.addConn({ res, lastHeartbeatTime: Date.now() });

@@ -1,9 +1,11 @@
 import emitterObj from "../../emitter";
 import { getDroppedAsset } from "../../utils";
 import he from "he";
+import { Request, Response } from "express";
+import { Credentials } from "../../types";
 
-export default async function NextSong(req: Express.Request, res: Express.Response) {
-  const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body;
+export default async function NextSong(req: Request, res: Response) {
+  const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body as Credentials;
 
   const jukeboxAsset = await getDroppedAsset({ assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId });
   const { currentPlayIndex, media } = jukeboxAsset.dataObject;

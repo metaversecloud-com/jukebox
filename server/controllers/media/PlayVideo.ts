@@ -1,10 +1,12 @@
 import emitterObj from "../../emitter";
 import { getDroppedAsset, getVisitor } from "../../utils";
 import he from "he";
+import { Request, Response } from "express";
+import { Credentials } from "../../types";
 
-export default async function PlayVideo(req: Express.Request, res: Express.Response) {
+export default async function PlayVideo(req: Request, res: Response) {
   try {
-    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query as Credentials;
     const { video, fromTrack } = req.body;
 
     const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };

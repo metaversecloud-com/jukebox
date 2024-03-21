@@ -1,16 +1,17 @@
 import emitterObj from "../../emitter";
-import { Credentials } from "../../types";
+import { Credentials, Video } from "../../types";
 import { getDroppedAsset } from "../../utils";
+import { Request, Response } from "express";
 
-export default async function AddToQueue(req: Express.Request, res: Express.Response) {
+export default async function AddToQueue(req: Request, res: Response) {
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query as Credentials;
 
-  const { videos } = req.body;
+  const { videos }: { videos: Video[] } = req.body;
   const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
   const jukeboxAsset = await getDroppedAsset(credentials);
   const timeFactor = new Date(Math.round(new Date().getTime() / 10000) * 10000);
   const lockId = `${jukeboxAsset.id}_${timeFactor}`;
-  
+
   try {
     await jukeboxAsset.updateDataObject(
       {
@@ -29,7 +30,6 @@ export default async function AddToQueue(req: Express.Request, res: Express.Resp
 
     res.json({ message: "OK" });
   } catch (e) {
-    // console.log("ERR", e);
     console.log("Update is properly locked due to mutex", visitorId);
     return;
   }

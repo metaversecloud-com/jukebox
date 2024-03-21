@@ -1,1 +1,1 @@
-export * from "./getDroppedAsset.ts"
+export * from "./getDroppedAsset"

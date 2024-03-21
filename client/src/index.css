@@ -35,3 +35,7 @@ p {
 .minus-icon {
   background-image: url('minus.svg');
 }
+
+.check-icon {
+  background-image: url('check.svg');
+}

@@ -1,14 +1,14 @@
 import express from "express";
 
-import { getVersion } from "./utils/getVersion.ts";
-import GetCatalog from "./controllers/media/GetCatalog.ts";
-import SearchVideos from "./controllers/media/SearchVideos.ts";
-import PlayVideo from "./controllers/media/PlayVideo.ts";
-import setHeartbeat from "./controllers/status/setHeartbeat.ts";
-import isAdminCheck from "./controllers/status/isAdminCheck.ts";
-import { isAdmin } from "./middleware/isAdmin.ts";
-import AddToQueue from "./controllers/media/AddToQueue.ts";
-import SendNextSongInfo from "./controllers/media/sendNextSongInfo.ts";
+import { getVersion } from "../utils/getVersion";
+import GetCatalog from "../controllers/media/GetCatalog";
+import SearchVideos from "../controllers/media/SearchVideos";
+import PlayVideo from "../controllers/media/PlayVideo";
+import setHeartbeat from "../controllers/status/setHeartbeat";
+import isAdminCheck from "../controllers/status/isAdminCheck";
+import { isAdmin } from "../middleware/isAdmin";
+import AddToQueue from "../controllers/media/AddToQueue";
+import SendNextSongInfo from "../controllers/media/SendNextSongInfo";
 
 const router = express.Router();
 
@@ -24,6 +24,8 @@ router.get("/system/health", (req, res) => {
       NODE_ENV: process.env.NODE_ENV,
       INSTANCE_DOMAIN: process.env.API_DOMAIN,
       INTERACTIVE_KEY: process.env.PUBLIC_KEY,
+      INTERACTIVE_SECRET: process.env.INTERACTIVE_SECRET ? "SET" : "NOT SET",
+      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY ? "SET" : "NOT SET",
     },
   });
 });
