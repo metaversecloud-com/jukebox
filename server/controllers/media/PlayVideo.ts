@@ -7,21 +7,23 @@ import { Credentials } from "../../types/index.js";
 export default async function PlayVideo(req: Request, res: Response) {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query as Credentials;
-    const { video, fromTrack } = req.body;
+    const { videoId } = req.body;
 
     const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
     const jukeboxAsset = await getDroppedAsset(credentials);
+    const newIdx = jukeboxAsset.dataObject.media.findIndex((v) => v.id.videoId === videoId);
+    const video = jukeboxAsset.dataObject.media[newIdx];
 
     const mediaLink = `https://www.youtube.com/watch?v=${video.id.videoId}`;
 
-    const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}`;
-
+    const timeFactor = new Date(Math.round(new Date().getTime() / 25000) * 25000);
+    const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}_${timeFactor}`;
+    // const newIdx = jukeboxAsset.dataObject.media.map((v) => v.id.videoId).indexOf(video.id.videoId);
     try {
       await jukeboxAsset.updateDataObject(
         {
           ...jukeboxAsset.dataObject,
-          currentPlayingMedia: video,
-          fromTrack,
+          currentPlayIndex: newIdx,
         },
         {
           lock: {
@@ -41,13 +43,20 @@ export default async function PlayVideo(req: Request, res: Response) {
         syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
       });
 
-      emitterObj.emitFunc("nowPlaying", { video, assetId: jukeboxAsset.id, interactiveNonce, visitorId, urlSlug });
+      emitterObj.emitFunc("nowPlaying", {
+        videoId,
+        assetId: jukeboxAsset.id,
+        interactiveNonce,
+        visitorId,
+        urlSlug,
+        currentPlayIndex: newIdx,
+      });
 
       return res.status(200).json({ videoId: video.id.videoId });
     } catch (e) {
       // console.log("ERR", e);
       console.log("Update is properly locked due to mutex", visitorId);
-      return;
+      return res.status(409).json({ message: "Update is properly locked due to mutex" });
     }
   } catch (error) {
     console.error("Error:", error);

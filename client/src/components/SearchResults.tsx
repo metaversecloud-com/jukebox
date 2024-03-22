@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import VideoInfoTile from "./VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
-import { ADD_TO_QUEUE, InitialState, SET_CURRENT_MEDIA, Video } from "@/context/types";
+import { ADD_TO_QUEUE, InitialState, Video } from "@/context/types";
 import InfiniteScroll from "react-infinite-scroller";
-import { addToQueue, playVideo } from "@/context/actions";
+import { addToQueue } from "@/context/actions";
 import { convertMillisToMinutes } from "@/utils/duration";
 import { AxiosInstance } from "axios";
 import CircularLoader from "./CircularLoader";
@@ -20,14 +20,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
   const [addLoading, setAddLoading] = useState(false);
 
   const dispatch = useContext(GlobalDispatchContext);
-
-  const handlePlayVideo = async (videoId: string) => {
-    const video = searchResults.find((video) => video.id.videoId === videoId) as Video;
-    const res = await playVideo(backendAPI as AxiosInstance, video, false);
-    if (res) {
-      dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: video } });
-    }
-  };
 
   const handleAddToQueue = async () => {
     setAddLoading(true);
@@ -84,7 +76,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
                     }
                   : false
               }
-              playVideo={handlePlayVideo}
+              // playVideo={handlePlayVideo}
               addVideo={(videoId) => {
                 setSelectedVideos([...selectedVideos, videoId]);
               }}

@@ -11,12 +11,14 @@ export default async function AddToQueue(req: Request, res: Response) {
   const jukeboxAsset = await getDroppedAsset(credentials);
   const timeFactor = new Date(Math.round(new Date().getTime() / 10000) * 10000);
   const lockId = `${jukeboxAsset.id}_${timeFactor}`;
-
+  const mediaWithAddedVideos = jukeboxAsset.dataObject.media.slice();
   try {
+    mediaWithAddedVideos.splice(jukeboxAsset.dataObject.currentPlayIndex, 0, ...videos);
     await jukeboxAsset.updateDataObject(
       {
         ...jukeboxAsset.dataObject,
-        media: [...jukeboxAsset.dataObject.media, ...videos],
+        media: mediaWithAddedVideos,
+        currentPlayIndex: jukeboxAsset.dataObject.currentPlayIndex + videos.length,
       },
       {
         lock: {
@@ -28,9 +30,9 @@ export default async function AddToQueue(req: Request, res: Response) {
 
     emitterObj.emitFunc("addedToQueue", { assetId: jukeboxAsset.id, videos, interactiveNonce, urlSlug, visitorId });
 
-    res.json({ message: "OK" });
+    return res.json({ message: "OK" });
   } catch (e) {
     console.log("Update is properly locked due to mutex", visitorId);
-    return;
+    return res.status(409).json({ message: "Update is properly locked due to mutex" });
   }
 }

@@ -19,9 +19,9 @@ const fetchCatalog = async (backendAPI: AxiosInstance) => {
   }
 };
 
-const playVideo = async (backendAPI: AxiosInstance, video: Video, fromTrack: boolean) => {
+const playVideo = async (backendAPI: AxiosInstance, videoId: string) => {
   try {
-    const result = await backendAPI.post("/play", { video, fromTrack });
+    const result = await backendAPI.post("/play", { videoId });
     return result.data;
   } catch (error) {
     console.error(error);

@@ -9,7 +9,8 @@ export default async function NextSong(req: Request, res: Response) {
 
   const jukeboxAsset = await getDroppedAsset({ assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId });
   const { currentPlayIndex, media } = jukeboxAsset.dataObject;
-  const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}`;
+  const timeFactor = new Date(Math.round(new Date().getTime() / 25000) * 25000);
+  const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}_${timeFactor}`;
   const newPlayIndex = media.length === currentPlayIndex + 1 ? 0 : currentPlayIndex + 1;
 
   try {
@@ -17,8 +18,6 @@ export default async function NextSong(req: Request, res: Response) {
       {
         ...jukeboxAsset.dataObject,
         currentPlayIndex: newPlayIndex,
-        currentPlayingMedia: media[newPlayIndex],
-        fromTrack: true,
       },
       {
         lock: {
@@ -43,10 +42,10 @@ export default async function NextSong(req: Request, res: Response) {
     });
     emitterObj.emitFunc("nowPlaying", { assetId: jukeboxAsset.id, currentPlayIndex: newPlayIndex });
 
-    res.json({ message: "OK" });
+    return res.json({ message: "OK" });
   } catch (e) {
     // console.log("ERR", e);
     console.log("Update is properly locked due to mutex", visitorId);
-    return;
+    return res.status(409).json({ message: "Update is properly locked due to mutex" });
   }
 }

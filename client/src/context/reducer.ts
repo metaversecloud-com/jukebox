@@ -7,7 +7,6 @@ import {
   SET_BACKEND_API,
   SET_CATALOG,
   SET_CATALOG_LOADING,
-  SET_CURRENT_MEDIA,
   SET_INTERACTIVE_PARAMS,
   SET_NEXT_PAGE_LOADING,
   SET_SEARCH_LOADING,
@@ -15,7 +14,7 @@ import {
   SET_SEARCH_STATUS,
   UPDATE_PLAY_INDEX,
   SET_IS_ADMIN,
-  ADD_TO_QUEUE
+  ADD_TO_QUEUE,
 } from "./types";
 
 const globalReducer = (state: InitialState, action: ActionType) => {
@@ -47,12 +46,11 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         catalog: payload.catalog,
         currentPlayIndex: payload.currentPlayIndex,
-        fromTrack: payload.fromTrack,
         nowPlaying: payload.nowPlaying,
         catalogLoading: false,
         catalogStatus: "SUCCESS",
       };
-    case SET_IS_ADMIN: 
+    case SET_IS_ADMIN:
       return {
         ...state,
         isAdmin: payload.isAdmin,
@@ -82,11 +80,6 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         searchStatus: "SUCCESS",
         nextPageToken: payload.newNextPageToken,
       };
-    case SET_CURRENT_MEDIA:
-      return {
-        ...state,
-        nowPlaying: payload.nowPlaying,
-      };
     case GENERATE_SKELETON:
       return {
         ...state,
@@ -98,17 +91,21 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         searchResults: [],
         nextPageToken: "",
       };
-    case UPDATE_PLAY_INDEX: 
+    case UPDATE_PLAY_INDEX:
       return {
         ...state,
         currentPlayIndex: payload.currentPlayIndex,
-        nowPlaying: state.catalog[payload.currentPlayIndex],
-        fromTrack: payload.fromTrack,
+        nowPlaying: state.catalog[payload.currentPlayIndex]
       };
-    case ADD_TO_QUEUE: 
+    case ADD_TO_QUEUE:
+      // eslint-disable-next-line no-case-declarations
+      const catalogWithAddedVideos = state.catalog.slice();
+      catalogWithAddedVideos.splice(state.currentPlayIndex, 0, ...payload.videos);
+
       return {
         ...state,
-        catalog: [...state.catalog, ...payload.videos],
+        catalog: catalogWithAddedVideos,
+        currentPlayIndex: state.currentPlayIndex + payload.videos.length,
       };
     default: {
       throw new Error(`Unhandled action type: ${type}`);

@@ -2,47 +2,41 @@ import Header from "@/components/Header";
 import VideoInfoTile from "@/components/VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
 import { fetchCatalog, playVideo } from "@/context/actions";
-import { InitialState, SET_CATALOG, SET_CATALOG_LOADING, SET_CURRENT_MEDIA, Video } from "@/context/types";
+import { InitialState, SET_CATALOG, SET_CATALOG_LOADING, UPDATE_PLAY_INDEX, Video } from "@/context/types";
 import { convertMillisToMinutes } from "@/utils/duration";
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AxiosInstance } from "axios";
-import CircularLoader from "@/components/CircularLoader";
 
 const Home: React.FC = () => {
-  const {
-    hasInteractiveParams,
-    catalog,
-    catalogLoading,
-    nowPlaying,
-    backendAPI,
-    currentPlayIndex,
-    fromTrack,
-    isAdmin,
-  } = useContext(GlobalStateContext) as InitialState;
+  const { hasInteractiveParams, catalog, catalogLoading, nowPlaying, backendAPI, currentPlayIndex, isAdmin } =
+    useContext(GlobalStateContext) as InitialState;
 
-  const [playLoading, setPlayLoading] = useState(false);
+  const [playLoadingIndex, setPlayLoadingIndex] = useState<number>(-1);
+
   const dispatch = useContext(GlobalDispatchContext);
 
   const handlePlayVideo = async (videoId: string) => {
-    setPlayLoading(true);
     const video = catalog.find((video) => video.id.videoId === videoId) as Video;
-    const res = await playVideo(backendAPI as AxiosInstance, video, true);
+    const idx = catalog.findIndex((video) => video.id.videoId === videoId);
+    setPlayLoadingIndex(idx);
+    const res = await playVideo(backendAPI as AxiosInstance, video.id.videoId);
     if (res) {
-      dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: video } });
+      dispatch!({
+        type: UPDATE_PLAY_INDEX,
+        payload: { currentPlayIndex: idx },
+      });
     }
-    setPlayLoading(false);
+    setPlayLoadingIndex(-1);
   };
 
   useEffect(() => {
     async function loadCatalog() {
       dispatch!({ type: SET_CATALOG_LOADING, payload: { catalogLoading: true } });
-      const { currentPlayIndex, media, currentPlayingMedia, fromTrack } = await fetchCatalog(
-        backendAPI as AxiosInstance,
-      );
+      const { currentPlayIndex, media } = await fetchCatalog(backendAPI as AxiosInstance);
       dispatch!({
         type: SET_CATALOG,
-        payload: { catalog: media, currentPlayIndex, nowPlaying: currentPlayingMedia, fromTrack },
+        payload: { catalog: media, currentPlayIndex, nowPlaying: media[currentPlayIndex] },
       });
     }
 
@@ -59,14 +53,14 @@ const Home: React.FC = () => {
 
   return (
     <>
-      {playLoading && (
+      {/* {playLoading && (
         <>
           <div className="backdrop-brightness-90 blur-sm fixed top-0 z-10 w-full h-full"></div>
           <div className="fixed top-0 z-10 flex w-full h-full justify-center items-center select-none">
             <CircularLoader />
           </div>
         </>
-      )}
+      )} */}
       <Header />
       <div className="flex flex-col w-full justify-start">
         {nowPlaying && (
@@ -86,13 +80,7 @@ const Home: React.FC = () => {
         <p className="p1 font-semibold">Next Up: </p>
         {(() => {
           const queue = nowPlaying
-            ? (() => {
-                let offset = 1;
-                if (fromTrack === false) {
-                  offset = 0;
-                }
-                return catalog.slice(currentPlayIndex + offset).concat(catalog.slice(0, currentPlayIndex));
-              })()
+            ? catalog.slice(currentPlayIndex + 1).concat(catalog.slice(0, currentPlayIndex))
             : catalog;
           return queue.map((video, i) => (
             <div key={i} className="my-4">
@@ -103,6 +91,7 @@ const Home: React.FC = () => {
                 videoName={video.snippet.title}
                 videoDuration={convertMillisToMinutes(video.duration)}
                 thumbnail={video.snippet.thumbnails.high.url}
+                playLoading={playLoadingIndex === catalog.findIndex((v) => v.id.videoId === video.id.videoId)}
                 showControls={
                   !catalogLoading && isAdmin
                     ? {
@@ -111,6 +100,7 @@ const Home: React.FC = () => {
                       }
                     : false
                 }
+                disabledControls={playLoadingIndex !== -1}
                 playVideo={handlePlayVideo}
               ></VideoInfoTile>
             </div>

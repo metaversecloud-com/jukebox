@@ -45,9 +45,8 @@ const emitterObj = {
 emitterObj.listenNowPlaying = emitterObj.emitter.on("nowPlaying", (data) => {
   emitterObj.connections.forEach(({ res: existingConnection }) => {
     const { assetId, visitorId } = existingConnection.req.body;
-    console.log("NOW PLAYING EVENT");
     if (shouldSend(data, assetId, visitorId)) {
-      const dataToSend = !data.visitorId
+      const dataToSend = data.currentPlayIndex !== null
       ? { data: { currentPlayIndex: data.currentPlayIndex } }
       : { data: { video: data.video } };
       dataToSend.kind = "nowPlaying";

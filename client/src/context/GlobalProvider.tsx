@@ -8,7 +8,6 @@ const initialState: InitialState = {
   catalog: skeleton,
   currentPlayIndex: 0,
   isAdmin: false,
-  fromTrack: true,
   nowPlaying: videoSample,
   searchResults: [],
   nextPageToken: "",

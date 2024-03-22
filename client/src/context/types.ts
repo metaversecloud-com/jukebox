@@ -9,7 +9,6 @@ export const SET_CATALOG = "SET_CATALOG";
 export const SET_CATALOG_LOADING = "SET_CATALOG_LOADING";
 export const SET_CATALOG_STATUS = "SET_CATALOG_STATUS";
 export const GENERATE_SKELETON = "GENERATE_SKELETON";
-export const SET_CURRENT_MEDIA = "SET_CURRENT_MEDIA";
 export const SET_NEXT_PAGE_LOADING = "SET_NEXT_PAGE_LOADING";
 export const SET_BACKEND_API = "SET_BACKEND_API";
 export const UPDATE_PLAY_INDEX = "UPDATE_PLAY_INDEX";
@@ -36,7 +35,6 @@ export interface InitialState {
   isAdmin: boolean;
   nowPlaying: Video;
   currentPlayIndex: number;
-  fromTrack: boolean;
   searchResults: Video[];
   searchLoading: boolean;
   searchStatus: string;

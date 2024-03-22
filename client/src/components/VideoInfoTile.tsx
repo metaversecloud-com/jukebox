@@ -3,6 +3,7 @@ import Marquee from "react-fast-marquee";
 import he from "he";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import CircularLoader from "./CircularLoader";
 
 interface VideoInfoTileProps {
   videoId: string;
@@ -17,9 +18,11 @@ interface VideoInfoTileProps {
       }
     | false;
   playVideo?: (videoId: string) => void;
+  playLoading?: boolean;
   addVideo?: (videoId: string) => void;
   removeVideo?: (videoId: string) => void;
   videoInCatalog?: boolean;
+  disabledControls?: boolean;
 }
 
 const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
@@ -30,16 +33,26 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
   showControls,
   isLoading,
   playVideo,
+  playLoading,
   addVideo,
   removeVideo,
   videoInCatalog,
+  disabledControls
 }) => {
   const [playMarquee, setPlayMarquee] = useState(true);
 
   return (
     <div
-      className={`flex flex-row w-full rounded-l-xl ${showControls && showControls.plusminus !== false ? showControls.plusminus === "minus" && "bg-gray-300" : ""}`}
+      className={`relative flex flex-row w-full rounded-l-xl ${showControls && showControls.plusminus !== false ? showControls.plusminus === "minus" && "bg-gray-300" : ""}`}
     >
+      {playLoading && (
+        <>
+          <div className="backdrop-brightness-90 rounded-xl absolute top-0 z-10 w-[77%] h-full right-0"></div>
+          <div className="absolute top-0 z-10 flex rounded-xl w-[77%] h-full justify-center items-center select-none right-0">
+            <CircularLoader />
+          </div>
+        </>
+      )}
       {!isLoading ? (
         <div className="rounded-xl h-fit p-0">
           <img
@@ -90,6 +103,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
               showControls.plusminus &&
               (showControls.plusminus === "plus" ? (
                 <button
+                  disabled={disabledControls}
                   onClick={() => addVideo && addVideo(videoId)}
                   className="btn-icon flex items-center justify-center mx-[1px]"
                 >
@@ -97,6 +111,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
                 </button>
               ) : (
                 <button
+                  disabled={disabledControls}
                   onClick={() => removeVideo && removeVideo(videoId)}
                   className="btn-icon flex items-center justify-center mx-[1px]"
                 >
@@ -107,6 +122,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
 
             {showControls.play && (
               <button
+                disabled={disabledControls}
                 onClick={() => playVideo!(videoId)}
                 className={`btn-icon flex items-center justify-center mx-[1px]`}
               >

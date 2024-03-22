@@ -10,7 +10,6 @@ import {
   InitialState,
   InteractiveParams,
   SET_BACKEND_API,
-  SET_CURRENT_MEDIA,
   SET_INTERACTIVE_PARAMS,
   SET_IS_ADMIN,
   UPDATE_PLAY_INDEX,
@@ -131,14 +130,11 @@ const App = () => {
         const sse = JSON.parse(event.data);
         if (sse.kind === "nowPlaying") {
           const nowPlaying = sse.data;
-          if (nowPlaying.currentPlayIndex !== undefined) {
-            dispatch!({
-              type: UPDATE_PLAY_INDEX,
-              payload: { currentPlayIndex: nowPlaying.currentPlayIndex, fromTrack: true },
-            });
-          } else {
-            dispatch!({ type: SET_CURRENT_MEDIA, payload: { nowPlaying: nowPlaying.video, fromTrack: false } });
-          }
+          dispatch!({
+            type: UPDATE_PLAY_INDEX,
+            payload: { currentPlayIndex: nowPlaying.currentPlayIndex },
+          });
+
         } else if (sse.kind === "addedToQueue") {
           const videos = sse.videos;
           dispatch!({

@@ -26,7 +26,7 @@ const Search: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState(searchTermGlobal);
   const searchVideo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (searchLoading || searchTerm == "") return;
+    if (searchLoading || searchTerm.trim() == "") return;
     dispatch!({ type: RESET_SEARCH_RESULTS });
     dispatch!({ type: GENERATE_SKELETON });
 
