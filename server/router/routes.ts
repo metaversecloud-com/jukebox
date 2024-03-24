@@ -8,7 +8,7 @@ import setHeartbeat from "../controllers/status/setHeartbeat.js";
 import isAdminCheck from "../controllers/status/isAdminCheck.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 import AddToQueue from "../controllers/media/AddToQueue.js";
-import SendNextSongInfo from "../controllers/media/SendNextSongInfo.js";
+import SSE from "../controllers/media/SSE.js";
 
 const router = express.Router();
 
@@ -35,7 +35,7 @@ router.post("/search", isAdmin, SearchVideos);
 router.post("/play", isAdmin, PlayVideo);
 
 router.get("/catalog", GetCatalog);
-router.post("/sse", SendNextSongInfo);
+router.post("/sse", SSE);
 router.post("/heartbeat", setHeartbeat);
 router.get("/is-admin", isAdminCheck);
 router.post("/add-to-queue", isAdmin, AddToQueue);
