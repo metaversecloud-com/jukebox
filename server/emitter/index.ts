@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 
-const shouldSend = (data, assetId, visitorId) => {
+const shouldSend = (data: { assetId: string; visitorId: string | undefined }, assetId: string, visitorId: string) => {
   return data.assetId === assetId && (data.visitorId === undefined || data.visitorId !== visitorId);
 };
 
@@ -76,9 +76,10 @@ emitterObj.listenNowPlaying = emitterObj.emitter.on("nowPlaying", (data) => {
   emitterObj.connections.forEach(({ res: existingConnection }) => {
     const { assetId, visitorId } = existingConnection.req.body;
     if (shouldSend(data, assetId, visitorId)) {
-      const dataToSend = data.currentPlayIndex !== null
-      ? { data: { currentPlayIndex: data.currentPlayIndex } }
-      : { data: { video: data.video } };
+      const dataToSend =
+        data.currentPlayIndex !== null
+          ? { data: { currentPlayIndex: data.currentPlayIndex } }
+          : { data: { video: data.video } };
       dataToSend["kind"] = "nowPlaying";
       existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataToSend)}\n\n`);
     }

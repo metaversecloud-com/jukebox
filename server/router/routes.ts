@@ -21,10 +21,11 @@ router.get("/system/health", (req, res) => {
     appVersion: getVersion(),
     status: "OK",
     envs: {
-      NODE_ENV: process.env.NODE_ENV,
-      INSTANCE_DOMAIN: process.env.API_DOMAIN,
-      INTERACTIVE_KEY: process.env.PUBLIC_KEY,
+      NODE_ENV: process.env.NODE_ENV ? process.env.NODE_ENV : "NOT SET",
+      INSTANCE_DOMAIN: process.env.INSTANCE_DOMAIN ? process.env.INSTANCE_DOMAIN : "NOT SET",
+      INTERACTIVE_KEY: process.env.INTERACTIVE_KEY ? process.env.INTERACTIVE_KEY : "NOT SET",
       INTERACTIVE_SECRET: process.env.INTERACTIVE_SECRET ? "SET" : "NOT SET",
+      SAFE_SEARCH: process.env.SAFE_SEARCH ? process.env.SAFE_SEARCH : "NOT SET",
       GOOGLE_API_KEY: process.env.GOOGLE_API_KEY ? "SET" : "NOT SET",
     },
   });
