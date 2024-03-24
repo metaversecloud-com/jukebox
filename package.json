@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "npm run build -ws",
-    "start": "cd server && npm start",
+    "start": "npm run start -w server",
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
     "dev-server": "npm run dev --prefix server",
     "dev-client": "npm run dev --prefix client"
