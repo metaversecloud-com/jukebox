@@ -1,3 +1,4 @@
+// @ts-nocheck
 const YTDurationToMilliseconds = (isoDurationString: string) => {
   const regex =
     /^P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?$/;

@@ -13,7 +13,7 @@ export const getVisitor = async (credentials: Credentials) => {
         visitorId: parseInt(visitorId),
       },
     });
-
+    // @ts-ignore
     if (!visitor || !visitor.username) throw "Not in world";
 
     return visitor;

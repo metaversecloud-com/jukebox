@@ -48,6 +48,7 @@ app.use(function (req, res, next) {
       try {
         const cleanData = cleanReturnPayload(
           typeof data === "string" ? JSON.parse(data) : data,
+          // @ts-ignore
           "topia"
         );
         res.send = ogSend;

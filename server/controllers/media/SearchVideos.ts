@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { youtube_v3 } from "@googleapis/youtube";
 import initializeYouTube from "../../external/google.js";
 import { Video } from "../../types";

@@ -33,6 +33,7 @@ const emitterObj = {
     } else {
       this.connections.push(connection);
     }
+    console.log("Connection added", this.connections.length);
   },
   deleteConn: function () {
     // Remove inactive connections older than 1 hour
@@ -40,6 +41,35 @@ const emitterObj = {
       ({ lastHeartbeatTime }) => lastHeartbeatTime > Date.now() - 30 * 60 * 1000,
     );
   },
+  listenNowPlaying: null,
+  listenQueue: null,
+  // listenNowPlaying: function () {
+  //   this.emitter.on("nowPlaying", (data) => {
+  //     this.connections.forEach(({ res: existingConnection }) => {
+  //       const { assetId, visitorId } = existingConnection.req.body;
+  //       if (shouldSend(data, assetId, visitorId)) {
+  //         const dataToSend =
+  //           data.currentPlayIndex !== null
+  //             ? { data: { currentPlayIndex: data.currentPlayIndex } }
+  //             : { data: { video: data.video } };
+  //         dataToSend["kind"] = "nowPlaying";
+  //         existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataToSend)}\n\n`);
+  //       }
+  //     });
+  //   });
+  // },
+  // listenQueue: function () {
+  //   this.emitter.on("addedToQueue", (data) => {
+  //     this.connections.forEach(({ res: existingConnection }) => {
+  //       const { assetId, visitorId } = existingConnection.req.body;
+  //       if (shouldSend(data, assetId, visitorId)) {
+  //         const dataWithKind = { videos: data.videos, kind: "addedToQueue" };
+  //         console.log("DATA WITH KIND", dataWithKind)
+  //         existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataWithKind)}\n\n`);
+  //       }
+  //     });
+  //   });
+  // },
 };
 
 emitterObj.listenNowPlaying = emitterObj.emitter.on("nowPlaying", (data) => {
@@ -49,7 +79,7 @@ emitterObj.listenNowPlaying = emitterObj.emitter.on("nowPlaying", (data) => {
       const dataToSend = data.currentPlayIndex !== null
       ? { data: { currentPlayIndex: data.currentPlayIndex } }
       : { data: { video: data.video } };
-      dataToSend.kind = "nowPlaying";
+      dataToSend["kind"] = "nowPlaying";
       existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataToSend)}\n\n`);
     }
   });

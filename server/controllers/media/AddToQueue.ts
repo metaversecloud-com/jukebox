@@ -27,7 +27,6 @@ export default async function AddToQueue(req: Request, res: Response) {
         },
       },
     );
-
     emitterObj.emitFunc("addedToQueue", { assetId: jukeboxAsset.id, videos, interactiveNonce, urlSlug, visitorId });
 
     return res.json({ message: "OK" });

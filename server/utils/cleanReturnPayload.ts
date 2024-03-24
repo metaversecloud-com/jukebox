@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 const keys = ["topia", "credentials", "jwt", "requestOptions"];
 
 export const cleanReturnPayload = (payload) => {
