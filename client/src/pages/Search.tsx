@@ -53,7 +53,7 @@ const Search: React.FC = () => {
           <img src="left-arrow.svg" width={20} height={20} />
         </Link>
       )}
-      <Header />
+      <Header showAdminControls={false} />
       <div className="flex flex-col w-full justify-start">
         <p className="p2 font-semibold my-2">Search the Catalog</p>
         <form onSubmit={searchVideo} className="flex w-full justify-between items-center mt-1 mb-6">

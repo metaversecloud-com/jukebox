@@ -1,7 +1,16 @@
 import EventEmitter from "events";
 
-const shouldSend = (data: { assetId: string; visitorId: string | undefined }, assetId: string, visitorId: string) => {
-  return data.assetId === assetId && (data.visitorId === undefined || data.visitorId !== visitorId);
+const shouldSend = (
+  data: { assetId: string; visitorId: string | undefined; interactiveNonce: string | undefined },
+  assetId: string,
+  visitorId: string,
+  interactiveNonce: string,
+) => {
+  return (
+    data.assetId === assetId &&
+    (data.visitorId === undefined || data.visitorId !== visitorId) &&
+    (data.interactiveNonce === undefined || data.interactiveNonce !== interactiveNonce)
+  );
 };
 
 const emitterObj = {
@@ -74,8 +83,8 @@ const emitterObj = {
 
 emitterObj.listenNowPlaying = emitterObj.emitter.on("nowPlaying", (data) => {
   emitterObj.connections.forEach(({ res: existingConnection }) => {
-    const { assetId, visitorId } = existingConnection.req.body;
-    if (shouldSend(data, assetId, visitorId)) {
+    const { assetId, visitorId, interactiveNonce } = existingConnection.req.body;
+    if (shouldSend(data, assetId, visitorId, interactiveNonce)) {
       const dataToSend =
         data.currentPlayIndex !== null
           ? { data: { currentPlayIndex: data.currentPlayIndex } }
@@ -86,11 +95,11 @@ emitterObj.listenNowPlaying = emitterObj.emitter.on("nowPlaying", (data) => {
   });
 });
 
-emitterObj.listenQueue = emitterObj.emitter.on("addedToQueue", (data) => {
+emitterObj.listenQueue = emitterObj.emitter.on("queueAction", (data) => {
   emitterObj.connections.forEach(({ res: existingConnection }) => {
-    const { assetId, visitorId } = existingConnection.req.body;
-    if (shouldSend(data, assetId, visitorId)) {
-      const dataWithKind = { videos: data.videos, kind: "addedToQueue" };
+    const { assetId, visitorId, interactiveNonce } = existingConnection.req.body;
+    if (shouldSend(data, assetId, visitorId, interactiveNonce)) {
+      const dataWithKind = { videos: data.videos, kind: data.kind, videoIds: data.videoIds };
       existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataWithKind)}\n\n`);
     }
   });

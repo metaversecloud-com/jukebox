@@ -1,4 +1,4 @@
-import { skeleton } from "./constants";
+import { skeleton, videoSample } from "./constants";
 import {
   ActionType,
   GENERATE_SKELETON,
@@ -15,6 +15,7 @@ import {
   UPDATE_PLAY_INDEX,
   SET_IS_ADMIN,
   ADD_TO_QUEUE,
+  REMOVE_FROM_QUEUE,
 } from "./types";
 
 const globalReducer = (state: InitialState, action: ActionType) => {
@@ -46,7 +47,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         catalog: payload.catalog,
         currentPlayIndex: payload.currentPlayIndex,
-        nowPlaying: payload.nowPlaying,
+        nowPlaying: payload.nowPlaying || videoSample,
         catalogLoading: false,
         catalogStatus: "SUCCESS",
       };
@@ -95,7 +96,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
       return {
         ...state,
         currentPlayIndex: payload.currentPlayIndex,
-        nowPlaying: state.catalog[payload.currentPlayIndex]
+        nowPlaying: state.catalog[payload.currentPlayIndex] || videoSample,
       };
     case ADD_TO_QUEUE:
       // eslint-disable-next-line no-case-declarations
@@ -106,6 +107,15 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         catalog: catalogWithAddedVideos,
         currentPlayIndex: state.currentPlayIndex + payload.videos.length,
+      };
+    case REMOVE_FROM_QUEUE:
+      return {
+        ...state,
+        catalog: state.catalog.filter((video) => !payload.videoIds.includes(video.id.videoId)),
+        currentPlayIndex:
+          state.catalog.length > 0 && state.nowPlaying.id.videoId !== ""
+            ? state.catalog.findIndex((video) => video.id.videoId === state.nowPlaying.id.videoId)
+            : -1,
       };
     default: {
       throw new Error(`Unhandled action type: ${type}`);

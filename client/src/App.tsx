@@ -13,14 +13,16 @@ import {
   SET_INTERACTIVE_PARAMS,
   SET_IS_ADMIN,
   UPDATE_PLAY_INDEX,
+  REMOVE_FROM_QUEUE
 } from "./context/types";
 import Search from "./pages/Search";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
+import Admin from "./pages/Admin";
 
 const App = () => {
   const [searchParams] = useSearchParams();
 
-  const { backendAPI, hasInteractiveParams, } = useContext(GlobalStateContext) as InitialState;
+  const { backendAPI, hasInteractiveParams } = useContext(GlobalStateContext) as InitialState;
   const [connectionEstablished, setConnectionEstablished] = useState(false);
 
   const dispatch = useContext(GlobalDispatchContext);
@@ -134,15 +136,20 @@ const App = () => {
             type: UPDATE_PLAY_INDEX,
             payload: { currentPlayIndex: nowPlaying.currentPlayIndex },
           });
-
         } else if (sse.kind === "addedToQueue") {
           const videos = sse.videos;
           dispatch!({
             type: ADD_TO_QUEUE,
             payload: { videos },
           });
+        } else if (sse.kind === "removedFromQueue") {
+          const videoIds = sse.videoIds;
+          dispatch!({
+            type: REMOVE_FROM_QUEUE,
+            payload: { videoIds },
+          });
         }
-      }
+      },
     });
   }, [interactiveParams, dispatch]);
 
@@ -183,7 +190,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
-        
+        <Route path="/admin" element={<Admin />} />
+
         <Route path="*" element={<Error />} />
       </Routes>
     </div>

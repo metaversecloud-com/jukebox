@@ -9,6 +9,7 @@ import isAdminCheck from "../controllers/status/isAdminCheck.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 import AddToQueue from "../controllers/media/AddToQueue.js";
 import SSE from "../controllers/media/SSE.js";
+import RemoveFromQueue from "../controllers/media/RemoveFromQueue.js";
 
 const router = express.Router();
 
@@ -40,5 +41,6 @@ router.post("/sse", SSE);
 router.post("/heartbeat", setHeartbeat);
 router.get("/is-admin", isAdminCheck);
 router.post("/add-to-queue", isAdmin, AddToQueue);
+router.post("/remove-from-queue", isAdmin, RemoveFromQueue);
 
 export default router;

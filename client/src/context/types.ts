@@ -14,6 +14,7 @@ export const SET_BACKEND_API = "SET_BACKEND_API";
 export const UPDATE_PLAY_INDEX = "UPDATE_PLAY_INDEX";
 export const SET_IS_ADMIN = "SET_IS_ADMIN";
 export const ADD_TO_QUEUE = "ADD_TO_QUEUE";
+export const REMOVE_FROM_QUEUE = "REMOVE_FROM_QUEUE";
 
 export type InteractiveParams = {
   assetId: string | null;

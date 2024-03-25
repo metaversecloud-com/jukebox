@@ -39,3 +39,7 @@ p {
 .check-icon {
   background-image: url('check.svg');
 }
+
+.settings-icon {
+  background-image: url('settings.svg');
+}

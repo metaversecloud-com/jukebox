@@ -11,6 +11,9 @@ export default async function PlayVideo(req: Request, res: Response) {
 
     const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
     const jukeboxAsset = await getDroppedAsset(credentials);
+    if (jukeboxAsset.error) {
+      return res.status(404).json({ message: "Asset not found" });
+    }
     const newIdx = jukeboxAsset.dataObject.media.findIndex((v) => v.id.videoId === videoId);
     const video = jukeboxAsset.dataObject.media[newIdx];
 

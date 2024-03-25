@@ -43,12 +43,12 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
 
   return (
     <div
-      className={`relative flex flex-row w-full rounded-l-xl ${showControls && showControls.plusminus !== false ? showControls.plusminus === "minus" && "bg-gray-300" : ""}`}
+      className={`relative flex flex-row w-full rounded-l-xl pr-1 ${showControls && showControls.plusminus !== false ? showControls.plusminus === "minus" && "bg-gray-300" : ""}`}
     >
       {playLoading && (
         <>
-          <div className="backdrop-brightness-90 rounded-xl absolute top-0 z-10 w-[77%] h-full right-0"></div>
-          <div className="absolute top-0 z-10 flex rounded-xl w-[77%] h-full justify-center items-center select-none right-0">
+          <div className="backdrop-brightness-90 rounded-xl absolute top-0 z-10 h-full w-full"></div>
+          <div className="absolute top-0 z-10 flex rounded-xl h-full justify-center items-center select-none w-full">
             <CircularLoader />
           </div>
         </>

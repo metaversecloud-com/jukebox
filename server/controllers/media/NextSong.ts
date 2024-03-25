@@ -8,6 +8,9 @@ export default async function NextSong(req: Request, res: Response) {
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body as Credentials;
 
   const jukeboxAsset = await getDroppedAsset({ assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId });
+  if (jukeboxAsset.error) {
+    return res.status(404).json({ message: "Asset not found" });
+  }
   const { currentPlayIndex, media } = jukeboxAsset.dataObject;
   const timeFactor = new Date(Math.round(new Date().getTime() / 25000) * 25000);
   const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}_${timeFactor}`;

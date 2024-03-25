@@ -53,17 +53,9 @@ const Home: React.FC = () => {
 
   return (
     <>
-      {/* {playLoading && (
-        <>
-          <div className="backdrop-brightness-90 blur-sm fixed top-0 z-10 w-full h-full"></div>
-          <div className="fixed top-0 z-10 flex w-full h-full justify-center items-center select-none">
-            <CircularLoader />
-          </div>
-        </>
-      )} */}
-      <Header />
+      <Header showAdminControls={isAdmin} />
       <div className="flex flex-col w-full justify-start">
-        {nowPlaying && (
+        {nowPlaying && nowPlaying.id.videoId !== "" && (
           <>
             <p className="p1 font-semibold">Now Playing: </p>
             <div className="my-4">
@@ -83,10 +75,9 @@ const Home: React.FC = () => {
             ? catalog.slice(currentPlayIndex + 1).concat(catalog.slice(0, currentPlayIndex))
             : catalog;
           return queue.map((video, i) => (
-            <div key={i} className="my-4">
+            <div key={`${video.id.videoId}-${i}-div`} className="my-4">
               <VideoInfoTile
                 isLoading={catalogLoading}
-                key={`${video.id.videoId}${i}`}
                 videoId={video.id.videoId}
                 videoName={video.snippet.title}
                 videoDuration={convertMillisToMinutes(video.duration)}

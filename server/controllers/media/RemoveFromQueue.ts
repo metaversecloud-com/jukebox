@@ -3,10 +3,10 @@ import { Credentials, Video } from "../../types/index.js";
 import { getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
 
-export default async function AddToQueue(req: Request, res: Response) {
+export default async function RemoveFromQueue(req: Request, res: Response) {
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query as Credentials;
 
-  const { videos }: { videos: Video[] } = req.body;
+  const { videoIds }: { videoIds: string[] } = req.body;
   const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
   const jukeboxAsset = await getDroppedAsset(credentials);
   if (jukeboxAsset.error) {
@@ -14,14 +14,19 @@ export default async function AddToQueue(req: Request, res: Response) {
   }
   const timeFactor = new Date(Math.round(new Date().getTime() / 10000) * 10000);
   const lockId = `${jukeboxAsset.id}_${timeFactor}`;
-  const mediaWithAddedVideos = jukeboxAsset.dataObject.media.slice();
+  const mediaWithRemovedVideos = jukeboxAsset.dataObject.media.filter(
+    (video: Video) => !videoIds.includes(video.id.videoId),
+  );
+  const currentPlayIndex = mediaWithRemovedVideos.findIndex(
+    (video: Video) =>
+      video.id.videoId === jukeboxAsset.dataObject.media[jukeboxAsset.dataObject.currentPlayIndex].id.videoId,
+  );
   try {
-    mediaWithAddedVideos.splice(jukeboxAsset.dataObject.currentPlayIndex, 0, ...videos);
     await jukeboxAsset.updateDataObject(
       {
         ...jukeboxAsset.dataObject,
-        media: mediaWithAddedVideos,
-        currentPlayIndex: jukeboxAsset.dataObject.currentPlayIndex + videos.length,
+        media: mediaWithRemovedVideos,
+        currentPlayIndex,
       },
       {
         lock: {
@@ -32,11 +37,11 @@ export default async function AddToQueue(req: Request, res: Response) {
     );
     emitterObj.emitFunc("queueAction", {
       assetId: jukeboxAsset.id,
-      videos,
+      videoIds,
       interactiveNonce,
       urlSlug,
       visitorId,
-      kind: "addedToQueue",
+      kind: "removedFromQueue",
     });
 
     return res.json({ message: "OK" });

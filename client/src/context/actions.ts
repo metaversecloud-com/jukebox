@@ -46,4 +46,13 @@ const addToQueue = async (backendAPI: AxiosInstance, videos: Video[]) => {
   }
 };
 
-export { searchCatalog, fetchCatalog, playVideo, checkIsAdmin, addToQueue };
+const removeFromQueue = async (backendAPI: AxiosInstance, videoIds: string[]) => {
+  try {
+    const result = await backendAPI.post("/remove-from-queue", { videoIds });
+    return result.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export { searchCatalog, fetchCatalog, playVideo, checkIsAdmin, addToQueue, removeFromQueue };
