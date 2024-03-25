@@ -19,7 +19,7 @@ export default async function RemoveFromQueue(req: Request, res: Response) {
   );
   const currentPlayIndex = mediaWithRemovedVideos.findIndex(
     (video: Video) =>
-      video.id.videoId === jukeboxAsset.dataObject.media[jukeboxAsset.dataObject.currentPlayIndex].id.videoId,
+      video.id.videoId === jukeboxAsset.dataObject.media[jukeboxAsset.dataObject.currentPlayIndex]?.id?.videoId,
   );
   try {
     await jukeboxAsset.updateDataObject(

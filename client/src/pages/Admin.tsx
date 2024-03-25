@@ -20,7 +20,7 @@ const Admin = () => {
 
   const handleRemoveFromQueue = async () => {
     setRemoveLoading(true);
-    const res = await removeFromQueue(backendAPI as AxiosInstance, selectedVideoIds);
+    const res = await removeFromQueue(backendAPI as AxiosInstance, selectedVideoIds.filter((videoId) => videoId !== nowPlaying.id.videoId));
     if (res) {
       setSelectedVideoIds([]);
       dispatch!({
