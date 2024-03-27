@@ -20,21 +20,21 @@ const emitterObj = {
     this.emitter.emit(event, data);
   },
   addConn: function (connection) {
-    const { visitorId, interactiveNonce } = connection.res.req.body;
+    const { visitorId, interactiveNonce } = connection.res.req.query;
 
     if (
       this.connections.some(
         ({ res: existingConnection }) =>
-          existingConnection.req.body.interactiveNonce === interactiveNonce &&
-          existingConnection.req.body.visitorId === visitorId,
+          existingConnection.req.query.interactiveNonce === interactiveNonce &&
+          existingConnection.req.query.visitorId === visitorId,
       )
     ) {
       // Replace old connection with new one
       this.connections.splice(
         this.connections.findIndex(
           ({ res: existingConnection }) =>
-            existingConnection.req.body.interactiveNonce === interactiveNonce &&
-            existingConnection.req.body.visitorId === visitorId,
+            existingConnection.req.query.interactiveNonce === interactiveNonce &&
+            existingConnection.req.query.visitorId === visitorId,
         ),
         1,
         connection,
@@ -83,7 +83,7 @@ const emitterObj = {
 
 emitterObj.listenNowPlaying = emitterObj.emitter.on("nowPlaying", (data) => {
   emitterObj.connections.forEach(({ res: existingConnection }) => {
-    const { assetId, visitorId, interactiveNonce } = existingConnection.req.body;
+    const { assetId, visitorId, interactiveNonce } = existingConnection.req.query;
     if (shouldSend(data, assetId, visitorId, interactiveNonce)) {
       const dataToSend =
         data.currentPlayIndex !== null
@@ -97,7 +97,7 @@ emitterObj.listenNowPlaying = emitterObj.emitter.on("nowPlaying", (data) => {
 
 emitterObj.listenQueue = emitterObj.emitter.on("queueAction", (data) => {
   emitterObj.connections.forEach(({ res: existingConnection }) => {
-    const { assetId, visitorId, interactiveNonce } = existingConnection.req.body;
+    const { assetId, visitorId, interactiveNonce } = existingConnection.req.query;
     if (shouldSend(data, assetId, visitorId, interactiveNonce)) {
       const dataWithKind = { videos: data.videos, kind: data.kind, videoIds: data.videoIds };
       existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataWithKind)}\n\n`);

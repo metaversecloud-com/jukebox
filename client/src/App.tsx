@@ -13,15 +13,15 @@ import {
   SET_INTERACTIVE_PARAMS,
   SET_IS_ADMIN,
   UPDATE_PLAY_INDEX,
-  REMOVE_FROM_QUEUE
+  REMOVE_FROM_QUEUE,
 } from "./context/types";
 import Search from "./pages/Search";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
+// import { fetchEventSource } from "@microsoft/fetch-event-source";
 import Admin from "./pages/Admin";
 
 const App = () => {
   const [searchParams] = useSearchParams();
-
+  const [sseEvent, setSSEevent] = useState<EventSource | null>(null);
   const { backendAPI, hasInteractiveParams } = useContext(GlobalStateContext) as InitialState;
   const [connectionEstablished, setConnectionEstablished] = useState(false);
 
@@ -107,28 +107,27 @@ const App = () => {
     }
   }, [backendAPI, interactiveParams, dispatch]);
 
-  const fetchData = useCallback(async () => {
-    await fetchEventSource(`/api/sse`, {
-      method: "POST",
-      headers: {
-        "Accept": "text/event-stream",
-        "Content-Type": "application/json",
-      },
-      // signal: abortController.current.signal,
-      body: JSON.stringify({
-        assetId: interactiveParams?.assetId,
-        displayName: interactiveParams?.displayName,
-        interactiveNonce: interactiveParams?.interactiveNonce,
-        interactivePublicKey: interactiveParams?.interactivePublicKey,
-        isInteractiveIframe: interactiveParams?.isInteractiveIframe,
-        profileId: interactiveParams?.profileId,
-        sceneDropId: interactiveParams?.sceneDropId,
-        uniqueName: interactiveParams?.uniqueName,
-        urlSlug: interactiveParams?.urlSlug,
-        username: interactiveParams?.username,
-        visitorId: interactiveParams?.visitorId,
-      }),
-      onmessage(event) {
+  // const connectSSE = useCallback(() => {
+   
+  //   setSSEevent(events);
+  // }, [dispatch]);
+
+  useEffect(() => {
+    if (hasInteractiveParams && !connectionEstablished) {
+      console.log("Establishing connection...");
+      // connectSSE();
+      const events = new EventSource(
+        `/api/sse?assetId=${interactiveParams.assetId}&visitorId=${interactiveParams.visitorId}&interactiveNonce=${interactiveParams.interactiveNonce}&interactivePublicKey=${interactiveParams.interactivePublicKey}&profileId=${interactiveParams.profileId}&urlSlug=${interactiveParams.urlSlug}`,
+      );
+      setSSEevent(events);
+      setConnectionEstablished(true);
+    }
+  }, [hasInteractiveParams, connectionEstablished, interactiveParams, dispatch]);
+
+  useEffect(() => {
+    if (sseEvent) {
+      sseEvent.onmessage = (event) => {
+        console.log("RECEIVED EVENT");
         const sse = JSON.parse(event.data);
         if (sse.kind === "nowPlaying") {
           const nowPlaying = sse.data;
@@ -149,18 +148,9 @@ const App = () => {
             payload: { videoIds },
           });
         }
-      },
-    });
-  }, [interactiveParams, dispatch]);
-
-  useEffect(() => {
-    if (hasInteractiveParams && !connectionEstablished) {
-      console.log("Establishing connection...");
-      fetchData();
-      setConnectionEstablished(true);
+      };
     }
-  }, [hasInteractiveParams, interactiveParams, connectionEstablished, fetchData, dispatch]);
-
+  }, [sseEvent]);
   useEffect(() => {
     const sendHeartbeat = async () => {
       try {

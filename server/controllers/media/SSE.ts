@@ -2,8 +2,7 @@ import emitterObj from "../../emitter/index.js";
 import { Request, Response } from "express";
 
 export default async function SSE(req: Request, res: Response) {
-  if (!res.req.body.interactiveNonce) return res.status(400).json({ message: "Invalid" });
-
+  if (!res.req.query.interactiveNonce) return res.status(400).json({ message: "Invalid" });
   emitterObj.addConn({ res, lastHeartbeatTime: Date.now() });
 
   res.writeHead(200, {
@@ -14,5 +13,5 @@ export default async function SSE(req: Request, res: Response) {
 
   emitterObj.listenNowPlaying;
   emitterObj.listenQueue;
-
+  // res.write(`retry: 5000\ndata: ${JSON.stringify({ q: "hello" })}\n\n`);
 }

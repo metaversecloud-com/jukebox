@@ -37,7 +37,7 @@ router.post("/search", isAdmin, SearchVideos);
 router.post("/play", isAdmin, PlayVideo);
 
 router.get("/catalog", GetCatalog);
-router.post("/sse", SSE);
+router.get("/sse", SSE);
 router.post("/heartbeat", setHeartbeat);
 router.get("/is-admin", isAdminCheck);
 router.post("/add-to-queue", isAdmin, AddToQueue);
