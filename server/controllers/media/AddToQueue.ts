@@ -1,4 +1,4 @@
-import emitterObj from "../../emitter/index.js";
+import redisObj from "../../redis/index.js";
 import { Credentials, Video } from "../../types/index.js";
 import { getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
@@ -30,13 +30,14 @@ export default async function AddToQueue(req: Request, res: Response) {
         },
       },
     );
-    emitterObj.emitFunc("queueAction", {
+    redisObj.publish(`${process.env.INTERACTIVE_KEY}_JUKEBOX`, {
       assetId: jukeboxAsset.id,
       videos,
       interactiveNonce,
       urlSlug,
       visitorId,
       kind: "addedToQueue",
+      event: "queueAction",
     });
 
     return res.json({ message: "OK" });

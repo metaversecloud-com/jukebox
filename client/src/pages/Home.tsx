@@ -69,13 +69,13 @@ const Home: React.FC = () => {
             </div>
           </>
         )}
-        <p className="p1 font-semibold">Next Up: </p>
+        <p className="p1 font-semibold mb-2">Next Up: </p>
         {(() => {
           const queue = nowPlaying
             ? catalog.slice(currentPlayIndex + 1).concat(catalog.slice(0, currentPlayIndex))
             : catalog;
           return queue.map((video, i) => (
-            <div key={`${video.id.videoId}-${i}-div`} className="my-4">
+            <div key={`${video.id.videoId}-${i}-div`} className="my-2">
               <VideoInfoTile
                 isLoading={catalogLoading}
                 videoId={video.id.videoId}

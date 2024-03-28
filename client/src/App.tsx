@@ -107,15 +107,10 @@ const App = () => {
     }
   }, [backendAPI, interactiveParams, dispatch]);
 
-  // const connectSSE = useCallback(() => {
-   
-  //   setSSEevent(events);
-  // }, [dispatch]);
 
   useEffect(() => {
     if (hasInteractiveParams && !connectionEstablished) {
       console.log("Establishing connection...");
-      // connectSSE();
       const events = new EventSource(
         `/api/sse?assetId=${interactiveParams.assetId}&visitorId=${interactiveParams.visitorId}&interactiveNonce=${interactiveParams.interactiveNonce}&interactivePublicKey=${interactiveParams.interactivePublicKey}&profileId=${interactiveParams.profileId}&urlSlug=${interactiveParams.urlSlug}`,
       );
@@ -127,7 +122,6 @@ const App = () => {
   useEffect(() => {
     if (sseEvent) {
       sseEvent.onmessage = (event) => {
-        console.log("RECEIVED EVENT");
         const sse = JSON.parse(event.data);
         if (sse.kind === "nowPlaying") {
           const nowPlaying = sse.data;

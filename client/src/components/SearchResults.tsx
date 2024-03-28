@@ -56,7 +56,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
         loader={<CircularLoader />}
       >
         {searchResults.map((video: Video, i: number) => (
-          <div key={`${video.id.videoId}-${i}-result`} className="my-4">
+          <div key={`${video.id.videoId}-${i}-result`} className="my-3">
             <VideoInfoTile
               isLoading={searchLoading}
               videoId={video.id.videoId}

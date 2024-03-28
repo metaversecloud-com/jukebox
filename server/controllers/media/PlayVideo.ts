@@ -1,4 +1,4 @@
-import emitterObj from "../../emitter/index.js";
+import redisObj from "../../redis/index.js";
 import { getDroppedAsset } from "../../utils/index.js";
 import he from "he";
 import { Request, Response } from "express";
@@ -46,13 +46,14 @@ export default async function PlayVideo(req: Request, res: Response) {
         syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
       });
 
-      emitterObj.emitFunc("nowPlaying", {
+      redisObj.publish(`${process.env.INTERACTIVE_KEY}_JUKEBOX`, {
         videoId,
         assetId: jukeboxAsset.id,
         interactiveNonce,
         visitorId,
         urlSlug,
         currentPlayIndex: newIdx,
+        event: "nowPlaying",
       });
 
       return res.status(200).json({ videoId: video.id.videoId });

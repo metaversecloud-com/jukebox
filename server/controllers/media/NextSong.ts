@@ -1,4 +1,4 @@
-import emitterObj from "../../emitter/index.js";
+import redisObj from "../../redis/index.js";
 import { getDroppedAsset } from "../../utils/index.js";
 import he from "he";
 import { Request, Response } from "express";
@@ -43,7 +43,7 @@ export default async function NextSong(req: Request, res: Response) {
       audioRadius: jukeboxAsset.audioRadius || 2, // Far
       syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
     });
-    emitterObj.emitFunc("nowPlaying", { assetId: jukeboxAsset.id, currentPlayIndex: newPlayIndex });
+    redisObj.publish(`${process.env.INTERACTIVE_KEY}_JUKEBOX`, { assetId: jukeboxAsset.id, currentPlayIndex: newPlayIndex, event: "nowPlaying" });
 
     return res.json({ message: "OK" });
   } catch (e) {

@@ -55,7 +55,7 @@ const Admin = () => {
         ) : (
           <div className="flex flex-col w-full justify-start items-center">
             {catalog.map((video, i) => (
-              <div key={`${video.id.videoId}-${i}-tile`} className="my-4">
+              <div key={`${video.id.videoId}-${i}-tile`} className="my-2">
                 <VideoInfoTile
                   isLoading={false}
                   videoId={video.id.videoId}

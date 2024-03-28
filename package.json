@@ -15,12 +15,10 @@
     "server"
   ],
   "dependencies": {
-    "@rtsdk/topia": "^0.8.5",
-    "dotenv": "^16.4.5",
+    "concurrently": "^8.2.2",
     "he": "^1.2.0"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
     "@types/he": "^1.2.3",
     "prettier": "3.2.5"
   }

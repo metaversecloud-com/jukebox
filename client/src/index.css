@@ -17,29 +17,29 @@ p {
 }
 
 .play-icon {
-  background-image: url('play.svg');
+  background-image: url('/play.svg');
 }
 
 .stop-icon {
-  background-image: url('stop.svg');
+  background-image: url('/stop.svg');
 }
 
 .pause-icon {
-  background-image: url('pause.svg');
+  background-image: url('/pause.svg');
 }
 
 .add-icon {
-  background-image: url('plus.svg');
+  background-image: url('/plus.svg');
 }
 
 .minus-icon {
-  background-image: url('minus.svg');
+  background-image: url('/minus.svg');
 }
 
 .check-icon {
-  background-image: url('check.svg');
+  background-image: url('/check.svg');
 }
 
 .settings-icon {
-  background-image: url('settings.svg');
+  background-image: url('/settings.svg');
 }
