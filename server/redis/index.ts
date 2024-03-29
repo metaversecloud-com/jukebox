@@ -15,14 +15,14 @@ const shouldSendEvent = (
 
 const redisObj = {
   publisher: createClient({
-    password: process.env.REDIS_PASSWORD,
+    // password: process.env.REDIS_PASSWORD,
     socket: {
       host: process.env.REDIS_URL,
       port: parseInt(process.env.REDIS_PORT) || 6379,
     },
   }),
   subscriber: createClient({
-    password: process.env.REDIS_PASSWORD,
+    // password: process.env.REDIS_PASSWORD,
     socket: {
       host: process.env.REDIS_URL,
       port: parseInt(process.env.REDIS_PORT) || 6379,
