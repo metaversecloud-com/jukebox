@@ -101,10 +101,10 @@ const redisObj = {
   },
   deleteConn: function () {
     // Remove inactive connections older than 1 hour
-    this.connections = this.connections.filter(({ existingConnection, lastHeartbeatTime }) => {
+    this.connections = this.connections.filter(({ res, lastHeartbeatTime }) => {
       const isActive = lastHeartbeatTime > Date.now() - 30 * 60 * 1000;
       if (!isActive) {
-        console.log(`Connection to ${existingConnection.req.query.interactiveNonce} deleted`);
+        console.log(`Connection to ${res.req.query.interactiveNonce} deleted`);
       }
       return isActive;
     });
