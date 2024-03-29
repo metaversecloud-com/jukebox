@@ -36,7 +36,10 @@ const Home: React.FC = () => {
       const { currentPlayIndex, media } = await fetchCatalog(backendAPI as AxiosInstance);
       dispatch!({
         type: SET_CATALOG,
-        payload: { catalog: media, currentPlayIndex, nowPlaying: media[currentPlayIndex] },
+        payload: {
+          catalog: media,
+          currentPlayIndex,
+        },
       });
     }
 
@@ -69,34 +72,39 @@ const Home: React.FC = () => {
             </div>
           </>
         )}
-        <p className="p1 font-semibold mb-2">Next Up: </p>
-        {(() => {
-          const queue = nowPlaying
-            ? catalog.slice(currentPlayIndex + 1).concat(catalog.slice(0, currentPlayIndex))
-            : catalog;
-          return queue.map((video, i) => (
-            <div key={`${video.id.videoId}-${i}-div`} className="my-2">
-              <VideoInfoTile
-                isLoading={catalogLoading}
-                videoId={video.id.videoId}
-                videoName={video.snippet.title}
-                videoDuration={convertMillisToMinutes(video.duration)}
-                thumbnail={video.snippet.thumbnails.high.url}
-                playLoading={playLoadingIndex === catalog.findIndex((v) => v.id.videoId === video.id.videoId)}
-                showControls={
-                  !catalogLoading && isAdmin
-                    ? {
-                        play: true,
-                        plusminus: false,
-                      }
-                    : false
-                }
-                disabledControls={playLoadingIndex !== -1}
-                playVideo={handlePlayVideo}
-              ></VideoInfoTile>
-            </div>
-          ));
-        })()}
+        {catalog.length > 0 && (
+          <>
+            <p className="p1 font-semibold mb-2">Next Up: </p>
+            {(() => {
+              const queue =
+                nowPlaying && currentPlayIndex !== -1
+                  ? catalog.slice(currentPlayIndex + 1).concat(catalog.slice(0, currentPlayIndex))
+                  : catalog;
+              return queue.map((video, i) => (
+                <div key={`${video.id.videoId}-${i}-div`} className="my-2">
+                  <VideoInfoTile
+                    isLoading={catalogLoading}
+                    videoId={video.id.videoId}
+                    videoName={video.snippet.title}
+                    videoDuration={convertMillisToMinutes(video.duration)}
+                    thumbnail={video.snippet.thumbnails.high.url}
+                    playLoading={playLoadingIndex === catalog.findIndex((v) => v.id.videoId === video.id.videoId)}
+                    showControls={
+                      !catalogLoading && isAdmin
+                        ? {
+                            play: true,
+                            plusminus: false,
+                          }
+                        : false
+                    }
+                    disabledControls={playLoadingIndex !== -1}
+                    playVideo={handlePlayVideo}
+                  ></VideoInfoTile>
+                </div>
+              ));
+            })()}
+          </>
+        )}
       </div>
       {isAdmin && (
         <Link className="btn btn-enhanced w-full my-2" to={"/search"}>

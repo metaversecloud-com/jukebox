@@ -110,7 +110,7 @@ const App = () => {
 
   useEffect(() => {
     if (hasInteractiveParams && !connectionEstablished) {
-      console.log("Establishing connection...");
+      console.log("Establishing SSE connection...");
       const events = new EventSource(
         `/api/sse?assetId=${interactiveParams.assetId}&visitorId=${interactiveParams.visitorId}&interactiveNonce=${interactiveParams.interactiveNonce}&interactivePublicKey=${interactiveParams.interactivePublicKey}&profileId=${interactiveParams.profileId}&urlSlug=${interactiveParams.urlSlug}`,
       );

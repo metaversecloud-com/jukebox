@@ -14,10 +14,10 @@ export default async function RemoveFromQueue(req: Request, res: Response) {
   }
   const timeFactor = new Date(Math.round(new Date().getTime() / 10000) * 10000);
   const lockId = `${jukeboxAsset.id}_${timeFactor}`;
-  const mediaWithRemovedVideos = jukeboxAsset.dataObject.media.filter(
+  const remainingVideos = jukeboxAsset.dataObject.media.filter(
     (video: Video) => !videoIds.includes(video.id.videoId),
   );
-  const currentPlayIndex = mediaWithRemovedVideos.findIndex(
+  const currentPlayIndex = remainingVideos.findIndex(
     (video: Video) =>
       video.id.videoId === jukeboxAsset.dataObject.media[jukeboxAsset.dataObject.currentPlayIndex]?.id?.videoId,
   );
@@ -25,7 +25,7 @@ export default async function RemoveFromQueue(req: Request, res: Response) {
     await jukeboxAsset.updateDataObject(
       {
         ...jukeboxAsset.dataObject,
-        media: mediaWithRemovedVideos,
+        media: remainingVideos,
         currentPlayIndex,
       },
       {

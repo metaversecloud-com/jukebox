@@ -14,19 +14,19 @@ const Admin = () => {
   const [selectedVideoIds, setSelectedVideoIds] = useState<string[]>([]);
   const [removeLoading, setRemoveLoading] = useState(false);
 
-  const { backendAPI, catalog, nowPlaying } = useContext(GlobalStateContext) as InitialState;
+  const { backendAPI, catalog } = useContext(GlobalStateContext) as InitialState;
 
   const dispatch = useContext(GlobalDispatchContext);
 
   const handleRemoveFromQueue = async () => {
     setRemoveLoading(true);
-    const res = await removeFromQueue(backendAPI as AxiosInstance, selectedVideoIds.filter((videoId) => videoId !== nowPlaying.id.videoId));
+    const res = await removeFromQueue(backendAPI as AxiosInstance, selectedVideoIds);
     if (res) {
       setSelectedVideoIds([]);
       dispatch!({
         type: REMOVE_FROM_QUEUE,
         // TODO allow removing nowPlaying media
-        payload: { videoIds: selectedVideoIds.filter((videoId) => videoId !== nowPlaying.id.videoId) },
+        payload: { videoIds: selectedVideoIds },
       });
     }
     setRemoveLoading(false);
@@ -38,7 +38,7 @@ const Admin = () => {
           <img src="left-arrow.svg" width={20} height={20} />
         </Link>
       )}
-      <div className="flex flex-col w-full justify-start items-center">
+      <div className="flex flex-col w-full justify-start items-center pb-12">
         {/* <h1 className="h1 self-center">Settings</h1> */}
         <h3 className="h3 self-start mt-6 mb-4">Catalog</h3>
         {selectedVideoIds.length > 0 && (

@@ -16,24 +16,18 @@ const shouldSendEvent = (
 const redisObj = {
   publisher: createClient({
     url: process.env.REDIS_URL,
-    // password: process.env.REDIS_PASSWORD,
     socket: {
       tls: process.env.REDIS_URL.startsWith("rediss"),
-      // connectTimeout: 50000
-      // port: parseInt(process.env.REDIS_PORT) || 6379,
     },
   }),
   subscriber: createClient({
     url: process.env.REDIS_URL,
-    // password: process.env.REDIS_PASSWORD,
     socket: {
       tls: process.env.REDIS_URL.startsWith("rediss"),
-      // connectTimeout: 50000
-      // port: parseInt(process.env.REDIS_PORT) || 6379,
     },
   }),
   // For local development
-  
+
   // publisher: createClient({
   //   password: process.env.REDIS_PASSWORD,
   //   socket: {
@@ -49,13 +43,13 @@ const redisObj = {
   //   },
   // }),
   publish: function (channel: string, message: any) {
-    console.log("Publishing")
+    console.log("Publishing");
     this.publisher.publish(channel, JSON.stringify(message));
   },
   subscribe: function (channel: string) {
     this.subscriber.subscribe(channel, (message) => {
       const data = JSON.parse(message);
-      // console.log("Message received", data)
+      console.log("Message received");
       if (data.event === "nowPlaying") {
         this.connections.forEach(({ res: existingConnection }) => {
           const { assetId, visitorId, interactiveNonce } = existingConnection.req.query;
@@ -103,13 +97,17 @@ const redisObj = {
     } else {
       this.connections.push(connection);
     }
-    console.log("Connection added", this.connections.length);
+    console.log("Connection added", interactiveNonce, this.connections.length);
   },
   deleteConn: function () {
     // Remove inactive connections older than 1 hour
-    this.connections = this.connections.filter(
-      ({ lastHeartbeatTime }) => lastHeartbeatTime > Date.now() - 30 * 60 * 1000,
-    );
+    this.connections = this.connections.filter(({ existingConnection, lastHeartbeatTime }) => {
+      const isActive = lastHeartbeatTime > Date.now() - 30 * 60 * 1000;
+      if (!isActive) {
+        console.log(`Connection to ${existingConnection.req.query.interactiveNonce} deleted`);
+      }
+      return isActive;
+    });
   },
 };
 
@@ -119,7 +117,7 @@ redisObj.subscriber.connect();
 redisObj.subscribe(`${process.env.INTERACTIVE_KEY}_JUKEBOX`);
 
 redisObj.publisher.on("error", (err) => console.error("Publisher Error", err));
-redisObj.subscriber.on("error", (err) => console.error("subscriber Error", err));
+redisObj.subscriber.on("error", (err) => console.error("Subscriber Error", err));
 
 setInterval(() => {
   if (redisObj.connections.length > 0) {

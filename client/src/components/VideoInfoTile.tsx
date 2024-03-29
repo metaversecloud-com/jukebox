@@ -43,7 +43,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
 
   return (
     <div
-      className={`relative flex flex-row w-full rounded-l-xl pr-1 ${showControls && showControls.plusminus !== false ? showControls.plusminus === "minus" && "bg-gray-300" : ""}`}
+      className={`relative flex flex-row w-full rounded-xl pr-1 ${showControls && showControls.plusminus !== false ? showControls.plusminus === "minus" && "bg-gray-300" : ""}`}
     >
       {playLoading && (
         <>

@@ -6,7 +6,7 @@ import { skeleton, videoSample } from "./constants";
 
 const initialState: InitialState = {
   catalog: skeleton,
-  currentPlayIndex: 0,
+  currentPlayIndex: -1,
   isAdmin: false,
   nowPlaying: videoSample,
   searchResults: [],

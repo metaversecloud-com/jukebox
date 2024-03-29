@@ -47,7 +47,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...state,
         catalog: payload.catalog,
         currentPlayIndex: payload.currentPlayIndex,
-        nowPlaying: payload.nowPlaying || videoSample,
+        nowPlaying: payload.currentPlayIndex !== -1 ? payload.catalog[payload.currentPlayIndex] : videoSample,
         catalogLoading: false,
         catalogStatus: "SUCCESS",
       };
@@ -96,25 +96,32 @@ const globalReducer = (state: InitialState, action: ActionType) => {
       return {
         ...state,
         currentPlayIndex: payload.currentPlayIndex,
-        nowPlaying: state.catalog[payload.currentPlayIndex] || videoSample,
+        nowPlaying: state.catalog[payload.currentPlayIndex],
       };
     case ADD_TO_QUEUE:
       // eslint-disable-next-line no-case-declarations
       const catalogWithAddedVideos = state.catalog.slice();
-      catalogWithAddedVideos.splice(state.currentPlayIndex, 0, ...payload.videos);
+      if (state.currentPlayIndex === -1) {
+        catalogWithAddedVideos.push(...payload.videos);
+      } else {
+        catalogWithAddedVideos.splice(state.currentPlayIndex, 0, ...payload.videos);
+      }
 
       return {
         ...state,
         catalog: catalogWithAddedVideos,
-        currentPlayIndex: state.currentPlayIndex + payload.videos.length,
+        currentPlayIndex:
+          state.currentPlayIndex !== -1 ? state.currentPlayIndex + payload.videos.length : state.currentPlayIndex,
       };
     case REMOVE_FROM_QUEUE:
+      // eslint-disable-next-line no-case-declarations
+      const filteredCatalog = state.catalog.filter((video) => !payload.videoIds.includes(video.id.videoId));
       return {
         ...state,
-        catalog: state.catalog.filter((video) => !payload.videoIds.includes(video.id.videoId)),
+        catalog: filteredCatalog,
         currentPlayIndex:
-          state.catalog.length > 0 && state.nowPlaying.id.videoId !== ""
-            ? state.catalog.findIndex((video) => video.id.videoId === state.nowPlaying.id.videoId)
+          filteredCatalog.length > 0 && state.currentPlayIndex !== -1
+            ? filteredCatalog.findIndex((video) => video.id.videoId === state.nowPlaying.id.videoId)
             : -1,
       };
     default: {

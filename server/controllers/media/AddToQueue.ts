@@ -15,13 +15,18 @@ export default async function AddToQueue(req: Request, res: Response) {
   const timeFactor = new Date(Math.round(new Date().getTime() / 10000) * 10000);
   const lockId = `${jukeboxAsset.id}_${timeFactor}`;
   const mediaWithAddedVideos = jukeboxAsset.dataObject.media.slice();
+  const currentPlayIndex = jukeboxAsset.dataObject.currentPlayIndex;
   try {
-    mediaWithAddedVideos.splice(jukeboxAsset.dataObject.currentPlayIndex, 0, ...videos);
+    if (currentPlayIndex === -1) {
+      mediaWithAddedVideos.push(...videos);
+    } else {
+      mediaWithAddedVideos.splice(currentPlayIndex, 0, ...videos);
+    }
     await jukeboxAsset.updateDataObject(
       {
         ...jukeboxAsset.dataObject,
         media: mediaWithAddedVideos,
-        currentPlayIndex: jukeboxAsset.dataObject.currentPlayIndex + videos.length,
+        currentPlayIndex: currentPlayIndex !== -1 ? currentPlayIndex + videos.length : currentPlayIndex,
       },
       {
         lock: {
