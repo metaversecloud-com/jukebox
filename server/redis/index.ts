@@ -16,17 +16,21 @@ const shouldSendEvent = (
 const redisObj = {
   publisher: createClient({
     url: process.env.REDIS_URL,
+    // connect_timeout: 1,
     // password: process.env.REDIS_PASSWORD,
     socket: {
       tls: process.env.REDIS_URL.startsWith("rediss"),
+      connectTimeout: 5000
       // port: parseInt(process.env.REDIS_PORT) || 6379,
     },
   }),
   subscriber: createClient({
     url: process.env.REDIS_URL,
+    // connect_timeout: 1,
     // password: process.env.REDIS_PASSWORD,
     socket: {
       tls: process.env.REDIS_URL.startsWith("rediss"),
+      connectTimeout: 5000
       // port: parseInt(process.env.REDIS_PORT) || 6379,
     },
   }),
