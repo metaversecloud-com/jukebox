@@ -16,26 +16,40 @@ const shouldSendEvent = (
 const redisObj = {
   publisher: createClient({
     url: process.env.REDIS_URL,
-    connect_timeout: 1,
     // password: process.env.REDIS_PASSWORD,
     socket: {
       tls: process.env.REDIS_URL.startsWith("rediss"),
-      connectTimeout: 50000
+      // connectTimeout: 50000
       // port: parseInt(process.env.REDIS_PORT) || 6379,
     },
   }),
   subscriber: createClient({
     url: process.env.REDIS_URL,
-    connect_timeout: 1,
     // password: process.env.REDIS_PASSWORD,
     socket: {
       tls: process.env.REDIS_URL.startsWith("rediss"),
-      connectTimeout: 50000
+      // connectTimeout: 50000
       // port: parseInt(process.env.REDIS_PORT) || 6379,
     },
   }),
+  // For local development
+  
+  // publisher: createClient({
+  //   password: process.env.REDIS_PASSWORD,
+  //   socket: {
+  //     host: process.env.REDIS_URL,
+  //     port: parseInt(process.env.REDIS_PORT) || 6379,
+  //   },
+  // }),
+  // subscriber: createClient({
+  //   password: process.env.REDIS_PASSWORD,
+  //   socket: {
+  //     host: process.env.REDIS_URL,
+  //     port: parseInt(process.env.REDIS_PORT) || 6379,
+  //   },
+  // }),
   publish: function (channel: string, message: any) {
-    // console.log("Publishing")
+    console.log("Publishing")
     this.publisher.publish(channel, JSON.stringify(message));
   },
   subscribe: function (channel: string) {
