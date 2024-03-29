@@ -18,14 +18,14 @@ const redisObj = {
     password: process.env.REDIS_PASSWORD,
     socket: {
       host: process.env.REDIS_URL,
-      port: 6379,
+      port: parseInt(process.env.REDIS_PORT) || 6379,
     },
   }),
   subscriber: createClient({
     password: process.env.REDIS_PASSWORD,
     socket: {
       host: process.env.REDIS_URL,
-      port: 6379,
+      port: parseInt(process.env.REDIS_PORT) || 6379,
     },
   }),
   publish: function (channel: string, message: any) {
