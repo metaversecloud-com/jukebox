@@ -37,9 +37,9 @@ p {
 }
 
 .check-icon {
-  background-image: url('/check.svg');
+  background-image: url('https://sdk-style.s3.amazonaws.com/icons/check.svg');
 }
 
 .settings-icon {
-  background-image: url('/settings.svg');
+  background-image: url('https://sdk-style.s3.amazonaws.com/icons/cog.svg');
 }

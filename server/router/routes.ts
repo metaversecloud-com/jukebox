@@ -10,6 +10,7 @@ import { isAdmin } from "../middleware/isAdmin.js";
 import AddToQueue from "../controllers/media/AddToQueue.js";
 import SSE from "../controllers/media/SSE.js";
 import RemoveFromQueue from "../controllers/media/RemoveFromQueue.js";
+import { handleCheckInteractiveCredentials } from "../controllers/status/handleCheckInteractiveCredentials.js";
 
 const router = express.Router();
 
@@ -35,6 +36,8 @@ router.get("/system/health", (req, res) => {
     },
   });
 });
+
+router.get("/system/interactive-credentials", handleCheckInteractiveCredentials);
 
 // YouTube
 router.post("/search", isAdmin, SearchVideos);

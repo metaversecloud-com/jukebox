@@ -17,7 +17,7 @@ import { AxiosInstance } from "axios";
 const Search: React.FC = () => {
   const location = useLocation();
   const dispatch = useContext(GlobalDispatchContext);
-  const { searchTermGlobal, nextPageToken, searchLoading, nextPageLoading, backendAPI } = useContext(
+  const { searchTermGlobal, nextPageToken, searchLoading, nextPageLoading, backendAPI, searchResults } = useContext(
     GlobalStateContext,
   ) as InitialState;
 
@@ -49,13 +49,13 @@ const Search: React.FC = () => {
   return (
     <>
       {currentPath !== "/" && (
-        <Link to="/" className="p-1 border rounded-full hover:bg-slate-50 self-start">
+        <Link to="/" className="p-1 border rounded-full hover:bg-[#f3f5f6] transition-colors self-start">
           <img src="left-arrow.svg" width={20} height={20} />
         </Link>
       )}
       <Header showAdminControls={false} />
       <div className="flex flex-col w-full justify-start">
-        <p className="p2 font-semibold my-2">Search the Catalog</p>
+        <p className="p2 !font-semibold my-2">Search YouTube</p>
         <form onSubmit={searchVideo} className="flex w-full justify-between items-center mt-1 mb-6">
           <input
             type="text"
@@ -68,12 +68,16 @@ const Search: React.FC = () => {
             placeholder="Type here to search..."
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button disabled={searchLoading} className="btn btn-enhanced w-fit">
+          <button disabled={searchLoading} className="btn btn-enhanced !w-fit">
             Search
           </button>
         </form>
-        <p className="p1 font-semibold my-2">Browse Catalog</p>
-        <SearchResults loadNextSet={fetchNextPage} />
+        {searchResults.length > 0 && (
+          <>
+            <p className="p1 !font-semibold my-2">Search Results</p>
+            <SearchResults loadNextSet={fetchNextPage} />
+          </>
+        )}
       </div>
     </>
   );

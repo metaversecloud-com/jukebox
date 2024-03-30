@@ -14,7 +14,7 @@ const initialState: InitialState = {
   searchLoading: false,
   nextPageLoading: false,
   searchStatus: "",
-  catalogLoading: false,
+  catalogLoading: true,
   catalogStatus: "",
   hasInteractiveParams: false,
   interactiveParams: null,

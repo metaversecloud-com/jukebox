@@ -9,7 +9,7 @@ const Header: React.FC<HeaderProps> = ({ showAdminControls }) => {
       {showAdminControls && (
         <Link
           to={"/admin"}
-          className="border rounded-full flex self-start items-center justify-center p-1 hover:bg-slate-100"
+          className="border rounded-full flex self-start items-center justify-center p-1 hover:bg-[#f3f5f6] transition-colors"
         >
           <i className="icon settings-icon h-6 w-6" />
         </Link>
@@ -17,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({ showAdminControls }) => {
 
       <div className="flex flex-col items-center justify-center mt-2">
         <img src="Gramophone_Front.png" alt="Gramophone" className="w-96 h-52 object-cover" />
-        <h1 className="h3 font-semibold my-6">Jukebox</h1>
+        <h1 className="h3 !font-semibold !my-6">Jukebox</h1>
       </div>
     </div>
   );

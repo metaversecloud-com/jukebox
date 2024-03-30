@@ -1,4 +1,4 @@
-import { Route, Routes, useSearchParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 
 import Home from "@pages/Home";
 import Error from "@pages/Error";
@@ -20,6 +20,8 @@ import Search from "./pages/Search";
 import Admin from "./pages/Admin";
 
 const App = () => {
+  const navigate = useNavigate();
+
   const [searchParams] = useSearchParams();
   const [sseEvent, setSSEevent] = useState<EventSource | null>(null);
   const { backendAPI, hasInteractiveParams } = useContext(GlobalStateContext) as InitialState;
@@ -100,13 +102,22 @@ const App = () => {
     }
   }, [interactiveParams, setInteractiveParams]);
 
+  
+  const setupBackend = useCallback(async () => {
+    const setupResult = await setupBackendAPI(interactiveParams);
+    if (!setupResult.success) {
+      navigate("*");
+      return;
+    } else {
+      dispatch!({ type: SET_BACKEND_API, payload: { backendAPI: setupResult.backendAPI } });
+    }
+  }, [dispatch, interactiveParams, navigate]);
+  
   useEffect(() => {
     if (!backendAPI) {
-      const API = setupBackendAPI(interactiveParams);
-      dispatch!({ type: SET_BACKEND_API, payload: { backendAPI: API } });
+      setupBackend();
     }
-  }, [backendAPI, interactiveParams, dispatch]);
-
+  }, [backendAPI, setupBackend]);
 
   useEffect(() => {
     if (hasInteractiveParams && !connectionEstablished) {

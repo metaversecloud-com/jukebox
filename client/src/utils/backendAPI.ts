@@ -3,7 +3,7 @@ import axios from "axios";
 
 // const BASE_URL = import.meta.env.VITE_API_URL as string || "http://localhost:3000";
 
-const setupBackendAPI = (interactiveParams: InteractiveParams) => {
+const setupBackendAPI = async (interactiveParams: InteractiveParams) => {
   const backendAPI = axios.create({
     baseURL: `/api`,
     headers: {
@@ -28,7 +28,12 @@ const setupBackendAPI = (interactiveParams: InteractiveParams) => {
       return config;
     });
   }
-  return backendAPI;
+  try {
+    await backendAPI.get("/system/interactive-credentials");
+    return { success: true, backendAPI };
+  } catch (error) {
+    return { success: false };
+  }
 };
 
 export { setupBackendAPI };

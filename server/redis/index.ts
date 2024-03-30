@@ -43,13 +43,13 @@ const redisObj = {
   //   },
   // }),
   publish: function (channel: string, message: any) {
-    console.log("Publishing");
+    console.log(`Publishing ${message.event} to ${channel}`);
     this.publisher.publish(channel, JSON.stringify(message));
   },
   subscribe: function (channel: string) {
     this.subscriber.subscribe(channel, (message) => {
       const data = JSON.parse(message);
-      console.log("Message received");
+      console.log(`Event '${data.event}' received on ${channel}`);
       if (data.event === "nowPlaying") {
         this.connections.forEach(({ res: existingConnection }) => {
           const { assetId, visitorId, interactiveNonce } = existingConnection.req.query;
@@ -97,10 +97,10 @@ const redisObj = {
     } else {
       this.connections.push(connection);
     }
-    console.log("Connection added", interactiveNonce, this.connections.length);
+    console.log(`Connection ${interactiveNonce} added. Length is ${this.connections.length}`);
   },
   deleteConn: function () {
-    // Remove inactive connections older than 1 hour
+    // Remove inactive connections older than 30 minutes
     this.connections = this.connections.filter(({ res, lastHeartbeatTime }) => {
       const isActive = lastHeartbeatTime > Date.now() - 30 * 60 * 1000;
       if (!isActive) {

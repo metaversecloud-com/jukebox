@@ -32,7 +32,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     async function loadCatalog() {
-      dispatch!({ type: SET_CATALOG_LOADING, payload: { catalogLoading: true } });
+      // dispatch!({ type: SET_CATALOG_LOADING, payload: { catalogLoading: true } });
       const { currentPlayIndex, media } = await fetchCatalog(backendAPI as AxiosInstance);
       dispatch!({
         type: SET_CATALOG,
@@ -43,13 +43,7 @@ const Home: React.FC = () => {
       });
     }
 
-    if (
-      hasInteractiveParams &&
-      !catalogLoading &&
-      catalog.length > 0 &&
-      catalog[0].id.videoId === "" &&
-      backendAPI !== null
-    ) {
+    if (hasInteractiveParams && catalog.length > 0 && catalog[0].id.videoId === "" && backendAPI !== null) {
       loadCatalog();
     }
   }, [hasInteractiveParams, dispatch, catalogLoading, catalog, backendAPI]);
@@ -60,7 +54,7 @@ const Home: React.FC = () => {
       <div className="flex flex-col w-full justify-start">
         {nowPlaying && nowPlaying.id.videoId !== "" && (
           <>
-            <p className="p1 font-semibold">Now Playing: </p>
+            <p className="p1 !font-semibold">Now Playing: </p>
             <div className="my-4">
               <VideoInfoTile
                 isLoading={catalogLoading}
@@ -74,7 +68,7 @@ const Home: React.FC = () => {
         )}
         {catalog.length > 0 && (
           <>
-            <p className="p1 font-semibold mb-2">Next Up: </p>
+            <p className="p1 !font-semibold mb-2">Next Up: </p>
             {(() => {
               const queue =
                 nowPlaying && currentPlayIndex !== -1

@@ -3,7 +3,9 @@ export type Credentials = {
   interactivePublicKey: string;
   interactiveNonce: string;
   urlSlug: string;
-  visitorId: string;
+  profileId?: string;
+  username?: string;
+  visitorId: number;
 };
 
 export type Video = {

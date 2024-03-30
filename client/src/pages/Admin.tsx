@@ -34,18 +34,17 @@ const Admin = () => {
   return (
     <>
       {currentPath !== "/" && (
-        <Link to="/" className="p-1 border rounded-full hover:bg-slate-50 self-start">
+        <Link to="/" className="p-1 border rounded-full hover:bg-[#f3f5f6] transition-colors self-start">
           <img src="left-arrow.svg" width={20} height={20} />
         </Link>
       )}
       <div className="flex flex-col w-full justify-start items-center pb-12">
-        {/* <h1 className="h1 self-center">Settings</h1> */}
-        <h3 className="h3 self-start mt-6 mb-4">Catalog</h3>
+        <h3 className="h3 self-start !mt-6 !mb-4">Catalog</h3>
         {selectedVideoIds.length > 0 && (
           <button
             disabled={removeLoading}
             onClick={handleRemoveFromQueue}
-            className="fixed right-5 bottom-5 btn btn-enhanced w-fit z-10"
+            className="fixed right-5 bottom-5 btn btn-enhanced !w-fit z-10"
           >
             {!removeLoading ? `Remove (${selectedVideoIds.length})` : "Removing..."}
           </button>
@@ -55,7 +54,7 @@ const Admin = () => {
         ) : (
           <div className="flex flex-col w-full justify-start items-center">
             {catalog.map((video, i) => (
-              <div key={`${video.id.videoId}-${i}-tile`} className="my-2">
+              <div key={`${video.id.videoId}-${i}-tile`} className="my-2 w-full">
                 <VideoInfoTile
                   isLoading={false}
                   videoId={video.id.videoId}

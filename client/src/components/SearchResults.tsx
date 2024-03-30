@@ -44,7 +44,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
         <button
           disabled={addLoading}
           onClick={handleAddToQueue}
-          className="fixed right-5 bottom-5 btn btn-enhanced w-fit z-10"
+          className="fixed right-5 bottom-5 btn btn-enhanced !w-fit z-10"
         >
           {!addLoading ? `Add (${selectedVideos.length})` : "Adding..."}
         </button>
@@ -56,7 +56,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
         loader={<CircularLoader />}
       >
         {searchResults.map((video: Video, i: number) => (
-          <div key={`${video.id.videoId}-${i}-result`} className="my-3">
+          <div key={`${video.id.videoId}-${i}-result`} className="my-4">
             <VideoInfoTile
               isLoading={searchLoading}
               videoId={video.id.videoId}

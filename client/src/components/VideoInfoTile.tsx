@@ -83,10 +83,10 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
                   }, 3000);
                 }}
               >
-                <p className="p1 font-semibold">{he.decode(`${videoName}&#160;`)}</p>
+                <p className="p1 !font-semibold">{he.decode(`${videoName}&#160;`)}</p>
               </Marquee>
             ) : (
-              <p className="p1 font-semibold">{he.decode(`${videoName}&#160;`)}</p>
+              <p className="p1 !font-semibold">{he.decode(`${videoName}&#160;`)}</p>
             )
           ) : (
             <Skeleton width={200} className="self-start" />
@@ -96,8 +96,8 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
         {showControls && (
           <div className="flex items-center justify-end">
             {videoInCatalog ? (
-              <span className="w-[40px] h-[40px] rounded-full flex items-center justify-center mx-[1px]">
-                <i className="bg-center bg-no-repeat bg-contain check-icon h-8 w-8" />
+              <span className="w-[40px] h-[40px] flex items-center justify-center mx-[1px]">
+                <i className="bg-center bg-no-repeat bg-contain check-icon h-5 w-5" />
               </span>
             ) : (
               showControls.plusminus &&
@@ -105,15 +105,15 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
                 <button
                   disabled={disabledControls}
                   onClick={() => addVideo && addVideo(videoId)}
-                  className="btn-icon flex items-center justify-center mx-[1px]"
+                  className="btn-icon !p-0 transition-colors flex items-center justify-center mx-[1px]"
                 >
-                  <i className="icon add-icon h-4 w-4" />
+                  <i className="icon add-icon h-5 w-5" />
                 </button>
               ) : (
                 <button
                   disabled={disabledControls}
                   onClick={() => removeVideo && removeVideo(videoId)}
-                  className="btn-icon flex items-center justify-center mx-[1px]"
+                  className="btn-icon !p-0 transition-colors flex items-center justify-center mx-[1px]"
                 >
                   <i className="icon minus-icon h-4 w-4" />
                 </button>
@@ -124,7 +124,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
               <button
                 disabled={disabledControls}
                 onClick={() => playVideo!(videoId)}
-                className={`btn-icon flex items-center justify-center mx-[1px]`}
+                className={`btn-icon !p-0 transition-colors flex items-center justify-center mx-[1px]`}
               >
                 <i className="icon play-icon h-4 w-4" />
               </button>
