@@ -1,13 +1,11 @@
-// TODO - Remove ts-nocheck and fix types
-// @ts-nocheck
+import { InteractiveParams } from "@/context/types";
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_URL as string || "http://localhost:3000";
-let backendAPI = axios;
+// const BASE_URL = import.meta.env.VITE_API_URL as string || "http://localhost:3000";
 
-const setupBackendAPI = (interactiveParams) => {
-  backendAPI = axios.create({
-    baseURL: `${BASE_URL}/api`,
+const setupBackendAPI = async (interactiveParams: InteractiveParams) => {
+  const backendAPI = axios.create({
+    baseURL: `/api`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -30,6 +28,12 @@ const setupBackendAPI = (interactiveParams) => {
       return config;
     });
   }
+  try {
+    await backendAPI.get("/system/interactive-credentials");
+    return { success: true, backendAPI };
+  } catch (error) {
+    return { success: false };
+  }
 };
 
-export { backendAPI, setupBackendAPI };
+export { setupBackendAPI };

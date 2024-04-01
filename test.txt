@@ -1,0 +1,8 @@
+http://localhost:3001/?assetId=-NrMIMrX-59YD9ecAyJP
+displayName=Abel+Tefera
+interactiveNonce=47d9a966-d186-49bc-9b0c-6deb4186675b
+interactivePublicKey=V4PvbCJSh7FsfbNdwSfB
+profileId=c0vhZ5S0RvGvN8aguIUO
+urlSlug=jukebox-dev
+username=Abel+Tefera
+visitorId=173

@@ -24,3 +24,9 @@ build-ssr
 *.sw?
 
 .env
+
+dist/
+
+notes.txt
+test.txt
+data_object_sample.json

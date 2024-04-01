@@ -1,62 +1,111 @@
-import { backendAPI } from "@/utils/backendAPI";
-import { Button, Grid, Typography } from "@mui/material";
-import React, { useState } from "react";
+import Header from "@/components/Header";
+import VideoInfoTile from "@/components/VideoInfoTile";
+import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
+import { fetchCatalog, playVideo } from "@/context/actions";
+import { InitialState, SET_CATALOG, SET_CATALOG_LOADING, UPDATE_PLAY_INDEX, Video } from "@/context/types";
+import { convertMillisToMinutes } from "@/utils/duration";
+import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { AxiosInstance } from "axios";
 
-const Home = () => {
-  const [droppedAsset, setDroppedAsset] = useState();
+const Home: React.FC = () => {
+  const { hasInteractiveParams, catalog, catalogLoading, nowPlaying, backendAPI, currentPlayIndex, isAdmin } =
+    useContext(GlobalStateContext) as InitialState;
 
-  const hasInteractiveParams = null;
+  const [playLoadingIndex, setPlayLoadingIndex] = useState<number>(-1);
 
-  const handleGetDroppedAsset = async () => {
-    try {
-      const result = await backendAPI.get("/dropped-asset");
-      if (result.data.success) {
-        setDroppedAsset(result.data.droppedAsset);
-      } else return console.log("Error getting data object");
-    } catch (error) {
-      console.log(error);
+  const dispatch = useContext(GlobalDispatchContext);
+
+  const handlePlayVideo = async (videoId: string) => {
+    const video = catalog.find((video) => video.id.videoId === videoId) as Video;
+    const idx = catalog.findIndex((video) => video.id.videoId === videoId);
+    setPlayLoadingIndex(idx);
+    const res = await playVideo(backendAPI as AxiosInstance, video.id.videoId);
+    if (res) {
+      dispatch!({
+        type: UPDATE_PLAY_INDEX,
+        payload: { currentPlayIndex: idx },
+      });
     }
+    setPlayLoadingIndex(-1);
   };
 
+  useEffect(() => {
+    async function loadCatalog() {
+      // dispatch!({ type: SET_CATALOG_LOADING, payload: { catalogLoading: true } });
+      const { currentPlayIndex, media } = await fetchCatalog(backendAPI as AxiosInstance);
+      dispatch!({
+        type: SET_CATALOG,
+        payload: {
+          catalog: media,
+          currentPlayIndex,
+        },
+      });
+    }
+
+    if (hasInteractiveParams && catalog.length > 0 && catalog[0].id.videoId === "" && backendAPI !== null) {
+      loadCatalog();
+    }
+  }, [hasInteractiveParams, dispatch, catalogLoading, catalog, backendAPI]);
+
   return (
-    <Grid container direction="column" justifyContent="space-around" p={10}>
-      <Grid item>
-        <Grid alignItems="center" container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="h4">Server side example using interactive parameters</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            {!hasInteractiveParams ? (
-              <Typography>
-                Edit an asset in your world and open the Links page in the Modify Asset drawer and add a link to your
-                website or use &quot;http://localhost:3000&quot; for testing locally. You can also add assetId,
-                interactiveNonce, interactivePublicKey, urlSlug, and visitorId directly to the URL as search parameters
-                to use this feature.
-              </Typography>
-            ) : (
-              <Typography>Interactive parameters found, nice work!</Typography>
-            )}
-          </Grid>
-          <Grid item>
-            <Button onClick={handleGetDroppedAsset} variant="contained">
-              Get Dropped Asset Details
-            </Button>
-          </Grid>
-          {droppedAsset && (
-            <>
-              <Grid item pt={4} xs={12}>
-              <Typography>
-                You have successfully retrieved the dropped asset details for {droppedAsset.assetName}!
-              </Typography>
-            </Grid>
-            <Grid item m={4} xs={12}>
-              <img alt="preview" src={droppedAsset.topLayerURL || droppedAsset.bottomLayerURL} />
-            </Grid>
-            </>
-          )}
-        </Grid>
-      </Grid>
-    </Grid>
+    <>
+      <Header showAdminControls={isAdmin} />
+      <div className="flex flex-col w-full justify-start">
+        {nowPlaying && nowPlaying.id.videoId !== "" && (
+          <>
+            <p className="p1 !font-semibold">Now Playing: </p>
+            <div className="my-4">
+              <VideoInfoTile
+                isLoading={catalogLoading}
+                videoId={nowPlaying.id.videoId}
+                videoName={nowPlaying.snippet.title}
+                videoDuration={convertMillisToMinutes(nowPlaying.duration)}
+                thumbnail={nowPlaying.snippet.thumbnails.high.url}
+              ></VideoInfoTile>
+            </div>
+          </>
+        )}
+        {catalog.length > 0 && (
+          <>
+            <p className="p1 !font-semibold mb-2">Next Up: </p>
+            {(() => {
+              const queue =
+                nowPlaying && currentPlayIndex !== -1
+                  ? catalog.slice(currentPlayIndex + 1).concat(catalog.slice(0, currentPlayIndex))
+                  : catalog;
+              return queue.map((video, i) => (
+                <div key={`${video.id.videoId}-${i}-div`} className="my-2">
+                  <VideoInfoTile
+                    isLoading={catalogLoading}
+                    videoId={video.id.videoId}
+                    videoName={video.snippet.title}
+                    videoDuration={convertMillisToMinutes(video.duration)}
+                    thumbnail={video.snippet.thumbnails.high.url}
+                    playLoading={playLoadingIndex === catalog.findIndex((v) => v.id.videoId === video.id.videoId)}
+                    showControls={
+                      !catalogLoading && isAdmin
+                        ? {
+                            play: true,
+                            plusminus: false,
+                          }
+                        : false
+                    }
+                    disabledControls={playLoadingIndex !== -1}
+                    playVideo={handlePlayVideo}
+                  ></VideoInfoTile>
+                </div>
+              ));
+            })()}
+          </>
+        )}
+      </div>
+      {isAdmin && (
+        <Link className="btn btn-enhanced w-full my-2" to={"/search"}>
+          Add a Song
+        </Link>
+      )}
+    </>
   );
 };
 
