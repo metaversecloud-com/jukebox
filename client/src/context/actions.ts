@@ -55,4 +55,13 @@ const removeFromQueue = async (backendAPI: AxiosInstance, videoIds: string[]) =>
   }
 };
 
-export { searchCatalog, fetchCatalog, playVideo, checkIsAdmin, addToQueue, removeFromQueue };
+const checkInteractiveCredentials = async (backendAPI: AxiosInstance) => {
+  try {
+    const result = await backendAPI.get("/system/interactive-credentials");
+    return result.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export { checkInteractiveCredentials, searchCatalog, fetchCatalog, playVideo, checkIsAdmin, addToQueue, removeFromQueue };

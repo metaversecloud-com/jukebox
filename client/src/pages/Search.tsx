@@ -48,11 +48,9 @@ const Search: React.FC = () => {
 
   return (
     <>
-      {currentPath !== "/" && (
-        <Link to="/" className="p-1 border rounded-full hover:bg-[#f3f5f6] transition-colors self-start">
-          <img src="left-arrow.svg" width={20} height={20} />
-        </Link>
-      )}
+      <Link to="/admin" className="p-1 border rounded-full hover:bg-[#f3f5f6] transition-colors self-start">
+        <img src="left-arrow.svg" width={20} height={20} />
+      </Link>
       <Header showAdminControls={false} />
       <div className="flex flex-col w-full justify-start">
         <p className="p2 !font-semibold my-2">Search YouTube</p>

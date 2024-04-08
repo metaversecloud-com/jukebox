@@ -14,10 +14,12 @@ import {
   SET_IS_ADMIN,
   UPDATE_PLAY_INDEX,
   REMOVE_FROM_QUEUE,
+  SET_CATALOG,
 } from "./context/types";
 import Search from "./pages/Search";
 // import { fetchEventSource } from "@microsoft/fetch-event-source";
 import Admin from "./pages/Admin";
+import { checkInteractiveCredentials, checkIsAdmin, fetchCatalog } from "./context/actions";
 
 const App = () => {
   const navigate = useNavigate();
@@ -102,17 +104,12 @@ const App = () => {
     }
   }, [interactiveParams, setInteractiveParams]);
 
-  
   const setupBackend = useCallback(async () => {
-    const setupResult = await setupBackendAPI(interactiveParams);
-    if (!setupResult.success) {
-      navigate("*");
-      return;
-    } else {
-      dispatch!({ type: SET_BACKEND_API, payload: { backendAPI: setupResult.backendAPI } });
-    }
-  }, [dispatch, interactiveParams, navigate]);
-  
+    const backendAPI = await setupBackendAPI(interactiveParams);
+
+    dispatch!({ type: SET_BACKEND_API, payload: { backendAPI } });
+  }, [dispatch, interactiveParams]);
+
   useEffect(() => {
     if (!backendAPI) {
       setupBackend();
@@ -155,7 +152,14 @@ const App = () => {
         }
       };
     }
-  }, [sseEvent]);
+    return () => {
+      if (sseEvent) {
+        // console.log("Closing SSE...");
+        sseEvent.close();
+      }
+    };
+  }, [sseEvent, dispatch]);
+
   useEffect(() => {
     const sendHeartbeat = async () => {
       try {
@@ -167,18 +171,33 @@ const App = () => {
       }
     };
 
-    const getIsAdmin = async () => {
-      if (backendAPI) {
-        const { data } = await backendAPI.get("/is-admin");
-        dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: data.isAdmin } });
-      }
-    };
-
-    getIsAdmin();
-
     const intervalId = setInterval(sendHeartbeat, 1000 * 60 * 5);
     return () => clearInterval(intervalId);
   }, [backendAPI, dispatch]);
+
+  useEffect(() => {
+    const initialLoad = () => {
+      if (backendAPI) {
+        Promise.all([checkInteractiveCredentials(backendAPI), checkIsAdmin(backendAPI), fetchCatalog(backendAPI)]).then(
+          ([result, admin, catalog]) => {
+            if (!result.success) {
+              navigate("*");
+            }
+            dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: admin.isAdmin } });
+
+            dispatch!({
+              type: SET_CATALOG,
+              payload: {
+                catalog: catalog.media,
+                currentPlayIndex: catalog.currentPlayIndex,
+              },
+            });
+          },
+        );
+      }
+    };
+    initialLoad();
+  }, [backendAPI, dispatch, navigate]);
 
   return (
     <div className="flex flex-col p-4 items-center justify-center w-full">

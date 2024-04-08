@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import VideoInfoTile from "@/components/VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
 import { removeFromQueue } from "@/context/actions";
@@ -14,7 +15,7 @@ const Admin = () => {
   const [selectedVideoIds, setSelectedVideoIds] = useState<string[]>([]);
   const [removeLoading, setRemoveLoading] = useState(false);
 
-  const { backendAPI, catalog } = useContext(GlobalStateContext) as InitialState;
+  const { backendAPI, catalog, isAdmin } = useContext(GlobalStateContext) as InitialState;
 
   const dispatch = useContext(GlobalDispatchContext);
 
@@ -33,11 +34,7 @@ const Admin = () => {
   };
   return (
     <>
-      {currentPath !== "/" && (
-        <Link to="/" className="p-1 border rounded-full hover:bg-[#f3f5f6] transition-colors self-start">
-          <img src="left-arrow.svg" width={20} height={20} />
-        </Link>
-      )}
+      <Header showAdminControls={isAdmin} />
       <div className="flex flex-col w-full justify-start items-center pb-12">
         <h3 className="h3 self-start !mt-6 !mb-4">Catalog</h3>
         {selectedVideoIds.length > 0 && (
@@ -79,6 +76,9 @@ const Admin = () => {
             ))}
           </div>
         )}
+        <Link className="btn btn-enhanced my-2 fixed bottom-5 !w-80" to={"/search"}>
+          Add a Song
+        </Link>
       </div>
     </>
   );

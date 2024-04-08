@@ -1,15 +1,14 @@
 import Header from "@/components/Header";
 import VideoInfoTile from "@/components/VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
-import { fetchCatalog, playVideo } from "@/context/actions";
-import { InitialState, SET_CATALOG, SET_CATALOG_LOADING, UPDATE_PLAY_INDEX, Video } from "@/context/types";
+import { playVideo } from "@/context/actions";
+import { InitialState, UPDATE_PLAY_INDEX, Video } from "@/context/types";
 import { convertMillisToMinutes } from "@/utils/duration";
-import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
 import { AxiosInstance } from "axios";
 
 const Home: React.FC = () => {
-  const { hasInteractiveParams, catalog, catalogLoading, nowPlaying, backendAPI, currentPlayIndex, isAdmin } =
+  const { catalog, catalogLoading, nowPlaying, backendAPI, currentPlayIndex, isAdmin } =
     useContext(GlobalStateContext) as InitialState;
 
   const [playLoadingIndex, setPlayLoadingIndex] = useState<number>(-1);
@@ -29,24 +28,6 @@ const Home: React.FC = () => {
     }
     setPlayLoadingIndex(-1);
   };
-
-  useEffect(() => {
-    async function loadCatalog() {
-      // dispatch!({ type: SET_CATALOG_LOADING, payload: { catalogLoading: true } });
-      const { currentPlayIndex, media } = await fetchCatalog(backendAPI as AxiosInstance);
-      dispatch!({
-        type: SET_CATALOG,
-        payload: {
-          catalog: media,
-          currentPlayIndex,
-        },
-      });
-    }
-
-    if (hasInteractiveParams && catalog.length > 0 && catalog[0].id.videoId === "" && backendAPI !== null) {
-      loadCatalog();
-    }
-  }, [hasInteractiveParams, dispatch, catalogLoading, catalog, backendAPI]);
 
   return (
     <>
@@ -100,11 +81,6 @@ const Home: React.FC = () => {
           </>
         )}
       </div>
-      {isAdmin && (
-        <Link className="btn btn-enhanced w-full my-2" to={"/search"}>
-          Add a Song
-        </Link>
-      )}
     </>
   );
 };

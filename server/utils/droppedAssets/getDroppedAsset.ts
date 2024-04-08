@@ -1,5 +1,6 @@
 import { Credentials } from "../../types/index.js";
 import { DroppedAsset, errorHandler } from "../index.js";
+import { initializeJukebox } from "./initializeJukebox.js";
 
 export const getDroppedAsset = async (credentials: Credentials) => {
   try {
@@ -15,6 +16,10 @@ export const getDroppedAsset = async (credentials: Credentials) => {
     });
 
     if (!droppedAsset) throw "Dropped asset not found";
+
+    if (!droppedAsset.dataObject || !droppedAsset?.dataObject?.media) {
+      await initializeJukebox(droppedAsset);
+    }
 
     return droppedAsset;
   } catch (error) {
