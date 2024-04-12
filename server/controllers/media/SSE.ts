@@ -11,4 +11,5 @@ export default async function SSE(req: Request, res: Response) {
     "Cache-Control": "no-cache",
   });
 
+  res.write(`retry: 5000\ndata: ${JSON.stringify({ success: true })}\n\n`);
 }

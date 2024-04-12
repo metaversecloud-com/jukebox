@@ -11,22 +11,20 @@ import {
   InitialState,
 } from "@/context/types";
 import React, { useContext, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AxiosInstance } from "axios";
 
 const Search: React.FC = () => {
-  const location = useLocation();
   const dispatch = useContext(GlobalDispatchContext);
-  const { searchTermGlobal, nextPageToken, searchLoading, nextPageLoading, backendAPI, searchResults } = useContext(
+  const { searchTermGlobal, nextPageToken, searchLoading, nextPageLoading, backendAPI, searchResults, isAdmin } = useContext(
     GlobalStateContext,
   ) as InitialState;
 
-  const currentPath = location.pathname;
 
   const [searchTerm, setSearchTerm] = useState(searchTermGlobal);
   const searchVideo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (searchLoading || searchTerm.trim() == "") return;
+    if (searchLoading || searchTerm.trim() == "" || !isAdmin) return;
     dispatch!({ type: RESET_SEARCH_RESULTS });
     dispatch!({ type: GENERATE_SKELETON });
 

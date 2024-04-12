@@ -50,27 +50,19 @@ const redisObj = {
     this.subscriber.subscribe(channel, (message) => {
       const data = JSON.parse(message);
       console.log(`Event '${data.event}' received on ${channel}`);
+      let dataToSend: { data?: any; kind?: string } = {};
       if (data.event === "nowPlaying") {
-        this.connections.forEach(({ res: existingConnection }) => {
-          const { assetId, visitorId, interactiveNonce } = existingConnection.req.query;
-          if (shouldSendEvent(data, assetId, visitorId, interactiveNonce)) {
-            const dataToSend =
-              data.currentPlayIndex !== null
-                ? { data: { currentPlayIndex: data.currentPlayIndex } }
-                : { data: { video: data.video } };
-            dataToSend["kind"] = "nowPlaying";
-            existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataToSend)}\n\n`);
-          }
-        });
-      } else if (data.event === "queueAction") {
-        this.connections.forEach(({ res: existingConnection }) => {
-          const { assetId, visitorId, interactiveNonce } = existingConnection.req.query;
-          if (shouldSendEvent(data, assetId, visitorId, interactiveNonce)) {
-            const dataWithKind = { videos: data.videos, kind: data.kind, videoIds: data.videoIds };
-            existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataWithKind)}\n\n`);
-          }
-        });
+        dataToSend = { data: { videoId: data.videoId }, kind: "nowPlaying" };
+      } else if (data.event === "mediaAction") {
+        dataToSend = { data: { media: data.videos }, kind: data.kind };
       }
+
+      this.connections.forEach(({ res: existingConnection }) => {
+        const { assetId, visitorId, interactiveNonce } = existingConnection.req.query;
+        if (shouldSendEvent(data, assetId, visitorId, interactiveNonce)) {
+          existingConnection.write(`retry: 5000\ndata: ${JSON.stringify(dataToSend)}\n\n`);
+        }
+      });
     });
   },
   connections: [],
@@ -102,7 +94,7 @@ const redisObj = {
   deleteConn: function () {
     // Remove inactive connections older than 30 minutes
     this.connections = this.connections.filter(({ res, lastHeartbeatTime }) => {
-      const isActive = lastHeartbeatTime > Date.now() - 30 * 60 * 1000;
+      const isActive = lastHeartbeatTime > Date.now() - 15 * 60 * 1000;
       if (!isActive) {
         console.log(`Connection to ${res.req.query.interactiveNonce} deleted`);
       }

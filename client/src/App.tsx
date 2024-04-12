@@ -6,20 +6,21 @@ import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { GlobalDispatchContext, GlobalStateContext } from "./context/GlobalContext";
 import { setupBackendAPI } from "./utils/backendAPI";
 import {
-  ADD_TO_QUEUE,
+  ADD_TO_CATALOG,
   InitialState,
   InteractiveParams,
   SET_BACKEND_API,
   SET_INTERACTIVE_PARAMS,
   SET_IS_ADMIN,
-  UPDATE_PLAY_INDEX,
-  REMOVE_FROM_QUEUE,
-  SET_CATALOG,
+  UPDATE_PLAYING_SONG,
+  REMOVE_FROM_CATALOG,
+  SET_JUKEBOX,
 } from "./context/types";
 import Search from "./pages/Search";
 // import { fetchEventSource } from "@microsoft/fetch-event-source";
 import Admin from "./pages/Admin";
-import { checkInteractiveCredentials, checkIsAdmin, fetchCatalog } from "./context/actions";
+import { checkInteractiveCredentials, checkIsAdmin, fetchJukeboxDataObject } from "./context/actions";
+import AddToQueue from "./pages/AddToQueue";
 
 const App = () => {
   const navigate = useNavigate();
@@ -132,21 +133,21 @@ const App = () => {
       sseEvent.onmessage = (event) => {
         const sse = JSON.parse(event.data);
         if (sse.kind === "nowPlaying") {
-          const nowPlaying = sse.data;
+          const videoId = sse.data.videoId;
           dispatch!({
-            type: UPDATE_PLAY_INDEX,
-            payload: { currentPlayIndex: nowPlaying.currentPlayIndex },
+            type: UPDATE_PLAYING_SONG,
+            payload: { nowPlayingId: videoId },
           });
-        } else if (sse.kind === "addedToQueue") {
-          const videos = sse.videos;
+        } else if (sse.kind === "addedToCatalog") {
+          const videos = sse.data.media;
           dispatch!({
-            type: ADD_TO_QUEUE,
+            type: ADD_TO_CATALOG,
             payload: { videos },
           });
-        } else if (sse.kind === "removedFromQueue") {
-          const videoIds = sse.videoIds;
+        } else if (sse.kind === "removedFromCatalog") {
+          const videoIds = sse.data.media;
           dispatch!({
-            type: REMOVE_FROM_QUEUE,
+            type: REMOVE_FROM_CATALOG,
             payload: { videoIds },
           });
         }
@@ -178,18 +179,18 @@ const App = () => {
   useEffect(() => {
     const initialLoad = () => {
       if (backendAPI) {
-        Promise.all([checkInteractiveCredentials(backendAPI), checkIsAdmin(backendAPI), fetchCatalog(backendAPI)]).then(
-          ([result, admin, catalog]) => {
+        Promise.all([checkInteractiveCredentials(backendAPI), checkIsAdmin(backendAPI), fetchJukeboxDataObject(backendAPI)]).then(
+          ([result, admin, dataObject]) => {
             if (!result.success) {
               navigate("*");
             }
             dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: admin.isAdmin } });
 
             dispatch!({
-              type: SET_CATALOG,
+              type: SET_JUKEBOX,
               payload: {
-                catalog: catalog.media,
-                currentPlayIndex: catalog.currentPlayIndex,
+                catalog: dataObject.catalog,
+                queue: dataObject.queue,
               },
             });
           },
@@ -205,7 +206,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
         <Route path="/admin" element={<Admin />} />
-
+        <Route path="/add-to-queue" element={<AddToQueue />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </div>

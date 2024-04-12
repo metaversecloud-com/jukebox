@@ -1,32 +1,31 @@
+import { checkIsAdmin } from "../../middleware/isAdmin.js";
 import redisObj from "../../redis/index.js";
 import { Credentials, Video } from "../../types/index.js";
 import { getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
 
-export default async function RemoveFromQueue(req: Request, res: Response) {
+export default async function RemoveMedia(req: Request, res: Response) {
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query as Credentials;
 
-  const { videoIds }: { videoIds: string[] } = req.body;
+  const { videoIds, type }: { videoIds: string[]; type: "catalog" | "queue" } = req.body;
   const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
-  const jukeboxAsset = await getDroppedAsset(credentials);
+  const [isAdmin, jukeboxAsset] = await Promise.all([checkIsAdmin(credentials), getDroppedAsset(credentials)]);
+
+  if (type === "catalog" && !isAdmin) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  
   if (jukeboxAsset.error) {
     return res.status(404).json({ message: "Asset not found" });
   }
   const timeFactor = new Date(Math.round(new Date().getTime() / 10000) * 10000);
   const lockId = `${jukeboxAsset.id}_${timeFactor}`;
-  const remainingVideos = jukeboxAsset.dataObject.media.filter(
-    (video: Video) => !videoIds.includes(video.id.videoId),
-  );
-  const currentPlayIndex = remainingVideos.findIndex(
-    (video: Video) =>
-      video.id.videoId === jukeboxAsset.dataObject.media[jukeboxAsset.dataObject.currentPlayIndex]?.id?.videoId,
-  );
+  const remainingVideos = jukeboxAsset.dataObject[type].filter((video: Video) => !videoIds.includes(video.id.videoId));
   try {
     await jukeboxAsset.updateDataObject(
       {
         ...jukeboxAsset.dataObject,
-        media: remainingVideos,
-        currentPlayIndex,
+        [type]: remainingVideos,
       },
       {
         lock: {
@@ -37,12 +36,12 @@ export default async function RemoveFromQueue(req: Request, res: Response) {
     );
     redisObj.publish(`${process.env.INTERACTIVE_KEY}_JUKEBOX`, {
       assetId: jukeboxAsset.id,
-      videoIds,
+      videos: videoIds,
       interactiveNonce,
       urlSlug,
       visitorId,
-      kind: "removedFromQueue",
-      event: "queueAction",
+      kind: type === "catalog" ? "removedFromCatalog" : "removedFromQueue",
+      event: "mediaAction",
     });
 
     return res.json({ message: "OK" });

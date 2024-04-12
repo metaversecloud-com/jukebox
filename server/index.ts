@@ -6,7 +6,7 @@ import path from "path";
 
 import { cleanReturnPayload } from "./utils/cleanReturnPayload.js";
 import { fileURLToPath } from "url";
-import webhookRouter from "./router/webhook.js";
+import webhookRouter from "./router/webhooks.js";
 
 
 // import youtubeRouter from "./youtubeRoutes";
