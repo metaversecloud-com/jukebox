@@ -52,7 +52,7 @@ const redisObj = {
       console.log(`Event '${data.event}' received on ${channel}`);
       let dataToSend: { data?: any; kind?: string } = {};
       if (data.event === "nowPlaying") {
-        dataToSend = { data: { videoId: data.videoId }, kind: "nowPlaying" };
+        dataToSend = { data: { videoId: data.videoId, nextUpId: data.nextUpId }, kind: "nowPlaying" };
       } else if (data.event === "mediaAction") {
         dataToSend = { data: { media: data.videos }, kind: data.kind };
       }

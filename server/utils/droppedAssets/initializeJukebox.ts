@@ -12,6 +12,7 @@ export const initializeJukebox = async (droppedAsset: IDroppedAsset) => {
         {
           catalog: [],
           queue: [],
+          nowPlaying: "-1",
         },
         { lock: { lockId } },
       );

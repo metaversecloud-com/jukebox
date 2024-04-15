@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import VideoInfoTile from "@/components/VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
+import { addToQueue } from "@/context/actions";
 import { ADD_TO_QUEUE, InitialState, Video } from "@/context/types";
 import { convertMillisToMinutes } from "@/utils/duration";
 import { useContext, useEffect, useState } from "react";
@@ -9,7 +10,7 @@ import { Link } from "react-router-dom";
 const AddToQueue = () => {
   const dispatch = useContext(GlobalDispatchContext);
 
-  const { catalog, queue } = useContext(GlobalStateContext) as InitialState;
+  const { catalog, queue, backendAPI, nowPlaying } = useContext(GlobalStateContext) as InitialState;
 
   const [selectedVideos, setSelectedVideos] = useState<string[]>([]);
   const [addLoading, setAddLoading] = useState(false);
@@ -18,10 +19,10 @@ const AddToQueue = () => {
 
   const handleAddToQueue = async () => {
     setAddLoading(true);
-    const toAdd = catalog.filter((video) => selectedVideos.includes(video.id.videoId));
-    if (toAdd.length > 0) {
+    const result = await addToQueue(backendAPI!, selectedVideos);
+    if (result && result.success) {
+      dispatch!({ type: ADD_TO_QUEUE, payload: { videoIds: selectedVideos } });
       setSelectedVideos([]);
-      dispatch!({ type: ADD_TO_QUEUE, payload: { videos: toAdd } });
     }
     setAddLoading(false);
   };
@@ -66,15 +67,19 @@ const AddToQueue = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+      <p className="p1 !font-semibold my-2">Browse Catalog</p>
       {searchResults.map((video: Video, i: number) => (
-        <div key={`${video.id.videoId}-${i}-result`} className="my-4">
+        <div key={`${video.id.videoId}-${i}-result`} className="my-2">
           <VideoInfoTile
             isLoading={false}
             videoId={video.id.videoId}
             videoName={video.snippet.title}
             videoDuration={convertMillisToMinutes(video.duration)}
             thumbnail={video.snippet.thumbnails.high.url}
-            videoInMedia={queue.find((v) => v.id.videoId === video.id.videoId) !== undefined}
+            videoInMedia={
+              (nowPlaying && nowPlaying.id.videoId === video.id.videoId) ||
+              queue.find((v) => v.id.videoId === video.id.videoId) !== undefined
+            }
             showControls={{
               plusminus:
                 selectedVideos.length > 0 && selectedVideos.find((v) => v === video.id.videoId) ? "minus" : "plus",

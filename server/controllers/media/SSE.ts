@@ -1,7 +1,7 @@
-import redisObj from "../../redis/index.js";
+import redisObj from "../../redis-sse/index.js";
 import { Request, Response } from "express";
 
-export default async function SSE(req: Request, res: Response) {
+export default async function sse(req: Request, res: Response) {
   if (!res.req.query.interactiveNonce) return res.status(400).json({ message: "Invalid" });
   redisObj.addConn({ res, lastHeartbeatTime: Date.now() });
 

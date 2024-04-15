@@ -16,6 +16,9 @@ import {
   ADD_TO_CATALOG,
   REMOVE_FROM_CATALOG,
   UPDATE_PLAYING_SONG,
+  ADD_TO_QUEUE,
+  REMOVE_FROM_QUEUE,
+  Video,
 } from "./types";
 
 const globalReducer = (state: InitialState, action: ActionType) => {
@@ -42,11 +45,18 @@ const globalReducer = (state: InitialState, action: ActionType) => {
       searchStatus: payload.searchStatus,
     };
   } else if (type === SET_JUKEBOX) {
+    const queue = payload.queue.map((videoId: string) =>
+      payload.catalog.find((video: Video) => video.id.videoId === videoId),
+    );
+    const nowPlaying =
+      payload.nowPlayingId !== "-1"
+        ? payload.catalog.find((video: Video) => video.id.videoId === payload.nowPlayingId)
+        : videoSample;
     return {
       ...state,
       catalog: payload.catalog,
-      queue: payload.queue,
-      nowPlaying: payload.queue[0] ? payload.queue[0] : videoSample,
+      queue,
+      nowPlaying,
       jukeboxLoading: false,
       jukeboxStatus: "SUCCESS",
     };
@@ -85,12 +95,12 @@ const globalReducer = (state: InitialState, action: ActionType) => {
       searchResults: skeleton,
     };
   } else if (type === UPDATE_PLAYING_SONG) {
-    if (!payload.nowPlayingId) return { ...state, nowPlaying: videoSample, queue: [] };
-    const idx = state.queue.findIndex((v) => v.id.videoId === payload.nowPlayingId);
+    if (payload.nowPlayingId === "-1") return { ...state, nowPlaying: videoSample, queue: [] };
+    const idx = state.queue.findIndex((v) => v.id.videoId === payload.nextUpId);
     return {
       ...state,
       nowPlaying: state.catalog.find((v) => v.id.videoId === payload.nowPlayingId),
-      queue: state.queue.slice(idx + 1),
+      queue: payload.nextUpId ? state.queue.slice(idx) : [],
     };
   } else if (type === RESET_SEARCH_RESULTS) {
     return {
@@ -108,6 +118,23 @@ const globalReducer = (state: InitialState, action: ActionType) => {
     return {
       ...state,
       catalog: filteredCatalog,
+    };
+  } else if (type === ADD_TO_QUEUE) {
+    const addedVideos = payload.videoIds.map((videoId: string) =>
+      state.catalog.find((video) => video.id.videoId === videoId),
+    );
+    const nowPlaying =
+      state.queue.length === 0 && state.nowPlaying.id.videoId === "" ? addedVideos.shift() : state.nowPlaying;
+    return {
+      ...state,
+      nowPlaying,
+      queue: [...state.queue, ...addedVideos],
+    };
+  } else if (type === REMOVE_FROM_QUEUE) {
+    const filteredQueue = state.queue.filter((video) => !payload.videoIds.includes(video.id.videoId));
+    return {
+      ...state,
+      queue: filteredQueue,
     };
   } else {
     throw new Error(`Unhandled action type: ${type}`);

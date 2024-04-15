@@ -7,6 +7,7 @@ const searchCatalog = async (backendAPI: AxiosInstance, searchTerm: string, next
     return result.data;
   } catch (error) {
     console.error(error);
+    return null;
   }
 };
 
@@ -16,6 +17,7 @@ const fetchJukeboxDataObject = async (backendAPI: AxiosInstance) => {
     return result.data;
   } catch (error) {
     console.error(error);
+    return null;
   }
 };
 
@@ -25,6 +27,7 @@ const checkIsAdmin = async (backendAPI: AxiosInstance) => {
     return result.data;
   } catch (error) {
     console.error(error);
+    return null;
   }
 };
 
@@ -34,6 +37,7 @@ const addToCatalog = async (backendAPI: AxiosInstance, videos: Video[]) => {
     return result.data;
   } catch (error) {
     console.error(error);
+    return null;
   }
 };
 
@@ -43,6 +47,27 @@ const removeFromCatalog = async (backendAPI: AxiosInstance, videoIds: string[]) 
     return result.data;
   } catch (error) {
     console.error(error);
+    return null;
+  }
+};
+
+const addToQueue = async (backendAPI: AxiosInstance, videoIds: string[]) => {
+  try {
+    const result = await backendAPI.post("/add-media", { videos: videoIds, type: "queue" });
+    return result.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+const removeFromQueue = async (backendAPI: AxiosInstance, videoIds: string[]) => {
+  try {
+    const result = await backendAPI.post("/remove-media", { videoIds, type: "queue" });
+    return result.data;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 };
 
@@ -52,7 +77,17 @@ const checkInteractiveCredentials = async (backendAPI: AxiosInstance) => {
     return result.data;
   } catch (error) {
     console.error(error);
+    return null;
   }
 };
 
-export { checkInteractiveCredentials, searchCatalog, fetchJukeboxDataObject, checkIsAdmin, addToCatalog, removeFromCatalog };
+export {
+  checkInteractiveCredentials,
+  searchCatalog,
+  fetchJukeboxDataObject,
+  checkIsAdmin,
+  addToCatalog,
+  removeFromCatalog,
+  addToQueue,
+  removeFromQueue,
+};

@@ -1,5 +1,5 @@
 import { checkIsAdmin } from "../../middleware/isAdmin.js";
-import redisObj from "../../redis/index.js";
+import redisObj from "../../redis-sse/index.js";
 import { Credentials, Video } from "../../types/index.js";
 import { getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
@@ -14,14 +14,19 @@ export default async function RemoveMedia(req: Request, res: Response) {
   if (type === "catalog" && !isAdmin) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  
+
   if (jukeboxAsset.error) {
     return res.status(404).json({ message: "Asset not found" });
   }
   const timeFactor = new Date(Math.round(new Date().getTime() / 10000) * 10000);
   const lockId = `${jukeboxAsset.id}_${timeFactor}`;
-  const remainingVideos = jukeboxAsset.dataObject[type].filter((video: Video) => !videoIds.includes(video.id.videoId));
+  let remainingVideos: Video[] | string[] = [];
   try {
+    if (type === "catalog") {
+      remainingVideos = jukeboxAsset.dataObject.catalog.filter((video: Video) => !videoIds.includes(video.id.videoId));
+    } else if (type === "queue") {
+      remainingVideos = jukeboxAsset.dataObject.queue.filter((videoId: string) => !videoIds.includes(videoId));
+    }
     await jukeboxAsset.updateDataObject(
       {
         ...jukeboxAsset.dataObject,
@@ -44,9 +49,9 @@ export default async function RemoveMedia(req: Request, res: Response) {
       event: "mediaAction",
     });
 
-    return res.json({ message: "OK" });
+    return res.json({ success: true });
   } catch (e) {
-    console.log("Update is properly locked due to mutex", visitorId);
-    return res.status(409).json({ message: "Update is properly locked due to mutex" });
+    console.log("Update is properly locked due to mutex (RemoveMedia)");
+    return res.status(409).json({ message: "Update is properly locked due to mutex (RemoveMedia)" });
   }
 }

@@ -1,8 +1,8 @@
-import redisObj from "../../redis/index.js";
+import redisObj from "../../redis-sse/index.js";
 import { getDroppedAsset } from "../../utils/index.js";
 import he from "he";
 import { Request, Response } from "express";
-import { Credentials } from "../../types/index.js";
+import { Credentials, Video } from "../../types/index.js";
 
 export default async function NextSong(req: Request, res: Response) {
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body as Credentials;
@@ -14,26 +14,12 @@ export default async function NextSong(req: Request, res: Response) {
   const { queue } = jukeboxAsset.dataObject;
   const timeFactor = new Date(Math.round(new Date().getTime() / 25000) * 25000);
   const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}_${timeFactor}`;
-  const nowPlaying = queue[0];
   const remainingQueue = queue.slice(1);
-
+  let nowPlaying = "-1" as "-1" | Video;
   const promises = [];
   try {
-    promises.push(
-      jukeboxAsset.updateDataObject(
-        {
-          ...jukeboxAsset.dataObject,
-          queue: remainingQueue,
-        },
-        {
-          lock: {
-            lockId,
-            releaseLock: false,
-          },
-        },
-      ),
-    );
-    if (nowPlaying) {
+    if (queue.length > 0) {
+      nowPlaying = jukeboxAsset.dataObject.catalog.find((video: Video) => video.id.videoId === queue[0]) as Video;
       const videoId = nowPlaying.id.videoId;
       const videoTitle = nowPlaying.snippet.title;
 
@@ -51,30 +37,36 @@ export default async function NextSong(req: Request, res: Response) {
         }),
       );
     } else {
-      promises.push(
-        jukeboxAsset.updateMediaType({
-          mediaLink: "",
-          isVideo: false,
-          mediaName: "",
-          mediaType: "link",
-          audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
-          audioRadius: jukeboxAsset.audioRadius || 2, // Far
-          syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
-        }),
-      );
+      promises.push(jukeboxAsset.updateMediaType({ mediaType: "none" }));
     }
 
+    promises.push(
+      jukeboxAsset.updateDataObject(
+        {
+          ...jukeboxAsset.dataObject,
+          queue: remainingQueue,
+          nowPlaying: nowPlaying !== "-1" ? nowPlaying.id.videoId : "-1",
+        },
+        {
+          lock: {
+            lockId,
+            releaseLock: false,
+          },
+        },
+      ),
+    );
+
     await Promise.all(promises);
-    
+
     redisObj.publish(`${process.env.INTERACTIVE_KEY}_JUKEBOX`, {
       assetId: jukeboxAsset.id,
-      videoId: nowPlaying ? nowPlaying.id.videoId : null,
+      videoId: nowPlaying !== "-1" ? nowPlaying.id.videoId : "-1",
+      nextUpId: remainingQueue.length > 0 ? remainingQueue[0] : null,
       event: "nowPlaying",
     });
 
-    return res.json({ message: "OK" });
+    return res.json({ success: true });
   } catch (e) {
-    // console.log("ERR", e);
     console.log("Update is properly locked due to mutex (Next Song)");
     return res.status(409).json({ message: "Update is properly locked due to mutex (Next Song)" });
   }

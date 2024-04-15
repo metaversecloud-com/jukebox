@@ -15,6 +15,8 @@ import {
   UPDATE_PLAYING_SONG,
   REMOVE_FROM_CATALOG,
   SET_JUKEBOX,
+  ADD_TO_QUEUE,
+  REMOVE_FROM_QUEUE,
 } from "./context/types";
 import Search from "./pages/Search";
 // import { fetchEventSource } from "@microsoft/fetch-event-source";
@@ -136,7 +138,7 @@ const App = () => {
           const videoId = sse.data.videoId;
           dispatch!({
             type: UPDATE_PLAYING_SONG,
-            payload: { nowPlayingId: videoId },
+            payload: { nowPlayingId: videoId, nextUpId: sse.data.nextUpId },
           });
         } else if (sse.kind === "addedToCatalog") {
           const videos = sse.data.media;
@@ -148,6 +150,18 @@ const App = () => {
           const videoIds = sse.data.media;
           dispatch!({
             type: REMOVE_FROM_CATALOG,
+            payload: { videoIds },
+          });
+        } else if (sse.kind === "addedToQueue") {
+          const videoIds = sse.data.media;
+          dispatch!({
+            type: ADD_TO_QUEUE,
+            payload: { videoIds },
+          });
+        } else if (sse.kind === "removedFromQueue") {
+          const videoIds = sse.data.media;
+          dispatch!({
+            type: REMOVE_FROM_QUEUE,
             payload: { videoIds },
           });
         }
@@ -179,22 +193,25 @@ const App = () => {
   useEffect(() => {
     const initialLoad = () => {
       if (backendAPI) {
-        Promise.all([checkInteractiveCredentials(backendAPI), checkIsAdmin(backendAPI), fetchJukeboxDataObject(backendAPI)]).then(
-          ([result, admin, dataObject]) => {
-            if (!result.success) {
-              navigate("*");
-            }
-            dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: admin.isAdmin } });
+        Promise.all([
+          checkInteractiveCredentials(backendAPI),
+          checkIsAdmin(backendAPI),
+          fetchJukeboxDataObject(backendAPI),
+        ]).then(([result, admin, dataObject]) => {
+          if (!result.success) {
+            navigate("*");
+          }
+          dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: admin.isAdmin } });
 
-            dispatch!({
-              type: SET_JUKEBOX,
-              payload: {
-                catalog: dataObject.catalog,
-                queue: dataObject.queue,
-              },
-            });
-          },
-        );
+          dispatch!({
+            type: SET_JUKEBOX,
+            payload: {
+              catalog: dataObject.catalog,
+              queue: dataObject.queue,
+              nowPlayingId: dataObject.nowPlaying,
+            },
+          });
+        });
       }
     };
     initialLoad();

@@ -7,6 +7,7 @@ import { addToCatalog } from "@/context/actions";
 import { convertMillisToMinutes } from "@/utils/duration";
 import { AxiosInstance } from "axios";
 import CircularLoader from "./CircularLoader";
+import uniqBy from "lodash.uniqby";
 
 interface SearchResultsProps {
   loadNextSet: () => void;
@@ -24,8 +25,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
   const handleAddToCatalog = async () => {
     setAddLoading(true);
     const toAdd = searchResults.filter((video) => selectedVideos.includes(video.id.videoId));
-    const res = await addToCatalog(backendAPI as AxiosInstance, toAdd);
-    if (res) {
+    const uniq = uniqBy(toAdd, (v: Video) => v.id.videoId) as Video[];
+    const res = await addToCatalog(backendAPI as AxiosInstance, uniq);
+    if (res && res.success) {
       setSelectedVideos([]);
       dispatch!({ type: ADD_TO_CATALOG, payload: { videos: toAdd } });
     }

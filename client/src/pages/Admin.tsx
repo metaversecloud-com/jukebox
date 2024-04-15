@@ -20,7 +20,7 @@ const Admin = () => {
   const handleRemoveFromCatalog = async () => {
     setRemoveLoading(true);
     const res = await removeFromCatalog(backendAPI as AxiosInstance, selectedVideoIds);
-    if (res) {
+    if (res && res.success) {
       setSelectedVideoIds([]);
       dispatch!({
         type: REMOVE_FROM_CATALOG,
@@ -44,7 +44,7 @@ const Admin = () => {
           </button>
         )}
         {catalog.length === 0 ? (
-          <p>No videos added</p>
+          <p className="text-start mb-2 w-full">No songs added</p>
         ) : (
           <div className="flex flex-col w-full justify-start items-center">
             {catalog.map((video, i) => (
