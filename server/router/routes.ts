@@ -7,7 +7,7 @@ import setHeartbeat from "../controllers/status/setHeartbeat.js";
 import isAdminCheck from "../controllers/status/isAdminCheck.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 import AddMedia from "../controllers/media/AddMedia.js";
-import sse from "../controllers/media/sse.js";
+import sse from "../controllers/media/Events.js";
 import RemoveMedia from "../controllers/media/RemoveMedia.js";
 import { handleCheckInteractiveCredentials } from "../controllers/status/handleCheckInteractiveCredentials.js";
 
