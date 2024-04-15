@@ -14,34 +14,34 @@ const shouldSendEvent = (
 };
 
 const redisObj = {
-  publisher: createClient({
-    url: process.env.REDIS_URL,
-    socket: {
-      tls: process.env.REDIS_URL.startsWith("rediss"),
-    },
-  }),
-  subscriber: createClient({
-    url: process.env.REDIS_URL,
-    socket: {
-      tls: process.env.REDIS_URL.startsWith("rediss"),
-    },
-  }),
-  // For local development
-
   // publisher: createClient({
-  //   password: process.env.REDIS_PASSWORD,
+  //   url: process.env.REDIS_URL,
   //   socket: {
-  //     host: process.env.REDIS_URL,
-  //     port: parseInt(process.env.REDIS_PORT) || 6379,
+  //     tls: process.env.REDIS_URL.startsWith("rediss"),
   //   },
   // }),
   // subscriber: createClient({
-  //   password: process.env.REDIS_PASSWORD,
+  //   url: process.env.REDIS_URL,
   //   socket: {
-  //     host: process.env.REDIS_URL,
-  //     port: parseInt(process.env.REDIS_PORT) || 6379,
+  //     tls: process.env.REDIS_URL.startsWith("rediss"),
   //   },
   // }),
+  // For local development
+
+  publisher: createClient({
+    password: process.env.REDIS_PASSWORD,
+    socket: {
+      host: process.env.REDIS_URL,
+      port: parseInt(process.env.REDIS_PORT) || 6379,
+    },
+  }),
+  subscriber: createClient({
+    password: process.env.REDIS_PASSWORD,
+    socket: {
+      host: process.env.REDIS_URL,
+      port: parseInt(process.env.REDIS_PORT) || 6379,
+    },
+  }),
   publish: function (channel: string, message: any) {
     console.log(`Publishing ${message.event} to ${channel}`);
     this.publisher.publish(channel, JSON.stringify(message));

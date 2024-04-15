@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import VideoInfoTile from "@/components/VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
 import { removeFromQueue } from "@/context/actions";
-import { InitialState, REMOVE_FROM_QUEUE, Video } from "@/context/types";
+import { InitialState, REMOVE_FROM_QUEUE } from "@/context/types";
 import { convertMillisToMinutes } from "@/utils/duration";
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
