@@ -6,7 +6,7 @@ import path from "path";
 
 import { cleanReturnPayload } from "./utils/cleanReturnPayload.js";
 import { fileURLToPath } from "url";
-import webhookRouter from "./router/webhook.js";
+import webhookRouter from "./router/webhooks.js";
 
 
 // import youtubeRouter from "./youtubeRoutes";
@@ -54,7 +54,7 @@ app.use(function (req, res, next) {
         res.send = ogSend;
         return res.send(cleanData);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         next();
       }
     }

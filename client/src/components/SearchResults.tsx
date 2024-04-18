@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import VideoInfoTile from "./VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
-import { ADD_TO_QUEUE, InitialState, Video } from "@/context/types";
+import { ADD_TO_CATALOG, InitialState, Video } from "@/context/types";
 import InfiniteScroll from "react-infinite-scroller";
-import { addToQueue } from "@/context/actions";
+import { addToCatalog } from "@/context/actions";
 import { convertMillisToMinutes } from "@/utils/duration";
 import { AxiosInstance } from "axios";
 import CircularLoader from "./CircularLoader";
+import uniqBy from "lodash.uniqby";
 
 interface SearchResultsProps {
   loadNextSet: () => void;
@@ -21,13 +22,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
 
   const dispatch = useContext(GlobalDispatchContext);
 
-  const handleAddToQueue = async () => {
+  const handleAddToCatalog = async () => {
     setAddLoading(true);
     const toAdd = searchResults.filter((video) => selectedVideos.includes(video.id.videoId));
-    const res = await addToQueue(backendAPI as AxiosInstance, toAdd);
-    if (res) {
+    const uniq = uniqBy(toAdd, (v: Video) => v.id.videoId) as Video[];
+    const res = await addToCatalog(backendAPI as AxiosInstance, uniq);
+    if (res && res.success) {
       setSelectedVideos([]);
-      dispatch!({ type: ADD_TO_QUEUE, payload: { videos: toAdd } });
+      dispatch!({ type: ADD_TO_CATALOG, payload: { videos: toAdd } });
     }
     setAddLoading(false);
   };
@@ -43,7 +45,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
       {selectedVideos.length > 0 && (
         <button
           disabled={addLoading}
-          onClick={handleAddToQueue}
+          onClick={handleAddToCatalog}
           className="fixed right-5 bottom-5 btn btn-enhanced !w-fit z-10"
         >
           {!addLoading ? `Add (${selectedVideos.length})` : "Adding..."}
@@ -63,11 +65,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
               videoName={video.snippet.title}
               videoDuration={convertMillisToMinutes(video.duration)}
               thumbnail={video.snippet.thumbnails.high.url}
-              videoInCatalog={catalog.find((v) => v.id.videoId === video.id.videoId) !== undefined}
+              videoInMedia={catalog.find((v) => v.id.videoId === video.id.videoId) !== undefined}
               showControls={
                 !searchLoading && isAdmin
                   ? {
-                      play: false,
                       plusminus:
                         selectedVideos.length > 0 && selectedVideos.find((v) => v === video.id.videoId)
                           ? "minus"
@@ -75,7 +76,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
                     }
                   : false
               }
-              // playVideo={handlePlayVideo}
               addVideo={(videoId) => {
                 setSelectedVideos([...selectedVideos, videoId]);
               }}

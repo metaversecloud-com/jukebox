@@ -1,63 +1,45 @@
 import Header from "@/components/Header";
 import VideoInfoTile from "@/components/VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
-import { fetchCatalog, playVideo } from "@/context/actions";
-import { InitialState, SET_CATALOG, SET_CATALOG_LOADING, UPDATE_PLAY_INDEX, Video } from "@/context/types";
+import { removeFromQueue } from "@/context/actions";
+import { InitialState, REMOVE_FROM_QUEUE } from "@/context/types";
 import { convertMillisToMinutes } from "@/utils/duration";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { AxiosInstance } from "axios";
 
 const Home: React.FC = () => {
-  const { hasInteractiveParams, catalog, catalogLoading, nowPlaying, backendAPI, currentPlayIndex, isAdmin } =
-    useContext(GlobalStateContext) as InitialState;
-
-  const [playLoadingIndex, setPlayLoadingIndex] = useState<number>(-1);
-
   const dispatch = useContext(GlobalDispatchContext);
 
-  const handlePlayVideo = async (videoId: string) => {
-    const video = catalog.find((video) => video.id.videoId === videoId) as Video;
-    const idx = catalog.findIndex((video) => video.id.videoId === videoId);
-    setPlayLoadingIndex(idx);
-    const res = await playVideo(backendAPI as AxiosInstance, video.id.videoId);
-    if (res) {
-      dispatch!({
-        type: UPDATE_PLAY_INDEX,
-        payload: { currentPlayIndex: idx },
-      });
+  const { catalog, jukeboxLoading, nowPlaying, isAdmin, queue, backendAPI } = useContext(
+    GlobalStateContext,
+  ) as InitialState;
+
+  const [selectedVideos, setSelectedVideos] = useState<string[]>([]);
+  const [removeLoading, setRemoveLoading] = useState(false);
+
+  const handleRemoveFromQueue = async () => {
+    setRemoveLoading(true);
+    const toRemoveIds = catalog
+      .filter((video) => selectedVideos.includes(video.id.videoId))
+      .map((video) => video.id.videoId);
+    const result = await removeFromQueue(backendAPI!, toRemoveIds);
+    if (result && result.success) {
+      dispatch!({ type: REMOVE_FROM_QUEUE, payload: { videoIds: toRemoveIds } });
+      setSelectedVideos([]);
     }
-    setPlayLoadingIndex(-1);
+    setRemoveLoading(false);
   };
 
-  useEffect(() => {
-    async function loadCatalog() {
-      // dispatch!({ type: SET_CATALOG_LOADING, payload: { catalogLoading: true } });
-      const { currentPlayIndex, media } = await fetchCatalog(backendAPI as AxiosInstance);
-      dispatch!({
-        type: SET_CATALOG,
-        payload: {
-          catalog: media,
-          currentPlayIndex,
-        },
-      });
-    }
-
-    if (hasInteractiveParams && catalog.length > 0 && catalog[0].id.videoId === "" && backendAPI !== null) {
-      loadCatalog();
-    }
-  }, [hasInteractiveParams, dispatch, catalogLoading, catalog, backendAPI]);
-
   return (
-    <>
+    <div className="flex flex-col w-full h-full pb-6">
       <Header showAdminControls={isAdmin} />
       <div className="flex flex-col w-full justify-start">
-        {nowPlaying && nowPlaying.id.videoId !== "" && (
+        {nowPlaying.id.videoId !== "" && (
           <>
             <p className="p1 !font-semibold">Now Playing: </p>
             <div className="my-4">
               <VideoInfoTile
-                isLoading={catalogLoading}
+                isLoading={jukeboxLoading}
                 videoId={nowPlaying.id.videoId}
                 videoName={nowPlaying.snippet.title}
                 videoDuration={convertMillisToMinutes(nowPlaying.duration)}
@@ -66,46 +48,53 @@ const Home: React.FC = () => {
             </div>
           </>
         )}
-        {catalog.length > 0 && (
+        {queue.length > 0 && (
           <>
             <p className="p1 !font-semibold mb-2">Next Up: </p>
-            {(() => {
-              const queue =
-                nowPlaying && currentPlayIndex !== -1
-                  ? catalog.slice(currentPlayIndex + 1).concat(catalog.slice(0, currentPlayIndex))
-                  : catalog;
-              return queue.map((video, i) => (
-                <div key={`${video.id.videoId}-${i}-div`} className="my-2">
-                  <VideoInfoTile
-                    isLoading={catalogLoading}
-                    videoId={video.id.videoId}
-                    videoName={video.snippet.title}
-                    videoDuration={convertMillisToMinutes(video.duration)}
-                    thumbnail={video.snippet.thumbnails.high.url}
-                    playLoading={playLoadingIndex === catalog.findIndex((v) => v.id.videoId === video.id.videoId)}
-                    showControls={
-                      !catalogLoading && isAdmin
-                        ? {
-                            play: true,
-                            plusminus: false,
-                          }
-                        : false
-                    }
-                    disabledControls={playLoadingIndex !== -1}
-                    playVideo={handlePlayVideo}
-                  ></VideoInfoTile>
-                </div>
-              ));
-            })()}
+
+            {queue.map((video, i) => (
+              <div key={`${video.id.videoId}-${i}-div`} className="my-2">
+                <VideoInfoTile
+                  isLoading={jukeboxLoading}
+                  videoId={video.id.videoId}
+                  videoName={video.snippet.title}
+                  videoDuration={convertMillisToMinutes(video.duration)}
+                  thumbnail={video.snippet.thumbnails.high.url}
+                  showControls={
+                    jukeboxLoading
+                      ? false
+                      : {
+                          plusminus:
+                            selectedVideos.length > 0 && selectedVideos.find((v) => v === video.id.videoId)
+                              ? "minus"
+                              : "plus",
+                        }
+                  }
+                  addVideo={(videoId) => {
+                    setSelectedVideos([...selectedVideos, videoId]);
+                  }}
+                  removeVideo={(videoId) => {
+                    setSelectedVideos(selectedVideos.filter((v) => v !== videoId));
+                  }}
+                ></VideoInfoTile>
+              </div>
+            ))}
           </>
         )}
-      </div>
-      {isAdmin && (
-        <Link className="btn btn-enhanced w-full my-2" to={"/search"}>
+        {selectedVideos.length > 0 && (
+          <button
+            disabled={removeLoading}
+            onClick={handleRemoveFromQueue}
+            className="fixed right-5 bottom-5 btn btn-enhanced !w-fit z-10"
+          >
+            {!removeLoading ? `Remove (${selectedVideos.length})` : "Removing..."}
+          </button>
+        )}
+        <Link className="btn btn-enhanced my-2 w-full" to={"/add-to-queue"}>
           Add a Song
         </Link>
-      )}
-    </>
+      </div>
+    </div>
   );
 };
 

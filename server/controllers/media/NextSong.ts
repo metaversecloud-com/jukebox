@@ -1,8 +1,8 @@
-import redisObj from "../../redis/index.js";
+import redisObj from "../../redis-sse/index.js";
 import { getDroppedAsset } from "../../utils/index.js";
 import he from "he";
 import { Request, Response } from "express";
-import { Credentials } from "../../types/index.js";
+import { Credentials, Video } from "../../types/index.js";
 
 export default async function NextSong(req: Request, res: Response) {
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body as Credentials;
@@ -11,44 +11,63 @@ export default async function NextSong(req: Request, res: Response) {
   if (jukeboxAsset.error) {
     return res.status(404).json({ message: "Asset not found" });
   }
-  const { currentPlayIndex, media } = jukeboxAsset.dataObject;
+  const { queue } = jukeboxAsset.dataObject;
   const timeFactor = new Date(Math.round(new Date().getTime() / 25000) * 25000);
   const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}_${timeFactor}`;
-  const newPlayIndex = media.length === currentPlayIndex + 1 ? 0 : currentPlayIndex + 1;
-
+  const remainingQueue = queue.slice(1);
+  let nowPlaying = "-1" as "-1" | Video;
+  const promises = [];
   try {
-    await jukeboxAsset.updateDataObject(
-      {
-        ...jukeboxAsset.dataObject,
-        currentPlayIndex: newPlayIndex,
-      },
-      {
-        lock: {
-          lockId,
-          releaseLock: false,
+    if (queue.length > 0) {
+      nowPlaying = jukeboxAsset.dataObject.catalog.find((video: Video) => video.id.videoId === queue[0]) as Video;
+      const videoId = nowPlaying.id.videoId;
+      const videoTitle = nowPlaying.snippet.title;
+
+      const mediaLink = `https://www.youtube.com/watch?v=${videoId}`;
+
+      promises.push(
+        jukeboxAsset.updateMediaType({
+          mediaLink,
+          isVideo: true,
+          mediaName: he.decode(videoTitle),
+          mediaType: "link",
+          audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
+          audioRadius: jukeboxAsset.audioRadius || 2, // Far
+          syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
+        }),
+      );
+    } else {
+      promises.push(jukeboxAsset.updateMediaType({ mediaType: "none" }));
+    }
+
+    promises.push(
+      jukeboxAsset.updateDataObject(
+        {
+          ...jukeboxAsset.dataObject,
+          queue: remainingQueue,
+          nowPlaying: nowPlaying !== "-1" ? nowPlaying.id.videoId : "-1",
         },
-      },
+        {
+          lock: {
+            lockId,
+            releaseLock: false,
+          },
+        },
+      ),
     );
-    const videoId = media[newPlayIndex].id.videoId;
-    const videoTitle = media[newPlayIndex].snippet.title;
 
-    const mediaLink = `https://www.youtube.com/watch?v=${videoId}`;
+    await Promise.all(promises);
 
-    await jukeboxAsset.updateMediaType({
-      mediaLink,
-      isVideo: true,
-      mediaName: he.decode(videoTitle),
-      mediaType: "link",
-      audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
-      audioRadius: jukeboxAsset.audioRadius || 2, // Far
-      syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
+    redisObj.publish(`${process.env.INTERACTIVE_KEY}_JUKEBOX`, {
+      assetId: jukeboxAsset.id,
+      videoId: nowPlaying !== "-1" ? nowPlaying.id.videoId : "-1",
+      nextUpId: remainingQueue.length > 0 ? remainingQueue[0] : null,
+      event: "nowPlaying",
     });
-    redisObj.publish(`${process.env.INTERACTIVE_KEY}_JUKEBOX`, { assetId: jukeboxAsset.id, currentPlayIndex: newPlayIndex, event: "nowPlaying" });
 
-    return res.json({ message: "OK" });
+    return res.json({ success: true });
   } catch (e) {
-    // console.log("ERR", e);
-    console.log("Update is properly locked due to mutex", visitorId);
-    return res.status(409).json({ message: "Update is properly locked due to mutex" });
+    console.log("Update is properly locked due to mutex (Next Song)");
+    return res.status(409).json({ message: "Update is properly locked due to mutex (Next Song)" });
   }
 }

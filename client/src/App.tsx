@@ -6,18 +6,23 @@ import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { GlobalDispatchContext, GlobalStateContext } from "./context/GlobalContext";
 import { setupBackendAPI } from "./utils/backendAPI";
 import {
-  ADD_TO_QUEUE,
+  ADD_TO_CATALOG,
   InitialState,
   InteractiveParams,
   SET_BACKEND_API,
   SET_INTERACTIVE_PARAMS,
   SET_IS_ADMIN,
-  UPDATE_PLAY_INDEX,
+  UPDATE_PLAYING_SONG,
+  REMOVE_FROM_CATALOG,
+  SET_JUKEBOX,
+  ADD_TO_QUEUE,
   REMOVE_FROM_QUEUE,
 } from "./context/types";
 import Search from "./pages/Search";
 // import { fetchEventSource } from "@microsoft/fetch-event-source";
 import Admin from "./pages/Admin";
+import { checkInteractiveCredentials, checkIsAdmin, fetchJukeboxDataObject } from "./context/actions";
+import AddToQueue from "./pages/AddToQueue";
 
 const App = () => {
   const navigate = useNavigate();
@@ -102,17 +107,12 @@ const App = () => {
     }
   }, [interactiveParams, setInteractiveParams]);
 
-  
   const setupBackend = useCallback(async () => {
-    const setupResult = await setupBackendAPI(interactiveParams);
-    if (!setupResult.success) {
-      navigate("*");
-      return;
-    } else {
-      dispatch!({ type: SET_BACKEND_API, payload: { backendAPI: setupResult.backendAPI } });
-    }
-  }, [dispatch, interactiveParams, navigate]);
-  
+    const backendAPI = await setupBackendAPI(interactiveParams);
+
+    dispatch!({ type: SET_BACKEND_API, payload: { backendAPI } });
+  }, [dispatch, interactiveParams]);
+
   useEffect(() => {
     if (!backendAPI) {
       setupBackend();
@@ -135,19 +135,31 @@ const App = () => {
       sseEvent.onmessage = (event) => {
         const sse = JSON.parse(event.data);
         if (sse.kind === "nowPlaying") {
-          const nowPlaying = sse.data;
+          const videoId = sse.data.videoId;
           dispatch!({
-            type: UPDATE_PLAY_INDEX,
-            payload: { currentPlayIndex: nowPlaying.currentPlayIndex },
+            type: UPDATE_PLAYING_SONG,
+            payload: { nowPlayingId: videoId, nextUpId: sse.data.nextUpId },
           });
-        } else if (sse.kind === "addedToQueue") {
-          const videos = sse.videos;
+        } else if (sse.kind === "addedToCatalog") {
+          const videos = sse.data.media;
           dispatch!({
-            type: ADD_TO_QUEUE,
+            type: ADD_TO_CATALOG,
             payload: { videos },
           });
+        } else if (sse.kind === "removedFromCatalog") {
+          const videoIds = sse.data.media;
+          dispatch!({
+            type: REMOVE_FROM_CATALOG,
+            payload: { videoIds },
+          });
+        } else if (sse.kind === "addedToQueue") {
+          const videoIds = sse.data.media;
+          dispatch!({
+            type: ADD_TO_QUEUE,
+            payload: { videoIds },
+          });
         } else if (sse.kind === "removedFromQueue") {
-          const videoIds = sse.videoIds;
+          const videoIds = sse.data.media;
           dispatch!({
             type: REMOVE_FROM_QUEUE,
             payload: { videoIds },
@@ -155,7 +167,14 @@ const App = () => {
         }
       };
     }
-  }, [sseEvent]);
+    return () => {
+      if (sseEvent) {
+        // console.log("Closing SSE...");
+        sseEvent.close();
+      }
+    };
+  }, [sseEvent, dispatch]);
+
   useEffect(() => {
     const sendHeartbeat = async () => {
       try {
@@ -167,18 +186,36 @@ const App = () => {
       }
     };
 
-    const getIsAdmin = async () => {
-      if (backendAPI) {
-        const { data } = await backendAPI.get("/is-admin");
-        dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: data.isAdmin } });
-      }
-    };
-
-    getIsAdmin();
-
     const intervalId = setInterval(sendHeartbeat, 1000 * 60 * 5);
     return () => clearInterval(intervalId);
   }, [backendAPI, dispatch]);
+
+  useEffect(() => {
+    const initialLoad = () => {
+      if (backendAPI) {
+        Promise.all([
+          checkInteractiveCredentials(backendAPI),
+          checkIsAdmin(backendAPI),
+          fetchJukeboxDataObject(backendAPI),
+        ]).then(([result, admin, dataObject]) => {
+          if (!result.success) {
+            navigate("*");
+          }
+          dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: admin.isAdmin } });
+
+          dispatch!({
+            type: SET_JUKEBOX,
+            payload: {
+              catalog: dataObject.catalog,
+              queue: dataObject.queue,
+              nowPlayingId: dataObject.nowPlaying,
+            },
+          });
+        });
+      }
+    };
+    initialLoad();
+  }, [backendAPI, dispatch, navigate]);
 
   return (
     <div className="flex flex-col p-4 items-center justify-center w-full">
@@ -186,7 +223,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
         <Route path="/admin" element={<Admin />} />
-
+        <Route path="/add-to-queue" element={<AddToQueue />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </div>

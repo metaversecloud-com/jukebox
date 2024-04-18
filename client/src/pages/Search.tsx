@@ -11,22 +11,20 @@ import {
   InitialState,
 } from "@/context/types";
 import React, { useContext, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AxiosInstance } from "axios";
 
 const Search: React.FC = () => {
-  const location = useLocation();
   const dispatch = useContext(GlobalDispatchContext);
-  const { searchTermGlobal, nextPageToken, searchLoading, nextPageLoading, backendAPI, searchResults } = useContext(
+  const { searchTermGlobal, nextPageToken, searchLoading, nextPageLoading, backendAPI, searchResults, isAdmin } = useContext(
     GlobalStateContext,
   ) as InitialState;
 
-  const currentPath = location.pathname;
 
   const [searchTerm, setSearchTerm] = useState(searchTermGlobal);
   const searchVideo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (searchLoading || searchTerm.trim() == "") return;
+    if (searchLoading || searchTerm.trim() == "" || !isAdmin) return;
     dispatch!({ type: RESET_SEARCH_RESULTS });
     dispatch!({ type: GENERATE_SKELETON });
 
@@ -48,11 +46,9 @@ const Search: React.FC = () => {
 
   return (
     <>
-      {currentPath !== "/" && (
-        <Link to="/" className="p-1 border rounded-full hover:bg-[#f3f5f6] transition-colors self-start">
-          <img src="left-arrow.svg" width={20} height={20} />
-        </Link>
-      )}
+      <Link to="/admin" className="p-1 border rounded-full hover:bg-[#f3f5f6] transition-colors self-start">
+        <img src="left-arrow.svg" width={20} height={20} />
+      </Link>
       <Header showAdminControls={false} />
       <div className="flex flex-col w-full justify-start">
         <p className="p2 !font-semibold my-2">Search YouTube</p>

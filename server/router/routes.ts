@@ -1,15 +1,14 @@
 import express from "express";
 
 import { getVersion } from "../utils/getVersion.js";
-import GetCatalog from "../controllers/media/GetCatalog.js";
+import GetJukeboxDataObject from "../controllers/media/GetJukeboxDataObject.js";
 import SearchVideos from "../controllers/media/SearchVideos.js";
-import PlayVideo from "../controllers/media/PlayVideo.js";
 import setHeartbeat from "../controllers/status/setHeartbeat.js";
 import isAdminCheck from "../controllers/status/isAdminCheck.js";
 import { isAdmin } from "../middleware/isAdmin.js";
-import AddToQueue from "../controllers/media/AddToQueue.js";
-import SSE from "../controllers/media/SSE.js";
-import RemoveFromQueue from "../controllers/media/RemoveFromQueue.js";
+import AddMedia from "../controllers/media/AddMedia.js";
+import sse from "../controllers/media/Events.js";
+import RemoveMedia from "../controllers/media/RemoveMedia.js";
 import { handleCheckInteractiveCredentials } from "../controllers/status/handleCheckInteractiveCredentials.js";
 
 const router = express.Router();
@@ -32,6 +31,7 @@ router.get("/system/health", (req, res) => {
       SAFE_SEARCH: process.env.SAFE_SEARCH ? process.env.SAFE_SEARCH : "NOT SET",
       GOOGLE_API_KEY: process.env.GOOGLE_API_KEY ? "SET" : "NOT SET",
       REDIS_URL: process.env.REDIS_URL ? "SET" : "NOT SET",
+      SDK_REDIS_URL: process.env.SDK_REDIS_URL ? "SET" : "NOT SET",
       REDIS_PASSWORD: process.env.REDIS_PASSWORD ? "SET" : "NOT SET",
     },
   });
@@ -41,13 +41,13 @@ router.get("/system/interactive-credentials", handleCheckInteractiveCredentials)
 
 // YouTube
 router.post("/search", isAdmin, SearchVideos);
-router.post("/play", isAdmin, PlayVideo);
 
-router.get("/catalog", GetCatalog);
-router.get("/sse", SSE);
+router.get("/jukebox", GetJukeboxDataObject);
+router.get("/sse", sse);
 router.post("/heartbeat", setHeartbeat);
 router.get("/is-admin", isAdminCheck);
-router.post("/add-to-queue", isAdmin, AddToQueue);
-router.post("/remove-from-queue", isAdmin, RemoveFromQueue);
+
+router.post("/add-media", AddMedia);
+router.post("/remove-media", RemoveMedia);
 
 export default router;

@@ -3,7 +3,6 @@ import Marquee from "react-fast-marquee";
 import he from "he";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import CircularLoader from "./CircularLoader";
 
 interface VideoInfoTileProps {
   videoId: string;
@@ -13,15 +12,12 @@ interface VideoInfoTileProps {
   isLoading: boolean;
   showControls?:
     | {
-        play: boolean;
-        plusminus: string | false;
+        plusminus: "plus" | "minus";
       }
     | false;
-  playVideo?: (videoId: string) => void;
-  playLoading?: boolean;
   addVideo?: (videoId: string) => void;
   removeVideo?: (videoId: string) => void;
-  videoInCatalog?: boolean;
+  videoInMedia?: boolean;
   disabledControls?: boolean;
 }
 
@@ -32,27 +28,17 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
   thumbnail,
   showControls,
   isLoading,
-  playVideo,
-  playLoading,
   addVideo,
   removeVideo,
-  videoInCatalog,
-  disabledControls
+  videoInMedia,
+  disabledControls,
 }) => {
   const [playMarquee, setPlayMarquee] = useState(true);
 
   return (
     <div
-      className={`relative flex flex-row w-full rounded-xl pr-1 ${showControls && showControls.plusminus !== false ? showControls.plusminus === "minus" && "bg-gray-300" : ""}`}
+      className={`relative flex flex-row w-full rounded-xl pr-1 ${showControls && showControls.plusminus === "minus" ? "bg-gray-300" : ""}`}
     >
-      {playLoading && (
-        <>
-          <div className="backdrop-brightness-90 rounded-xl absolute top-0 z-10 h-full w-full"></div>
-          <div className="absolute top-0 z-10 flex rounded-xl h-full justify-center items-center select-none w-full">
-            <CircularLoader />
-          </div>
-        </>
-      )}
       {!isLoading ? (
         <div className="rounded-xl h-fit p-0">
           <img
@@ -95,7 +81,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
         </div>
         {showControls && (
           <div className="flex items-center justify-end">
-            {videoInCatalog ? (
+            {videoInMedia ? (
               <span className="w-[40px] h-[40px] flex items-center justify-center mx-[1px]">
                 <i className="bg-center bg-no-repeat bg-contain check-icon h-5 w-5" />
               </span>
@@ -118,16 +104,6 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
                   <i className="icon minus-icon h-4 w-4" />
                 </button>
               ))
-            )}
-
-            {showControls.play && (
-              <button
-                disabled={disabledControls}
-                onClick={() => playVideo!(videoId)}
-                className={`btn-icon !p-0 transition-colors flex items-center justify-center mx-[1px]`}
-              >
-                <i className="icon play-icon h-4 w-4" />
-              </button>
             )}
           </div>
         )}

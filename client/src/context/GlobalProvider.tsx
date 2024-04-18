@@ -6,7 +6,7 @@ import { skeleton, videoSample } from "./constants";
 
 const initialState: InitialState = {
   catalog: skeleton,
-  currentPlayIndex: -1,
+  queue: skeleton,
   isAdmin: false,
   nowPlaying: videoSample,
   searchResults: [],
@@ -14,8 +14,8 @@ const initialState: InitialState = {
   searchLoading: false,
   nextPageLoading: false,
   searchStatus: "",
-  catalogLoading: true,
-  catalogStatus: "",
+  jukeboxLoading: true,
+  jukeboxStatus: "",
   hasInteractiveParams: false,
   interactiveParams: null,
   backendAPI: null,

@@ -7,24 +7,17 @@ const searchCatalog = async (backendAPI: AxiosInstance, searchTerm: string, next
     return result.data;
   } catch (error) {
     console.error(error);
+    return null;
   }
 };
 
-const fetchCatalog = async (backendAPI: AxiosInstance) => {
+const fetchJukeboxDataObject = async (backendAPI: AxiosInstance) => {
   try {
-    const result = await backendAPI.get("/catalog");
+    const result = await backendAPI.get("/jukebox");
     return result.data;
   } catch (error) {
     console.error(error);
-  }
-};
-
-const playVideo = async (backendAPI: AxiosInstance, videoId: string) => {
-  try {
-    const result = await backendAPI.post("/play", { videoId });
-    return result.data;
-  } catch (error) {
-    console.error(error);
+    return null;
   }
 };
 
@@ -34,25 +27,67 @@ const checkIsAdmin = async (backendAPI: AxiosInstance) => {
     return result.data;
   } catch (error) {
     console.error(error);
+    return null;
   }
 };
 
-const addToQueue = async (backendAPI: AxiosInstance, videos: Video[]) => {
+const addToCatalog = async (backendAPI: AxiosInstance, videos: Video[]) => {
   try {
-    const result = await backendAPI.post("/add-to-queue", { videos });
+    const result = await backendAPI.post("/add-media", { videos, type: "catalog" });
     return result.data;
   } catch (error) {
     console.error(error);
+    return null;
+  }
+};
+
+const removeFromCatalog = async (backendAPI: AxiosInstance, videoIds: string[]) => {
+  try {
+    const result = await backendAPI.post("/remove-media", { videoIds, type: "catalog" });
+    return result.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+const addToQueue = async (backendAPI: AxiosInstance, videoIds: string[]) => {
+  try {
+    const result = await backendAPI.post("/add-media", { videos: videoIds, type: "queue" });
+    return result.data;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 };
 
 const removeFromQueue = async (backendAPI: AxiosInstance, videoIds: string[]) => {
   try {
-    const result = await backendAPI.post("/remove-from-queue", { videoIds });
+    const result = await backendAPI.post("/remove-media", { videoIds, type: "queue" });
     return result.data;
   } catch (error) {
     console.error(error);
+    return null;
   }
 };
 
-export { searchCatalog, fetchCatalog, playVideo, checkIsAdmin, addToQueue, removeFromQueue };
+const checkInteractiveCredentials = async (backendAPI: AxiosInstance) => {
+  try {
+    const result = await backendAPI.get("/system/interactive-credentials");
+    return result.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export {
+  checkInteractiveCredentials,
+  searchCatalog,
+  fetchJukeboxDataObject,
+  checkIsAdmin,
+  addToCatalog,
+  removeFromCatalog,
+  addToQueue,
+  removeFromQueue,
+};

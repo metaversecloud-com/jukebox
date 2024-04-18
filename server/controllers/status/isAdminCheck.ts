@@ -1,5 +1,5 @@
 import { Credentials } from "../../types/index.js";
-import { getVisitor } from "../../utils/index.js";
+import { errorHandler, getVisitor } from "../../utils/index.js";
 import { Request, Response } from "express";
 
 export default async function isAdminCheck(req: Request, res: Response) {
@@ -14,7 +14,11 @@ export default async function isAdminCheck(req: Request, res: Response) {
       return res.status(200).json({ isAdmin: false });
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: err.message });
+    return errorHandler({
+      err,
+      functionName: "isAdminCheck",
+      message: "Error in Admin Check",
+      req, res
+    });
   }
 }

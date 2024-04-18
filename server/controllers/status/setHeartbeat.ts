@@ -1,4 +1,4 @@
-import redisObj from "../../redis/index.js";
+import redisObj from "../../redis-sse/index.js";
 import { Request, Response } from "express";
 
 export default async function setHeartbeat(req: Request, res: Response) {

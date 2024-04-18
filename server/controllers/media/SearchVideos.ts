@@ -1,9 +1,9 @@
-// @ts-nocheck
 import { youtube_v3 } from "@googleapis/youtube";
 import initializeYouTube from "../../external/google.js";
 import { Video } from "../../types";
 import { YTDurationToMilliseconds } from "../../utils/youtube/index.js";
 import { Request, Response } from "express";
+import { errorHandler } from "../../utils/errorHandler.js";
 
 async function getVideoDuration(videos: Video[], yt: youtube_v3.Youtube) {
   const videoIds = videos.map((video) => video.id.videoId);
@@ -43,7 +43,11 @@ export default async function SearchVideos(req: Request, res: Response) {
 
     return res.status(200).json({ searchResults: videosWithDuration, newNextPageToken });
   } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return errorHandler({
+      err,
+      functionName: "SearchVideos",
+      message: "Error searching",
+      req, res
+    });
   }
 }
