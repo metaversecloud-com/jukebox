@@ -1,5 +1,5 @@
 import { Credentials } from "../../types/index.js";
-import { getDroppedAsset } from "../../utils/index.js";
+import { errorHandler, getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
 
 export default async function GetJukeboxDataObject(req: Request, res: Response) {
@@ -14,7 +14,12 @@ export default async function GetJukeboxDataObject(req: Request, res: Response) 
       return res.status(200).json(jukeboxAsset.dataObject);
     }
   } catch (err: any) {
-    console.error("Get DataObject Error", JSON.stringify(err));
-    res.status(500).json({ error: err.message });
+    return errorHandler({
+      err,
+      functionName: "GetJukeboxDataObject",
+      message: "Error getting Jukebox",
+      req,
+      res
+    });
   }
 }

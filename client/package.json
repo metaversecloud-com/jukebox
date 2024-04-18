@@ -11,9 +11,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@microsoft/fetch-event-source": "^2.0.1",
-    "@types/lodash.uniqby": "^4.7.9",
-    "axios": "^1.6.7",
     "lodash.uniqby": "^4.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -23,6 +20,7 @@
     "react-router-dom": "^6.22.1"
   },
   "devDependencies": {
+    "@types/lodash.uniqby": "^4.7.9",
     "@types/node": "^20.11.20",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",
