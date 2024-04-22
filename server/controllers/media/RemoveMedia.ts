@@ -9,11 +9,7 @@ export default async function RemoveMedia(req: Request, res: Response) {
 
   const { videoIds, type }: { videoIds: string[]; type: "catalog" | "queue" } = req.body;
   const credentials = { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId };
-  const [isAdmin, jukeboxAsset] = await Promise.all([checkIsAdmin(credentials), getDroppedAsset(credentials)]);
-
-  if (type === "catalog" && !isAdmin) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+  const jukeboxAsset = await getDroppedAsset(credentials);
 
   if (jukeboxAsset.error) {
     return res.status(404).json({ message: "Asset not found" });

@@ -21,7 +21,7 @@ export default async function NextSong(req: Request, res: Response) {
     if (queue.length > 0) {
       nowPlaying = jukeboxAsset.dataObject.catalog.find((video: Video) => video.id.videoId === queue[0]) as Video;
       const videoId = nowPlaying.id.videoId;
-      const videoTitle = nowPlaying.snippet.title;
+      // const videoTitle = nowPlaying.snippet.title;
 
       const mediaLink = `https://www.youtube.com/watch?v=${videoId}`;
 
@@ -29,7 +29,8 @@ export default async function NextSong(req: Request, res: Response) {
         jukeboxAsset.updateMediaType({
           mediaLink,
           isVideo: true,
-          mediaName: he.decode(videoTitle),
+          // mediaName: he.decode(videoTitle),
+          mediaName: "Jukebox",
           mediaType: "link",
           audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
           audioRadius: jukeboxAsset.audioRadius || 2, // Far

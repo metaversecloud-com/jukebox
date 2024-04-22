@@ -66,6 +66,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ loadNextSet }) => {
               videoDuration={convertMillisToMinutes(video.duration)}
               thumbnail={video.snippet.thumbnails.high.url}
               videoInMedia={catalog.find((v) => v.id.videoId === video.id.videoId) !== undefined}
+              videoInSelected={selectedVideos.find((v) => v === video.id.videoId) ? true : false}
               showControls={
                 !searchLoading && isAdmin
                   ? {

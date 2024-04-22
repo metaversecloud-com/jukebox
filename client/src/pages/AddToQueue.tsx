@@ -76,6 +76,7 @@ const AddToQueue = () => {
             videoName={video.snippet.title}
             videoDuration={convertMillisToMinutes(video.duration)}
             thumbnail={video.snippet.thumbnails.high.url}
+            videoInSelected={selectedVideos.find((v) => v === video.id.videoId) ? true : false}
             videoInMedia={
               (nowPlaying && nowPlaying.id.videoId === video.id.videoId) ||
               queue.find((v) => v.id.videoId === video.id.videoId) !== undefined

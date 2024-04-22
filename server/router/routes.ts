@@ -48,6 +48,6 @@ router.post("/heartbeat", setHeartbeat);
 router.get("/is-admin", isAdminCheck);
 
 router.post("/add-media", AddMedia);
-router.post("/remove-media", RemoveMedia);
+router.post("/remove-media", isAdmin, RemoveMedia);
 
 export default router;

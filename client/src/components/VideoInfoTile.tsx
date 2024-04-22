@@ -17,6 +17,7 @@ interface VideoInfoTileProps {
     | false;
   addVideo?: (videoId: string) => void;
   removeVideo?: (videoId: string) => void;
+  videoInSelected?: boolean;
   videoInMedia?: boolean;
   disabledControls?: boolean;
 }
@@ -30,15 +31,22 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
   isLoading,
   addVideo,
   removeVideo,
+  videoInSelected,
   videoInMedia,
   disabledControls,
 }) => {
   const [playMarquee, setPlayMarquee] = useState(true);
 
+  const handleVideoAction = (videoId: string) => {
+    if (videoInSelected) {
+      removeVideo && removeVideo(videoId);
+    } else {
+      addVideo && addVideo(videoId);
+    }
+  }
+
   return (
-    <div
-      className={`relative flex flex-row w-full rounded-xl pr-1 ${showControls && showControls.plusminus === "minus" ? "bg-gray-300" : ""}`}
-    >
+    <div className={`relative flex flex-row w-full rounded-xl pr-1 ${videoInSelected ? "bg-gray-300" : ""}`}>
       {!isLoading ? (
         <div className="rounded-xl h-fit p-0">
           <img
@@ -85,25 +93,22 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
               <span className="w-[40px] h-[40px] flex items-center justify-center mx-[1px]">
                 <i className="bg-center bg-no-repeat bg-contain check-icon h-5 w-5" />
               </span>
+            ) : showControls.plusminus === "plus" ? (
+              <button
+                disabled={disabledControls}
+                onClick={() => handleVideoAction(videoId)}
+                className="btn-icon !p-0 transition-colors flex items-center justify-center mx-[1px]"
+              >
+                <i className="icon add-icon h-5 w-5" />
+              </button>
             ) : (
-              showControls.plusminus &&
-              (showControls.plusminus === "plus" ? (
-                <button
-                  disabled={disabledControls}
-                  onClick={() => addVideo && addVideo(videoId)}
-                  className="btn-icon !p-0 transition-colors flex items-center justify-center mx-[1px]"
-                >
-                  <i className="icon add-icon h-5 w-5" />
-                </button>
-              ) : (
-                <button
-                  disabled={disabledControls}
-                  onClick={() => removeVideo && removeVideo(videoId)}
-                  className="btn-icon !p-0 transition-colors flex items-center justify-center mx-[1px]"
-                >
-                  <i className="icon minus-icon h-4 w-4" />
-                </button>
-              ))
+              <button
+                disabled={disabledControls}
+                onClick={() => handleVideoAction(videoId)}
+                className="btn-icon !p-0 transition-colors flex items-center justify-center mx-[1px]"
+              >
+                <i className="icon minus-icon h-4 w-4" />
+              </button>
             )}
           </div>
         )}
