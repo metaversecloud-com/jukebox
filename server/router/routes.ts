@@ -42,6 +42,7 @@ router.get("/system/interactive-credentials", handleCheckInteractiveCredentials)
 // YouTube
 router.post("/search", isAdmin, SearchVideos);
 
+// Media Player
 router.get("/jukebox", GetJukeboxDataObject);
 router.get("/sse", sse);
 router.post("/heartbeat", setHeartbeat);
