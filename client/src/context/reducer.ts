@@ -56,7 +56,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
       ...state,
       catalog: payload.catalog,
       queue,
-      nowPlaying,
+      nowPlaying: nowPlaying ? nowPlaying : videoSample,
       jukeboxLoading: false,
       jukeboxStatus: "SUCCESS",
     };

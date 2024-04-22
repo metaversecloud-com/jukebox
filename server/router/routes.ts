@@ -42,12 +42,13 @@ router.get("/system/interactive-credentials", handleCheckInteractiveCredentials)
 // YouTube
 router.post("/search", isAdmin, SearchVideos);
 
+// Media Player
 router.get("/jukebox", GetJukeboxDataObject);
 router.get("/sse", sse);
 router.post("/heartbeat", setHeartbeat);
 router.get("/is-admin", isAdminCheck);
 
 router.post("/add-media", AddMedia);
-router.post("/remove-media", RemoveMedia);
+router.post("/remove-media", isAdmin, RemoveMedia);
 
 export default router;

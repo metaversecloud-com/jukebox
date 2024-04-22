@@ -55,11 +55,12 @@ const Admin = () => {
                   videoName={video.snippet.title}
                   videoDuration={convertMillisToMinutes(video.duration)}
                   thumbnail={video.snippet.thumbnails.high.url}
+                  videoInSelected={selectedVideoIds.find((v) => v === video.id.videoId) ? true : false}
                   showControls={{
                     plusminus:
                       selectedVideoIds.length > 0 && selectedVideoIds.find((v) => v === video.id.videoId)
-                        ? "minus"
-                        : "plus",
+                        ? "plus"
+                        : "minus",
                   }}
                   addVideo={(videoId) => {
                     setSelectedVideoIds([...selectedVideoIds, videoId]);

@@ -31,7 +31,8 @@ export default async function AddMedia(req: Request, res: Response) {
         jukeboxAsset.updateMediaType({
           mediaLink,
           isVideo: true,
-          mediaName: he.decode(firstVideo.snippet.title), // Will only change media name if one is sent from the frontend.
+          // mediaName: he.decode(firstVideo.snippet.title), 
+          mediaName: "Jukebox", 
           mediaType: "link",
           audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
           audioRadius: jukeboxAsset.audioRadius || 2, // Far

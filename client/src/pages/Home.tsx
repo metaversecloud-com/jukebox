@@ -60,14 +60,15 @@ const Home: React.FC = () => {
                   videoName={video.snippet.title}
                   videoDuration={convertMillisToMinutes(video.duration)}
                   thumbnail={video.snippet.thumbnails.high.url}
+                  videoInSelected={selectedVideos.find((v) => v === video.id.videoId) ? true : false}
                   showControls={
-                    jukeboxLoading
+                    jukeboxLoading || !isAdmin
                       ? false
                       : {
                           plusminus:
-                            selectedVideos.length > 0 && selectedVideos.find((v) => v === video.id.videoId)
-                              ? "minus"
-                              : "plus",
+                            selectedVideos.find((v) => v === video.id.videoId)
+                              ? "plus"
+                              : "minus",
                         }
                   }
                   addVideo={(videoId) => {
