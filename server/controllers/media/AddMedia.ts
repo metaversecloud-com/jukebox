@@ -30,7 +30,7 @@ export default async function AddMedia(req: Request, res: Response) {
       promises.push(
         jukeboxAsset.updateMediaType({
           mediaLink,
-          isVideo: true,
+          isVideo: process.env.INTERACTIVE_KEY === "0Ynmq1wZ4a1X0mCci4zO" ? false : true,
           // mediaName: he.decode(firstVideo.snippet.title), 
           mediaName: "Jukebox", 
           mediaType: "link",
