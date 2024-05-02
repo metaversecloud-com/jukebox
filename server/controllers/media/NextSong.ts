@@ -28,7 +28,7 @@ export default async function NextSong(req: Request, res: Response) {
       promises.push(
         jukeboxAsset.updateMediaType({
           mediaLink,
-          isVideo: true,
+          isVideo: process.env.AUDIO_ONLY ? false : true,
           // mediaName: he.decode(videoTitle),
           mediaName: "Jukebox",
           mediaType: "link",

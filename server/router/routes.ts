@@ -33,6 +33,7 @@ router.get("/system/health", (req, res) => {
       REDIS_URL: process.env.REDIS_URL ? "SET" : "NOT SET",
       SDK_REDIS_URL: process.env.SDK_REDIS_URL ? "SET" : "NOT SET",
       REDIS_PASSWORD: process.env.REDIS_PASSWORD ? "SET" : "NOT SET",
+      AUDIO_ONLY: process.env.AUDIO_ONLY ? process.env.AUDIO_ONLY : "NOT SET",
     },
   });
 });
