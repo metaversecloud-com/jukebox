@@ -198,8 +198,9 @@ const App = () => {
           checkIsAdmin(backendAPI),
           fetchJukeboxDataObject(backendAPI),
         ]).then(([result, admin, dataObject]) => {
-          if (!result || !result.success) {
+          if (!result || !result.success || !dataObject) {
             navigate("*");
+            return;
           }
           dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: admin.isAdmin } });
 
