@@ -49,6 +49,7 @@ export default async function NextSong(req: Request, res: Response) {
           nowPlaying: nowPlaying !== "-1" ? nowPlaying.id.videoId : "-1",
         },
         {
+          analytics: ["plays"],
           lock: {
             lockId,
             releaseLock: false,
