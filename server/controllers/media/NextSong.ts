@@ -1,13 +1,11 @@
 import redisObj from "../../redis-sse/index.js";
-import { getDroppedAsset } from "../../utils/index.js";
-import he from "he";
+import { World, getCredentials, getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
-import { Credentials, Video } from "../../types/index.js";
+import { Video } from "../../types/index.js";
 
 export default async function NextSong(req: Request, res: Response) {
-  const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body as Credentials;
-
-  const jukeboxAsset = await getDroppedAsset({ assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId });
+  const credentials = getCredentials(req.body);
+  const jukeboxAsset = await getDroppedAsset(credentials);
   if (jukeboxAsset.error) {
     return res.status(404).json({ message: "Asset not found" });
   }
@@ -24,6 +22,17 @@ export default async function NextSong(req: Request, res: Response) {
       // const videoTitle = nowPlaying.snippet.title;
 
       const mediaLink = `https://www.youtube.com/watch?v=${videoId}`;
+
+      if (process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME) {
+        const world = World.create(credentials.urlSlug, { credentials });
+        promises.push(
+          world.triggerParticle({
+            name: process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME,
+            duration: 10,
+            position: jukeboxAsset.position,
+          }),
+        );
+      }
 
       promises.push(
         jukeboxAsset.updateMediaType({
@@ -49,7 +58,7 @@ export default async function NextSong(req: Request, res: Response) {
           nowPlaying: nowPlaying !== "-1" ? nowPlaying.id.videoId : "-1",
         },
         {
-          analytics: ["plays"],
+          analytics: [{ analyticName: "plays", urlSlug: credentials.urlSlug, uniqueKey: credentials.urlSlug }],
           lock: {
             lockId,
             releaseLock: false,

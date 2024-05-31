@@ -1,7 +1,7 @@
 import { checkIsAdmin } from "../../middleware/isAdmin.js";
 import redisObj from "../../redis-sse/index.js";
-import { Video } from "../../types/index.js";
-import { getCredentials, getDroppedAsset } from "../../utils/index.js";
+import { AnalyticType, Video } from "../../types/index.js";
+import { World, getCredentials, getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
 // import he from "he";
 
@@ -21,17 +21,26 @@ export default async function AddMedia(req: Request, res: Response) {
   const lockId = `${jukeboxAsset.id}_${timeFactor}`;
   const promises = [];
 
-  const analytics = [];
+  const analytics: AnalyticType[] = [];
   if (type === "catalog") {
-    analytics.push("addsToCatalog");
+    analytics.push({
+      analyticName: "addsToCatalog",
+      uniqueKey: credentials.urlSlug,
+      urlSlug: credentials.urlSlug,
+    });
   } else if (type === "queue") {
-    analytics.push("addsToQueue");
+    analytics.push({
+      analyticName: "addsToQueue",
+      profileId: credentials.profileId,
+      uniqueKey: credentials.profileId,
+    });
   }
   let firstVideo = null;
   if (jukeboxAsset.dataObject.queue.length === 0 && type === "queue" && jukeboxAsset.dataObject.nowPlaying === "-1") {
     firstVideo = jukeboxAsset.dataObject.catalog.find((video: Video) => video.id.videoId === videos[0]);
     if (firstVideo) {
       const mediaLink = `https://www.youtube.com/watch?v=${firstVideo.id.videoId}`;
+      analytics.push({ analyticName: "plays", urlSlug: credentials.urlSlug, uniqueKey: credentials.urlSlug });
       promises.push(
         jukeboxAsset.updateMediaType({
           mediaLink,
@@ -43,14 +52,17 @@ export default async function AddMedia(req: Request, res: Response) {
           audioRadius: jukeboxAsset.audioRadius || 2, // Far
           syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
         }),
-        jukeboxAsset.updateDataObject(
-          {},
-          {
-            analytics: ["plays"],
-          },
-        ),
       );
-      // analytics.push("plays");
+      if (process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME) {
+        const world = World.create(credentials.urlSlug, { credentials });
+        promises.push(
+          world.triggerParticle({
+            name: process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME,
+            duration: 10,
+            position: jukeboxAsset.position,
+          }),
+        );
+      }
       videos.shift();
     }
   }
@@ -63,8 +75,6 @@ export default async function AddMedia(req: Request, res: Response) {
       },
       {
         analytics,
-        profileId: type === "catalog" ? undefined : credentials.profileId,
-        uniqueKey: type === "catalog" ? credentials.urlSlug : credentials.profileId,
         lock: {
           lockId,
           releaseLock: false,
