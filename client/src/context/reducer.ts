@@ -58,7 +58,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
       queue,
       nowPlaying: nowPlaying ? nowPlaying : videoSample,
       jukeboxLoading: false,
-      jukeboxStatus: "SUCCESS",
+      jukeboxStatus: "success",
     };
   } else if (type === SET_IS_ADMIN) {
     return {

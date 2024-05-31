@@ -25,12 +25,14 @@ export default async function AddMedia(req: Request, res: Response) {
   if (type === "catalog") {
     analytics.push({
       analyticName: "addsToCatalog",
+      incrementBy: videos.length,
       uniqueKey: credentials.urlSlug,
       urlSlug: credentials.urlSlug,
     });
   } else if (type === "queue") {
     analytics.push({
       analyticName: "addsToQueue",
+      incrementBy: videos.length,
       profileId: credentials.profileId,
       uniqueKey: credentials.profileId,
     });
@@ -55,13 +57,14 @@ export default async function AddMedia(req: Request, res: Response) {
       );
       if (process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME) {
         const world = World.create(credentials.urlSlug, { credentials });
-        promises.push(
-          world.triggerParticle({
+        world
+          .triggerParticle({
             name: process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME,
             duration: 10,
             position: jukeboxAsset.position,
-          }),
-        );
+          })
+          .then()
+          .catch(() => console.error("Cannot trigger particle"));
       }
       videos.shift();
     }

@@ -42,7 +42,7 @@ export interface InitialState {
   searchLoading: boolean;
   searchStatus: string;
   jukeboxLoading: boolean;
-  jukeboxStatus: string;
+  jukeboxStatus: "waiting" | "success";
   nextPageToken: string;
   nextPageLoading: boolean;
   hasInteractiveParams: boolean;

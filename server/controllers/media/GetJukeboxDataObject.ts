@@ -9,6 +9,7 @@ export default async function GetJukeboxDataObject(req: Request, res: Response) 
       return res.status(404).json({ message: "Asset not found" });
     }
     if (jukeboxAsset) {
+      
       jukeboxAsset
         .updateDataObject(
           {},

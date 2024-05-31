@@ -25,13 +25,14 @@ export default async function NextSong(req: Request, res: Response) {
 
       if (process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME) {
         const world = World.create(credentials.urlSlug, { credentials });
-        promises.push(
-          world.triggerParticle({
+        world
+          .triggerParticle({
             name: process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME,
             duration: 10,
             position: jukeboxAsset.position,
-          }),
-        );
+          })
+          .then()
+          .catch(() => console.error("Cannot trigger particle"));
       }
 
       promises.push(
