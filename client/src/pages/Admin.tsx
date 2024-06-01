@@ -9,7 +9,6 @@ import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Admin = () => {
-  
   const [selectedVideoIds, setSelectedVideoIds] = useState<string[]>([]);
   const [removeLoading, setRemoveLoading] = useState(false);
 
@@ -73,9 +72,11 @@ const Admin = () => {
             ))}
           </div>
         )}
-        <Link className="btn btn-enhanced my-2 w-full" to={"/search"}>
-          Add a Song
-        </Link>
+        <div className="w-full h-14 bottom-0 left-0 fixed flex justify-center items-center bg-white">
+          <Link to={"/search"} className="btn btn-enhanced !w-72">
+            Add a Song
+          </Link>
+        </div>
       </div>
     </>
   );

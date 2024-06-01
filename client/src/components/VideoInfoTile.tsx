@@ -65,6 +65,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
           {!isLoading ? (
             he.decode(videoName).length > 25 ? (
               <Marquee
+                className="z-0"
                 gradient={false}
                 speed={50}
                 delay={3}
