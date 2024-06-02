@@ -55,17 +55,15 @@ export default async function AddMedia(req: Request, res: Response) {
           syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
         }),
       );
-      if (process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME) {
-        const world = World.create(credentials.urlSlug, { credentials });
-        world
-          .triggerParticle({
-            name: process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME,
-            duration: 10,
-            position: jukeboxAsset.position,
-          })
-          .then()
-          .catch(() => console.error("Cannot trigger particle"));
-      }
+      const world = World.create(credentials.urlSlug, { credentials });
+      world
+        .triggerParticle({
+          name: process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME || "firework1_red",
+          duration: 10,
+          position: jukeboxAsset.position,
+        })
+        .then()
+        .catch(() => console.error("Error: Cannot trigger particle"));
       videos.shift();
     }
   }
