@@ -16,17 +16,24 @@ export default async function RemoveMedia(req: Request, res: Response) {
   }
   const timeFactor = new Date(Math.round(new Date().getTime() / 10000) * 10000);
   const lockId = `${jukeboxAsset.id}_${timeFactor}`;
-  let remainingVideos: Video[] | string[] = [];
   try {
+    const jukeboxUpdate: {
+      catalog?: Video[];
+      queue: string[];
+    } = {};
+
     if (type === "catalog") {
-      remainingVideos = jukeboxAsset.dataObject.catalog.filter((video: Video) => !videoIds.includes(video.id.videoId));
+      jukeboxUpdate.catalog = jukeboxAsset.dataObject.catalog.filter(
+        (video: Video) => !videoIds.includes(video.id.videoId),
+      );
+      jukeboxUpdate.queue = jukeboxAsset.dataObject.queue.filter((videoId: string) => !videoIds.includes(videoId));
     } else if (type === "queue") {
-      remainingVideos = jukeboxAsset.dataObject.queue.filter((videoId: string) => !videoIds.includes(videoId));
+      jukeboxUpdate.queue = jukeboxAsset.dataObject.queue.filter((videoId: string) => !videoIds.includes(videoId));
     }
     await jukeboxAsset.updateDataObject(
       {
         ...jukeboxAsset.dataObject,
-        [type]: remainingVideos,
+        ...jukeboxUpdate,
       },
       {
         lock: {

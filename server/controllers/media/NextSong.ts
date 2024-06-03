@@ -15,38 +15,40 @@ export default async function NextSong(req: Request, res: Response) {
   const remainingQueue = queue.slice(1);
   let nowPlaying = "-1" as "-1" | Video;
   const promises = [];
+  const analytics = [];
   try {
     if (queue.length > 0) {
       nowPlaying = jukeboxAsset.dataObject.catalog.find((video: Video) => video.id.videoId === queue[0]) as Video;
-      const videoId = nowPlaying.id.videoId;
-      // const videoTitle = nowPlaying.snippet.title;
+      if (nowPlaying) {
+        const videoId = nowPlaying.id.videoId;
+        // const videoTitle = nowPlaying.snippet.title;
 
-      const mediaLink = `https://www.youtube.com/watch?v=${videoId}`;
+        const mediaLink = `https://www.youtube.com/watch?v=${videoId}`;
 
-      if (process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME) {
         const world = World.create(credentials.urlSlug, { credentials });
         world
           .triggerParticle({
-            name: process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME,
+            name: process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME || "firework1_red",
             duration: 10,
             position: jukeboxAsset.position,
           })
           .then()
           .catch(() => console.error("Cannot trigger particle"));
-      }
 
-      promises.push(
-        jukeboxAsset.updateMediaType({
-          mediaLink,
-          isVideo: process.env.AUDIO_ONLY ? false : true,
-          // mediaName: he.decode(videoTitle),
-          mediaName: "Jukebox",
-          mediaType: "link",
-          audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
-          audioRadius: jukeboxAsset.audioRadius || 2, // Far
-          syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
-        }),
-      );
+        promises.push(
+          jukeboxAsset.updateMediaType({
+            mediaLink,
+            isVideo: process.env.AUDIO_ONLY ? false : true,
+            // mediaName: he.decode(videoTitle),
+            mediaName: "Jukebox",
+            mediaType: "link",
+            audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
+            audioRadius: jukeboxAsset.audioRadius || 2, // Far
+            syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
+          }),
+        );
+        analytics.push({ analyticName: "plays", urlSlug: credentials.urlSlug, uniqueKey: credentials.urlSlug });
+      }
     } else {
       promises.push(jukeboxAsset.updateMediaType({ mediaType: "none" }));
     }
@@ -56,10 +58,10 @@ export default async function NextSong(req: Request, res: Response) {
         {
           ...jukeboxAsset.dataObject,
           queue: remainingQueue,
-          nowPlaying: nowPlaying !== "-1" ? nowPlaying.id.videoId : "-1",
+          nowPlaying: nowPlaying && nowPlaying !== "-1" ? nowPlaying.id.videoId : "-1",
         },
         {
-          analytics: [{ analyticName: "plays", urlSlug: credentials.urlSlug, uniqueKey: credentials.urlSlug }],
+          analytics,
           lock: {
             lockId,
             releaseLock: false,

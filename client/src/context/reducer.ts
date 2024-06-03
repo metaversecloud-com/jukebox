@@ -115,9 +115,11 @@ const globalReducer = (state: InitialState, action: ActionType) => {
     };
   } else if (type === REMOVE_FROM_CATALOG) {
     const filteredCatalog = state.catalog.filter((video) => !payload.videoIds.includes(video.id.videoId));
+    const filteredQueue = state.queue.filter((video) => !payload.videoIds.includes(video.id.videoId));
     return {
       ...state,
       catalog: filteredCatalog,
+      queue: filteredQueue,
     };
   } else if (type === ADD_TO_QUEUE) {
     const addedVideos = payload.videoIds.map((videoId: string) =>
