@@ -88,11 +88,13 @@ const Home: React.FC = () => {
             {!removeLoading ? `Remove (${selectedVideos.length})` : "Removing..."}
           </button>
         )}
-        <div className="w-full h-14 bottom-0 left-0 fixed flex justify-center items-center bg-white">
-          <Link to={"/add-to-queue"} className="btn btn-enhanced !w-72">
-            Add a Song
-          </Link>
-        </div>
+        {!jukeboxLoading && (
+          <div className="w-full h-14 bottom-0 left-0 fixed flex justify-center items-center bg-white">
+            <Link to={"/add-to-queue"} className="btn btn-enhanced !w-72">
+              Add a Song
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
