@@ -34,7 +34,6 @@ export default async function NextSong(req: Request, res: Response) {
           })
           .then()
           .catch(() => console.error("Cannot trigger particle"));
-
         promises.push(
           jukeboxAsset.updateMediaType({
             mediaLink,
