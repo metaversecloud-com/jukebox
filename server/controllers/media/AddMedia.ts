@@ -58,7 +58,7 @@ export default async function AddMedia(req: Request, res: Response) {
       const world = World.create(credentials.urlSlug, { credentials });
       world
         .triggerParticle({
-          name: process.env.NEW_SONG_START_PARTICLE_EFFECT_NAME || "firework1_red",
+          name: "firework1_red",
           duration: 10,
           position: jukeboxAsset.position,
         })
