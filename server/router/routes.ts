@@ -12,7 +12,7 @@ import RemoveMedia from "../controllers/media/RemoveMedia.js";
 import { handleCheckInteractiveCredentials } from "../controllers/status/handleCheckInteractiveCredentials.js";
 
 const router = express.Router();
-
+const SERVER_START_DATE = new Date();
 router.get("/", (req, res) => {
   res.json({ message: "Hello from server!" });
 });
@@ -22,7 +22,7 @@ router.get("/system/health", (req, res) => {
     appVersion: getVersion(),
     status: "OK",
     envs: {
-      SERVER_START_DATE: new Date(),
+      SERVER_START_DATE: SERVER_START_DATE,
       API_KEY: process.env.API_KEY ? "SET" : "NOT SET",
       PORT: process.env.PORT ? process.env.PORT : "NOT SET",
       NODE_ENV: process.env.NODE_ENV ? process.env.NODE_ENV : "NOT SET",
