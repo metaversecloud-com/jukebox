@@ -22,6 +22,7 @@ router.get("/system/health", (req, res) => {
     appVersion: getVersion(),
     status: "OK",
     envs: {
+      SERVER_START_DATE: new Date(),
       API_KEY: process.env.API_KEY ? "SET" : "NOT SET",
       PORT: process.env.PORT ? process.env.PORT : "NOT SET",
       NODE_ENV: process.env.NODE_ENV ? process.env.NODE_ENV : "NOT SET",
