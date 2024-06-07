@@ -1,13 +1,11 @@
 import redisObj from "../../redis-sse/index.js";
-import { getDroppedAsset } from "../../utils/index.js";
-import he from "he";
+import { World, getCredentials, getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
-import { Credentials, Video } from "../../types/index.js";
+import { Video } from "../../types/index.js";
 
 export default async function NextSong(req: Request, res: Response) {
-  const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.body as Credentials;
-
-  const jukeboxAsset = await getDroppedAsset({ assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId });
+  const credentials = getCredentials(req.body);
+  const jukeboxAsset = await getDroppedAsset(credentials);
   if (jukeboxAsset.error) {
     return res.status(404).json({ message: "Asset not found" });
   }
@@ -17,26 +15,39 @@ export default async function NextSong(req: Request, res: Response) {
   const remainingQueue = queue.slice(1);
   let nowPlaying = "-1" as "-1" | Video;
   const promises = [];
+  const analytics = [];
   try {
     if (queue.length > 0) {
       nowPlaying = jukeboxAsset.dataObject.catalog.find((video: Video) => video.id.videoId === queue[0]) as Video;
-      const videoId = nowPlaying.id.videoId;
-      // const videoTitle = nowPlaying.snippet.title;
+      if (nowPlaying) {
+        const videoId = nowPlaying.id.videoId;
+        // const videoTitle = nowPlaying.snippet.title;
 
-      const mediaLink = `https://www.youtube.com/watch?v=${videoId}`;
+        const mediaLink = `https://www.youtube.com/watch?v=${videoId}`;
 
-      promises.push(
-        jukeboxAsset.updateMediaType({
-          mediaLink,
-          isVideo: process.env.AUDIO_ONLY ? false : true,
-          // mediaName: he.decode(videoTitle),
-          mediaName: "Jukebox",
-          mediaType: "link",
-          audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
-          audioRadius: jukeboxAsset.audioRadius || 2, // Far
-          syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
-        }),
-      );
+        const world = World.create(credentials.urlSlug, { credentials });
+        world
+          .triggerParticle({
+            name: "firework1_red",
+            duration: 10,
+            position: jukeboxAsset.position,
+          })
+          .then()
+          .catch(() => console.error("Cannot trigger particle"));
+        promises.push(
+          jukeboxAsset.updateMediaType({
+            mediaLink,
+            isVideo: process.env.AUDIO_ONLY ? false : true,
+            // mediaName: he.decode(videoTitle),
+            mediaName: "Jukebox",
+            mediaType: "link",
+            audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
+            audioRadius: jukeboxAsset.audioRadius || 2, // Far
+            syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
+          }),
+        );
+        analytics.push({ analyticName: "plays", urlSlug: credentials.urlSlug, uniqueKey: credentials.urlSlug });
+      }
     } else {
       promises.push(jukeboxAsset.updateMediaType({ mediaType: "none" }));
     }
@@ -46,9 +57,10 @@ export default async function NextSong(req: Request, res: Response) {
         {
           ...jukeboxAsset.dataObject,
           queue: remainingQueue,
-          nowPlaying: nowPlaying !== "-1" ? nowPlaying.id.videoId : "-1",
+          nowPlaying: nowPlaying && nowPlaying !== "-1" ? nowPlaying.id.videoId : "-1",
         },
         {
+          analytics,
           lock: {
             lockId,
             releaseLock: false,

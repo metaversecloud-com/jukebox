@@ -29,7 +29,7 @@ const App = () => {
 
   const [searchParams] = useSearchParams();
   const [sseEvent, setSSEevent] = useState<EventSource | null>(null);
-  const { backendAPI, hasInteractiveParams } = useContext(GlobalStateContext) as InitialState;
+  const { backendAPI, hasInteractiveParams, jukeboxStatus } = useContext(GlobalStateContext) as InitialState;
   const [connectionEstablished, setConnectionEstablished] = useState(false);
 
   const dispatch = useContext(GlobalDispatchContext);
@@ -192,14 +192,15 @@ const App = () => {
 
   useEffect(() => {
     const initialLoad = () => {
-      if (backendAPI) {
+      if (backendAPI && jukeboxStatus === "waiting") {
         Promise.all([
           checkInteractiveCredentials(backendAPI),
           checkIsAdmin(backendAPI),
           fetchJukeboxDataObject(backendAPI),
         ]).then(([result, admin, dataObject]) => {
-          if (!result || !result.success) {
+          if (!result || !result.success || !dataObject) {
             navigate("*");
+            return;
           }
           dispatch!({ type: SET_IS_ADMIN, payload: { isAdmin: admin.isAdmin } });
 

@@ -13,9 +13,9 @@ export default async function isAdminCheck(req: Request, res: Response) {
     } else {
       return res.status(200).json({ isAdmin: false });
     }
-  } catch (err) {
+  } catch (error) {
     return errorHandler({
-      err,
+      error,
       functionName: "isAdminCheck",
       message: "Error in Admin Check",
       req, res

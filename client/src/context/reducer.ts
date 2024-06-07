@@ -58,7 +58,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
       queue,
       nowPlaying: nowPlaying ? nowPlaying : videoSample,
       jukeboxLoading: false,
-      jukeboxStatus: "SUCCESS",
+      jukeboxStatus: "success",
     };
   } else if (type === SET_IS_ADMIN) {
     return {
@@ -115,9 +115,11 @@ const globalReducer = (state: InitialState, action: ActionType) => {
     };
   } else if (type === REMOVE_FROM_CATALOG) {
     const filteredCatalog = state.catalog.filter((video) => !payload.videoIds.includes(video.id.videoId));
+    const filteredQueue = state.queue.filter((video) => !payload.videoIds.includes(video.id.videoId));
     return {
       ...state,
       catalog: filteredCatalog,
+      queue: filteredQueue,
     };
   } else if (type === ADD_TO_QUEUE) {
     const addedVideos = payload.videoIds.map((videoId: string) =>

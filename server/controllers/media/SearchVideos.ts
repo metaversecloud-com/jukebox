@@ -44,7 +44,7 @@ export default async function SearchVideos(req: Request, res: Response) {
     return res.status(200).json({ searchResults: videosWithDuration, newNextPageToken });
   } catch (error) {
     return errorHandler({
-      err,
+      error,
       functionName: "SearchVideos",
       message: "Error searching",
       req, res

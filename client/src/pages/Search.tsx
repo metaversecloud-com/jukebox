@@ -22,9 +22,11 @@ const Search: React.FC = () => {
 
 
   const [searchTerm, setSearchTerm] = useState(searchTermGlobal);
+  const [lastSearchTerm, setLastSearchTerm] = useState(searchTermGlobal);
   const searchVideo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchLoading || searchTerm.trim() == "" || !isAdmin) return;
+    setLastSearchTerm(searchTerm)
     dispatch!({ type: RESET_SEARCH_RESULTS });
     dispatch!({ type: GENERATE_SKELETON });
 
@@ -38,7 +40,7 @@ const Search: React.FC = () => {
     dispatch!({ type: SET_NEXT_PAGE_LOADING, payload: { nextPageLoading: true } });
     const { searchResults, newNextPageToken } = await searchCatalog(
       backendAPI as AxiosInstance,
-      searchTerm,
+      lastSearchTerm,
       nextPageToken,
     );
     dispatch!({ type: SET_SEARCH_RESULTS, payload: { searchResults, newNextPageToken } });

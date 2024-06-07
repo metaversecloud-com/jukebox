@@ -15,7 +15,7 @@ const initialState: InitialState = {
   nextPageLoading: false,
   searchStatus: "",
   jukeboxLoading: true,
-  jukeboxStatus: "",
+  jukeboxStatus: "waiting",
   hasInteractiveParams: false,
   interactiveParams: null,
   backendAPI: null,

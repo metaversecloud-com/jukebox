@@ -33,7 +33,7 @@ const Home: React.FC = () => {
   return (
     <div className="flex flex-col w-full h-full pb-6">
       <Header showAdminControls={isAdmin} />
-      <div className="flex flex-col w-full justify-start">
+      <div className="flex flex-col w-full justify-start pb-6">
         {nowPlaying.id.videoId !== "" && (
           <>
             <p className="p1 !font-semibold">Now Playing: </p>
@@ -65,10 +65,7 @@ const Home: React.FC = () => {
                     jukeboxLoading || !isAdmin
                       ? false
                       : {
-                          plusminus:
-                            selectedVideos.find((v) => v === video.id.videoId)
-                              ? "plus"
-                              : "minus",
+                          plusminus: selectedVideos.find((v) => v === video.id.videoId) ? "plus" : "minus",
                         }
                   }
                   addVideo={(videoId) => {
@@ -91,9 +88,13 @@ const Home: React.FC = () => {
             {!removeLoading ? `Remove (${selectedVideos.length})` : "Removing..."}
           </button>
         )}
-        <Link className="btn btn-enhanced my-2 w-full" to={"/add-to-queue"}>
-          Add a Song
-        </Link>
+        {!jukeboxLoading && (
+          <div className="w-full h-14 bottom-0 left-0 fixed flex justify-center items-center bg-white">
+            <Link to={"/add-to-queue"} className="btn btn-enhanced !w-72">
+              Add a Song
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
