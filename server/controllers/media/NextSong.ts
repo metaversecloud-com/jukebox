@@ -30,7 +30,10 @@ export default async function NextSong(req: Request, res: Response) {
           .triggerParticle({
             name: "firework1_red",
             duration: 10,
-            position: jukeboxAsset.position,
+            position: {
+              x: jukeboxAsset.position.x,
+              y: jukeboxAsset.position.y - 130
+            },
           })
           .then()
           .catch(() => console.error("Cannot trigger particle"));
