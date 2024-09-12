@@ -67,7 +67,11 @@ export default async function AddMedia(req: Request, res: Response) {
         })
         .then()
         .catch(() => console.error("Error: Cannot trigger particle"));
+<<<<<<< dev
 
+=======
+        
+>>>>>>> main
       videos.shift();
     }
   }

@@ -32,7 +32,7 @@ export default async function NextSong(req: Request, res: Response) {
             duration: 10,
             position: {
               x: jukeboxAsset.position.x,
-              y: jukeboxAsset.position.y - 130,
+              y: jukeboxAsset.position.y - 130
             },
           })
           .then()
