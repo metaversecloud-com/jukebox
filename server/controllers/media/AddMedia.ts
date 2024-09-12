@@ -58,7 +58,7 @@ export default async function AddMedia(req: Request, res: Response) {
       const world = World.create(credentials.urlSlug, { credentials });
       world
         .triggerParticle({
-          name: "firework1_red",
+          name: "musicNote_float",
           duration: 10,
           position: {
             x: jukeboxAsset.position.x,
@@ -67,7 +67,7 @@ export default async function AddMedia(req: Request, res: Response) {
         })
         .then()
         .catch(() => console.error("Error: Cannot trigger particle"));
-        
+
       videos.shift();
     }
   }

@@ -28,11 +28,11 @@ export default async function NextSong(req: Request, res: Response) {
         const world = World.create(credentials.urlSlug, { credentials });
         world
           .triggerParticle({
-            name: "firework1_red",
+            name: "musicNote_float",
             duration: 10,
             position: {
               x: jukeboxAsset.position.x,
-              y: jukeboxAsset.position.y - 130
+              y: jukeboxAsset.position.y - 130,
             },
           })
           .then()

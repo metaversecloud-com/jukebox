@@ -21,8 +21,8 @@ router.get("/system/health", (req, res) => {
   return res.status(200).json({
     appVersion: getVersion(),
     status: "OK",
+    serverStartDate: SERVER_START_DATE,
     envs: {
-      SERVER_START_DATE,
       API_KEY: process.env.API_KEY ? "SET" : "NOT SET",
       PORT: process.env.PORT ? process.env.PORT : "NOT SET",
       NODE_ENV: process.env.NODE_ENV ? process.env.NODE_ENV : "NOT SET",
