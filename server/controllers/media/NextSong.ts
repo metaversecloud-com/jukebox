@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { Video } from "../../types/index.js";
 import { getAvailableVideos } from "../../utils/youtube/index.js";
 
-const findNextAvailableSong = async (queue: string[], catalog: Video[]): Promise<[Video | null, -1]> => {
+const findNextAvailableSong = async (queue: string[], catalog: Video[]): Promise<[Video | null, number]> => {
   const videoIds = await getAvailableVideos(catalog);
 
   for (let i = 0; i < queue.length; i++) {
@@ -30,8 +30,18 @@ export default async function NextSong(req: Request, res: Response) {
   const promises = [];
   const analytics = [];
   try {
+    // Lock the asset dataObject before attempting to find the next available song
+    // This would reduce YouTube API quota usage
+    await jukeboxAsset.updateDataObject(
+      {},
+      {
+        lock: {
+          lockId,
+          releaseLock: false,
+        },
+      },
+    );
     if (queue.length > 0) {
-      // nowPlaying = jukeboxAsset.dataObject.catalog.find((video: Video) => video.id.videoId === queue[0]) as Video;
       const [nextSong, index] = await findNextAvailableSong(queue, jukeboxAsset.dataObject.catalog);
       nowPlaying = nextSong;
       if (nowPlaying) {
@@ -82,10 +92,6 @@ export default async function NextSong(req: Request, res: Response) {
         },
         {
           analytics,
-          lock: {
-            lockId,
-            releaseLock: false,
-          },
         },
       ),
     );
