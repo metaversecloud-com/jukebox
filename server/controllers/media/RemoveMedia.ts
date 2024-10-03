@@ -1,4 +1,3 @@
-import { checkIsAdmin } from "../../middleware/isAdmin.js";
 import redisObj from "../../redis-sse/index.js";
 import { Credentials, Video } from "../../types/index.js";
 import { getDroppedAsset } from "../../utils/index.js";

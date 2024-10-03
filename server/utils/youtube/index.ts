@@ -1,4 +1,4 @@
-import yt from "../../external/google";
+import yt from "../../external/google.js";
 
 const YTDurationToMilliseconds = (isoDurationString: string) => {
   const regex =
