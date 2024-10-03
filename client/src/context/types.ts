@@ -69,4 +69,5 @@ export type Video = {
     }
   },
   duration: number;
+  exists?: boolean;
 }

@@ -8,6 +8,7 @@ interface VideoInfoTileProps {
   videoId: string;
   videoName: string;
   videoDuration: string;
+  videoExists?: boolean;
   thumbnail: string;
   isLoading: boolean;
   showControls?:
@@ -31,6 +32,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
   isLoading,
   addVideo,
   removeVideo,
+  videoExists,
   videoInSelected,
   videoInMedia,
   disabledControls,
@@ -43,7 +45,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
     } else {
       addVideo && addVideo(videoId);
     }
-  }
+  };
 
   return (
     <div className={`relative flex flex-row w-full rounded-xl pr-1 ${videoInSelected ? "bg-gray-300" : ""}`}>
@@ -87,6 +89,7 @@ const VideoInfoTile: React.FC<VideoInfoTileProps> = ({
             <Skeleton width={200} className="self-start" />
           )}
           {!isLoading ? <p className="p1">{videoDuration}</p> : <Skeleton count={1} width={100} />}
+          {videoExists === false && <p className="p3 !text-red-500">Video not available</p>}
         </div>
         {showControls && (
           <div className="flex items-center justify-end">
