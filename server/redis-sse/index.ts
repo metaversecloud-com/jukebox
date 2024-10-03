@@ -13,20 +13,12 @@ const shouldSendEvent = (
   );
 };
 
-const connectionOpt = process.env.IS_LOCALHOST
-  ? {
-      password: process.env.REDIS_PASSWORD,
-      socket: {
-        host: process.env.REDIS_URL,
-        port: parseInt(process.env.REDIS_PORT!) || 6379,
-      },
-    }
-  : {
-      url: process.env.REDIS_URL,
-      socket: {
-        tls: process.env.REDIS_URL!.startsWith("rediss"),
-      },
-    };
+const connectionOpt = {
+  url: process.env.REDIS_URL,
+  socket: {
+    tls: process.env.REDIS_URL!.startsWith("rediss"),
+  },
+};
 
 const redisObj = {
   publisher: createClient(connectionOpt),

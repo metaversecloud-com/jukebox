@@ -10,4 +10,6 @@ async function initializeYouTube() {
   return yt;
 }
 
-export default initializeYouTube;
+const yt = await initializeYouTube();
+
+export default yt;
