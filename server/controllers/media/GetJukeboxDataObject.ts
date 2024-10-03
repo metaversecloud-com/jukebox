@@ -1,6 +1,6 @@
 import { errorHandler, getCredentials, getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
-import { checkYouTubeLinksExist, chunkArray, getAvailableVideos } from "../../utils/youtube/index.js";
+import { getAvailableVideos } from "../../utils/youtube/index.js";
 
 export default async function GetJukeboxDataObject(req: Request, res: Response) {
   try {
