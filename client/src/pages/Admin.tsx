@@ -53,6 +53,7 @@ const Admin = () => {
                   videoId={video.id.videoId}
                   videoName={video.snippet.title}
                   videoDuration={convertMillisToMinutes(video.duration)}
+                  videoExists={video.exists}
                   thumbnail={video.snippet.thumbnails.high.url}
                   videoInSelected={selectedVideoIds.find((v) => v === video.id.videoId) ? true : false}
                   showControls={{

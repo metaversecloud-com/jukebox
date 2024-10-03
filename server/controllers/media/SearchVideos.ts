@@ -1,5 +1,5 @@
 import { youtube_v3 } from "@googleapis/youtube";
-import initializeYouTube from "../../external/google.js";
+import yt from "../../external/google.js";
 import { Video } from "../../types";
 import { YTDurationToMilliseconds } from "../../utils/youtube/index.js";
 import { Request, Response } from "express";
@@ -20,7 +20,6 @@ async function getVideoDuration(videos: Video[], yt: youtube_v3.Youtube) {
 }
 
 export default async function SearchVideos(req: Request, res: Response) {
-  const yt = await initializeYouTube();
 
   try {
     const { q, nextPageToken }: { q: string; nextPageToken: string } = req.body;

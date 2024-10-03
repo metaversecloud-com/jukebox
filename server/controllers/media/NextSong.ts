@@ -2,6 +2,19 @@ import redisObj from "../../redis-sse/index.js";
 import { World, getCredentials, getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
 import { Video } from "../../types/index.js";
+import { getAvailableVideos } from "../../utils/youtube/index.js";
+
+const findNextAvailableSong = async (queue: string[], catalog: Video[]): Promise<[Video | null, number]> => {
+  const videoIds = await getAvailableVideos(catalog);
+
+  for (let i = 0; i < queue.length; i++) {
+    const video = catalog.find((v) => v.id.videoId === queue[i]);
+    if (video && videoIds.includes(video.id.videoId)) {
+      return [video, i];
+    }
+  }
+  return [null, -1];
+};
 
 export default async function NextSong(req: Request, res: Response) {
   const credentials = getCredentials(req.body);
@@ -12,14 +25,27 @@ export default async function NextSong(req: Request, res: Response) {
   const { queue } = jukeboxAsset.dataObject;
   const timeFactor = new Date(Math.round(new Date().getTime() / 25000) * 25000);
   const lockId = `${jukeboxAsset.id}_${jukeboxAsset.mediaPlayTime}_${timeFactor}`;
-  const remainingQueue = queue.slice(1);
+  let remainingQueue = [];
   let nowPlaying = "-1" as "-1" | Video;
   const promises = [];
   const analytics = [];
   try {
+    // Lock the asset dataObject before attempting to find the next available song
+    // This would reduce YouTube API quota usage
+    await jukeboxAsset.updateDataObject(
+      {},
+      {
+        lock: {
+          lockId,
+          releaseLock: false,
+        },
+      },
+    );
     if (queue.length > 0) {
-      nowPlaying = jukeboxAsset.dataObject.catalog.find((video: Video) => video.id.videoId === queue[0]) as Video;
+      const [nextSong, index] = await findNextAvailableSong(queue, jukeboxAsset.dataObject.catalog);
+      nowPlaying = nextSong;
       if (nowPlaying) {
+        remainingQueue = queue.slice(index + 1);
         const videoId = nowPlaying.id.videoId;
         // const videoTitle = nowPlaying.snippet.title;
 
@@ -32,7 +58,7 @@ export default async function NextSong(req: Request, res: Response) {
             duration: 10,
             position: {
               x: jukeboxAsset.position.x,
-              y: jukeboxAsset.position.y - 130
+              y: jukeboxAsset.position.y - 130,
             },
           })
           .then()
@@ -50,6 +76,8 @@ export default async function NextSong(req: Request, res: Response) {
           }),
         );
         analytics.push({ analyticName: "plays", urlSlug: credentials.urlSlug, uniqueKey: credentials.urlSlug });
+      } else {
+        promises.push(jukeboxAsset.updateMediaType({ mediaType: "none" }));
       }
     } else {
       promises.push(jukeboxAsset.updateMediaType({ mediaType: "none" }));
@@ -64,10 +92,6 @@ export default async function NextSong(req: Request, res: Response) {
         },
         {
           analytics,
-          lock: {
-            lockId,
-            releaseLock: false,
-          },
         },
       ),
     );

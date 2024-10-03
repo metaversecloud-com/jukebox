@@ -1,4 +1,5 @@
-// @ts-nocheck
+import yt from "../../external/google.js";
+
 const YTDurationToMilliseconds = (isoDurationString: string) => {
   const regex =
     /^P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?$/;
@@ -30,4 +31,44 @@ const YTDurationToMilliseconds = (isoDurationString: string) => {
   }
 };
 
-export { YTDurationToMilliseconds };
+async function getAvailableVideos(catalog) {
+  const allVideoIds = catalog.map((video) => video.id.videoId);
+  const chunkedVideoIds = chunkArray(allVideoIds);
+  const existsOnYTPromises = [];
+  for (const chunk of chunkedVideoIds) {
+    existsOnYTPromises.push(checkYouTubeLinksExist(chunk));
+  }
+
+  const existsOnYT = await Promise.all(existsOnYTPromises);
+  const videoIds = existsOnYT.flat();
+  return videoIds;
+}
+
+async function checkYouTubeLinksExist(videoIds) {
+  try {
+    const response = await yt.videos.list({
+      id: videoIds.join(","),
+      part: "status",
+    });
+
+    const videoData = response.data.items;
+    if (videoData.length > 0) {
+      return videoData.map((video) => video.id); // Returning found video IDs
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching video details:", error);
+    return [];
+  }
+}
+
+function chunkArray(arr) {
+  const chunks = [];
+  for (let i = 0; i < arr.length; i += 50) {
+    chunks.push(arr.slice(i, i + 50));
+  }
+  return chunks;
+}
+
+export { YTDurationToMilliseconds, getAvailableVideos };
