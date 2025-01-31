@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import VideoInfoTile from "@/components/VideoInfoTile";
 import { GlobalDispatchContext, GlobalStateContext } from "@/context/GlobalContext";
-import { removeFromQueue } from "@/context/actions";
+import { removeFromQueue, skipToNextSong } from "@/context/actions";
 import { InitialState, REMOVE_FROM_QUEUE } from "@/context/types";
 import { convertMillisToMinutes } from "@/utils/duration";
 import { useContext, useState } from "react";
@@ -89,10 +89,17 @@ const Home: React.FC = () => {
           </button>
         )}
         {!jukeboxLoading && (
-          <div className="w-full h-14 bottom-0 left-0 fixed flex justify-center items-center bg-white">
+          <div className="w-full h-14 bottom-0 left-0 fixed flex justify-center items-center bg-white gap-2 px-2">
             <Link to={"/add-to-queue"} className="btn btn-enhanced !w-72">
               Add a Song
             </Link>
+            {isAdmin && queue.length ? (
+              <button onClick={() => skipToNextSong(backendAPI!)} className="btn btn-enhanced !w-72">
+                Skip to Next Song
+              </button>
+            ) : (
+              <></>
+            )}
           </div>
         )}
       </div>

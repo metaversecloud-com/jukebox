@@ -17,7 +17,12 @@ const findNextAvailableSong = async (queue: string[], catalog: Video[]): Promise
 };
 
 export default async function NextSong(req: Request, res: Response) {
-  const credentials = getCredentials(req.body);
+  let credentials;
+  if (Object.keys(req.body).length) {
+    credentials = getCredentials(req.body);
+  } else {
+    credentials = getCredentials(req.query);
+  }
   const jukeboxAsset = await getDroppedAsset(credentials);
   if (jukeboxAsset.error) {
     return res.status(404).json({ message: "Asset not found" });
