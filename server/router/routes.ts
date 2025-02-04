@@ -10,6 +10,7 @@ import AddMedia from "../controllers/media/AddMedia.js";
 import sse from "../controllers/media/Events.js";
 import RemoveMedia from "../controllers/media/RemoveMedia.js";
 import { handleCheckInteractiveCredentials } from "../controllers/status/handleCheckInteractiveCredentials.js";
+import NextSong from "../controllers/media/NextSong.js";
 
 const router = express.Router();
 const SERVER_START_DATE = new Date();
@@ -52,5 +53,6 @@ router.get("/is-admin", isAdminCheck);
 
 router.post("/add-media", AddMedia);
 router.post("/remove-media", isAdmin, RemoveMedia);
+router.post("/next", isAdmin, NextSong);
 
 export default router;

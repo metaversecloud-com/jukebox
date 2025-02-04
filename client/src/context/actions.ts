@@ -81,6 +81,16 @@ const checkInteractiveCredentials = async (backendAPI: AxiosInstance) => {
   }
 };
 
+const skipToNextSong = async (backendAPI: AxiosInstance) => {
+  try {
+    const result = await backendAPI.post("/next");
+    return result.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
 export {
   checkInteractiveCredentials,
   searchCatalog,
@@ -90,4 +100,5 @@ export {
   removeFromCatalog,
   addToQueue,
   removeFromQueue,
+  skipToNextSong
 };
