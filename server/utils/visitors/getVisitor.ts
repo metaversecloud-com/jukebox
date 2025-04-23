@@ -1,18 +1,12 @@
-import { Visitor } from "../topiaInit.js"
-import { errorHandler } from "../errorHandler.js"
+import { Visitor } from "../topiaInit.js";
+import { errorHandler } from "../errorHandler.js";
 import { Credentials } from "../../types/index.js";
 
 export const getVisitor = async (credentials: Credentials) => {
   try {
-    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = credentials;
+    const { urlSlug, visitorId } = credentials;
 
-    const visitor = await Visitor.get(parseInt(visitorId), urlSlug, {
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId: parseInt(visitorId),
-      },
-    });
+    const visitor = await Visitor.get(visitorId, urlSlug, { credentials });
     // @ts-ignore
     if (!visitor || !visitor.username) throw "Not in world";
 

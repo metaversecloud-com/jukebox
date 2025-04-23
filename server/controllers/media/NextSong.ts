@@ -23,6 +23,8 @@ export default async function NextSong(req: Request, res: Response) {
   } else {
     credentials = getCredentials(req.query);
   }
+  const {  urlSlug } = credentials;
+
   const jukeboxAsset = await getDroppedAsset(credentials);
   if (jukeboxAsset.error) {
     return res.status(404).json({ message: "Asset not found" });
@@ -34,6 +36,7 @@ export default async function NextSong(req: Request, res: Response) {
   let nowPlaying = "-1" as "-1" | Video;
   const promises = [];
   const analytics = [];
+  
   try {
     // Lock the asset dataObject before attempting to find the next available song
     // This would reduce YouTube API quota usage
@@ -46,9 +49,11 @@ export default async function NextSong(req: Request, res: Response) {
         },
       },
     );
+
     if (queue.length > 0) {
       const [nextSong, index] = await findNextAvailableSong(queue, jukeboxAsset.dataObject.catalog);
       nowPlaying = nextSong;
+
       if (nowPlaying) {
         remainingQueue = queue.slice(index + 1);
         const videoId = nowPlaying.id.videoId;
@@ -56,7 +61,7 @@ export default async function NextSong(req: Request, res: Response) {
 
         const mediaLink = `https://www.youtube.com/watch?v=${videoId}`;
 
-        const world = World.create(credentials.urlSlug, { credentials });
+        const world = World.create(urlSlug, { credentials });
         world
           .triggerParticle({
             name: "musicNote_float",
@@ -68,6 +73,7 @@ export default async function NextSong(req: Request, res: Response) {
           })
           .then()
           .catch(() => console.error("Cannot trigger particle"));
+
         promises.push(
           jukeboxAsset.updateMediaType({
             mediaLink,
@@ -80,7 +86,7 @@ export default async function NextSong(req: Request, res: Response) {
             syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
           }),
         );
-        analytics.push({ analyticName: "plays", urlSlug: credentials.urlSlug, uniqueKey: credentials.urlSlug });
+        analytics.push({ analyticName: "plays", urlSlug, uniqueKey: urlSlug });
       } else {
         promises.push(jukeboxAsset.updateMediaType({ mediaType: "none" }));
       }

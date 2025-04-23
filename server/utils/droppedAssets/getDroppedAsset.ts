@@ -7,13 +7,7 @@ export const getDroppedAsset = async (credentials: Credentials) => {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = credentials;
     if (!assetId || !interactivePublicKey || !interactiveNonce || !urlSlug || !visitorId) throw "Invalid credentials";
 
-    const droppedAsset = await DroppedAsset.get(assetId, urlSlug, {
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
-    });
+    const droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
 
     if (!droppedAsset) throw "Dropped asset not found";
 
