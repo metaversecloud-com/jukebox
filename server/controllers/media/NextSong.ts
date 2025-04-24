@@ -23,7 +23,7 @@ export default async function NextSong(req: Request, res: Response) {
   } else {
     credentials = getCredentials(req.query);
   }
-  const {  urlSlug } = credentials;
+  const { urlSlug } = credentials;
 
   const jukeboxAsset = await getDroppedAsset(credentials);
   if (jukeboxAsset.error) {
@@ -36,7 +36,7 @@ export default async function NextSong(req: Request, res: Response) {
   let nowPlaying = "-1" as "-1" | Video;
   const promises = [];
   const analytics = [];
-  
+
   try {
     // Lock the asset dataObject before attempting to find the next available song
     // This would reduce YouTube API quota usage
