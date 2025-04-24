@@ -7,6 +7,8 @@ import { Request, Response } from "express";
 
 export default async function AddMedia(req: Request, res: Response) {
   const credentials = getCredentials(req.query);
+  const { interactiveNonce, profileId, urlSlug, visitorId } = credentials;
+
   const { videos, type }: { videos: Video[] | string[]; type: "catalog" | "queue" } = req.body;
   const [isAdmin, jukeboxAsset] = await Promise.all([checkIsAdmin(credentials), getDroppedAsset(credentials)]);
 
@@ -26,15 +28,15 @@ export default async function AddMedia(req: Request, res: Response) {
     analytics.push({
       analyticName: "addsToCatalog",
       incrementBy: videos.length,
-      uniqueKey: credentials.urlSlug,
-      urlSlug: credentials.urlSlug,
+      uniqueKey: urlSlug,
+      urlSlug,
     });
   } else if (type === "queue") {
     analytics.push({
       analyticName: "addsToQueue",
       incrementBy: videos.length,
-      profileId: credentials.profileId,
-      uniqueKey: credentials.profileId,
+      profileId,
+      uniqueKey: profileId,
     });
   }
   let firstVideo = null;
@@ -42,7 +44,7 @@ export default async function AddMedia(req: Request, res: Response) {
     firstVideo = jukeboxAsset.dataObject.catalog.find((video: Video) => video.id.videoId === videos[0]);
     if (firstVideo) {
       const mediaLink = `https://www.youtube.com/watch?v=${firstVideo.id.videoId}`;
-      analytics.push({ analyticName: "plays", urlSlug: credentials.urlSlug, uniqueKey: credentials.urlSlug });
+      analytics.push({ analyticName: "plays", urlSlug, uniqueKey: urlSlug });
       promises.push(
         jukeboxAsset.updateMediaType({
           mediaLink,
@@ -55,7 +57,7 @@ export default async function AddMedia(req: Request, res: Response) {
           syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
         }),
       );
-      const world = World.create(credentials.urlSlug, { credentials });
+      const world = World.create(urlSlug, { credentials });
       world
         .triggerParticle({
           name: "musicNote_float",
@@ -91,9 +93,9 @@ export default async function AddMedia(req: Request, res: Response) {
     redisObj.publish(`${process.env.INTERACTIVE_KEY}_JUKEBOX`, {
       assetId: jukeboxAsset.id,
       videos: firstVideo ? [firstVideo.id.videoId, ...videos] : videos,
-      interactiveNonce: credentials.interactiveNonce,
-      urlSlug: credentials.urlSlug,
-      visitorId: credentials.visitorId,
+      interactiveNonce,
+      urlSlug,
+      visitorId,
       kind: type === "catalog" ? "addedToCatalog" : "addedToQueue",
       event: "mediaAction",
     });

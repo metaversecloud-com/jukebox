@@ -6,6 +6,8 @@ import { checkIsAdmin } from "../../middleware/isAdmin.js";
 export default async function GetJukeboxDataObject(req: Request, res: Response) {
   try {
     const credentials = getCredentials(req.query);
+    const {  profileId, urlSlug } = credentials;
+
     const jukeboxAsset = await getDroppedAsset(credentials);
     if (jukeboxAsset.error) {
       return res.status(404).json({ message: "Asset not found" });
@@ -18,9 +20,9 @@ export default async function GetJukeboxDataObject(req: Request, res: Response) 
             analytics: [
               {
                 analyticName: "views",
-                profileId: credentials.profileId,
-                uniqueKey: credentials.profileId,
-                urlSlug: credentials.urlSlug,
+                profileId,
+                uniqueKey: profileId,
+                urlSlug,
               },
             ],
           },

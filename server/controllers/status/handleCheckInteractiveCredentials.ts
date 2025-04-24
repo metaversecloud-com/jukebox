@@ -13,6 +13,7 @@ export const handleCheckInteractiveCredentials = async (
     // if key matches proceed with check using jwt created by topiaInit
     const user = User.create({ credentials });
     await user.checkInteractiveCredentials();
+
     return res.json({ success: true });
   } catch (error) {
     return errorHandler({
