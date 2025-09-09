@@ -11,7 +11,7 @@ export const getDroppedAsset = async (credentials: Credentials) => {
 
     if (!droppedAsset) throw "Dropped asset not found";
 
-    if (!droppedAsset.dataObject || !droppedAsset?.dataObject?.catalog || !droppedAsset?.dataObject?.queue) {
+    if (!droppedAsset.dataObject || !(droppedAsset?.dataObject as any)?.catalog || !(droppedAsset?.dataObject as any)?.queue) {
       await initializeJukebox(droppedAsset);
     }
 
