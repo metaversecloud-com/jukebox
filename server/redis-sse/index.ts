@@ -210,10 +210,20 @@ const redisObj = {
   },
 };
 
-redisObj.publisher.connect();
-redisObj.subscriber.connect();
+// Initialize connections and subscription with proper sequencing
+async function initRedis() {
+  try {
+    await redisObj.publisher.connect();
+    await redisObj.subscriber.connect();
+    // Subscribe only after connections are established
+    redisObj.subscribe(`${process.env.INTERACTIVE_KEY}_JUKEBOX`);
+  } catch (err) {
+    console.error("[Redis] Initialization error:", err);
+  }
+}
 
-redisObj.subscribe(`${process.env.INTERACTIVE_KEY}_JUKEBOX`);
+// Kick off initialization (top-level)
+initRedis();
 
 redisObj.publisher.on("error", (err) => console.error("Publisher Error", err));
 redisObj.subscriber.on("error", (err) => console.error("Subscriber Error", err));
