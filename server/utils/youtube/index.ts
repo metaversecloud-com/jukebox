@@ -7,13 +7,13 @@ const YTDurationToMilliseconds = (isoDurationString: string) => {
   const match = isoDurationString.match(regex);
 
   try {
-    const years = parseFloat(match[1] || 0);
-    const months = parseFloat(match[2] || 0);
-    const weeks = parseFloat(match[3] || 0);
-    const days = parseFloat(match[4] || 0);
-    const hours = parseFloat(match[5] || 0);
-    const minutes = parseFloat(match[6] || 0);
-    const seconds = parseFloat(match[7] || 0);
+    const years = parseFloat(match?.[1] || "0");
+    const months = parseFloat(match?.[2] || "0");
+    const weeks = parseFloat(match?.[3] || "0");
+    const days = parseFloat(match?.[4] || "0");
+    const hours = parseFloat(match?.[5] || "0");
+    const minutes = parseFloat(match?.[6] || "0");
+    const seconds = parseFloat(match?.[7] || "0");
 
     const milliseconds =
       years * 31536000000 +
@@ -44,14 +44,14 @@ async function getAvailableVideos(catalog) {
   return videoIds;
 }
 
-async function checkYouTubeLinksExist(videoIds) {
+async function checkYouTubeLinksExist(videoIds: string[]) {
   try {
     const response = await yt.videos.list({
-      id: videoIds.join(","),
-      part: "status",
+      id: videoIds,
+      part: ["status"],
     });
 
-    const videoData = response.data.items;
+    const videoData = response.data?.items || [];
     if (videoData.length > 0) {
       return videoData.map((video) => video.id); // Returning found video IDs
     } else {

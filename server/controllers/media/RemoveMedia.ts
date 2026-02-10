@@ -21,7 +21,9 @@ export default async function RemoveMedia(req: Request, res: Response) {
     const jukeboxUpdate: {
       catalog?: Video[];
       queue: string[];
-    } = {};
+    } = {
+      queue: jukeboxAsset.dataObject.queue || []
+    };
 
     if (type === "catalog") {
       jukeboxUpdate.catalog = jukeboxAsset.dataObject.catalog.filter(
