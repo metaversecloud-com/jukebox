@@ -50,3 +50,13 @@ Create a `.env` file in the root directory. See `.env-example` for a template.
 - Create a Key Pair at https://topia.io/t/dashboard/integrations
 - Add your INTERACTIVE_KEY and INTERACTIVE_SECRET to your .env
 - Add your Developer Public Key and toggle 'on' Add Player Session Credentials to Asset Interactions.
+
+## Implementation Requirements
+
+### Required Assets with Unique Names
+
+The app uses the following unique name patterns for managing dropped assets:
+
+| Unique Name Pattern | Description |
+| ------------------- | ----------- |
+| `Jukebox_keyAsset`  | Key asset   |
