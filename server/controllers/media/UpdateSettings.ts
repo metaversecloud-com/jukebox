@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { errorHandler, getCredentials, getDroppedAsset } from "../../utils/index.js";
 import { DEFAULT_SETTINGS, JukeboxMode, JukeboxSettings } from "../../types/index.js";
+import { DroppedAssetMediaType } from "@rtsdk/topia";
 
 const VALID_MODES: JukeboxMode[] = ["jukebox", "karaoke"];
 
@@ -14,9 +15,6 @@ export default async function UpdateSettings(req: Request, res: Response) {
     }
 
     const jukeboxAsset = await getDroppedAsset(credentials);
-    if (jukeboxAsset.error) {
-      return res.status(404).json({ message: "Asset not found" });
-    }
 
     const currentSettings: JukeboxSettings = jukeboxAsset.dataObject.settings || DEFAULT_SETTINGS;
     const newSettings: JukeboxSettings = {
@@ -24,6 +22,21 @@ export default async function UpdateSettings(req: Request, res: Response) {
       name: name !== undefined ? name : currentSettings.name,
       imageUrl: imageUrl !== undefined ? imageUrl : currentSettings.imageUrl,
     };
+
+    const { audioSliderVolume, audioRadius, mediaLink } = jukeboxAsset as any;
+    if(currentSettings.mode !== newSettings.mode) {
+          jukeboxAsset.updateMediaType({
+            mediaLink: mediaLink,
+            isVideo: newSettings.mode === "karaoke",
+            mediaName: newSettings.name || "Jukebox",
+            mediaType: DroppedAssetMediaType.LINK,
+            audioSliderVolume: audioSliderVolume || 10,
+            audioRadius: audioRadius || 2,
+            portalName: "",
+            syncUserMedia: true,
+          })
+      
+      }
 
     const lockId = `${jukeboxAsset.id}-settings-${new Date(Math.round(new Date().getTime() / 5000) * 5000)}`;
 
