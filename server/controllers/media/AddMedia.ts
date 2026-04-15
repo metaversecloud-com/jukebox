@@ -3,6 +3,7 @@ import redisObj from "../../redis-sse/index.js";
 import { AnalyticType, Video } from "../../types/index.js";
 import { World, getCredentials, getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
+import { DroppedAssetMediaType } from "@rtsdk/topia";
 // import he from "he";
 
 export default async function AddMedia(req: Request, res: Response) {
@@ -52,9 +53,10 @@ export default async function AddMedia(req: Request, res: Response) {
             (jukeboxAsset.dataObject.settings?.mode ?? (process.env.AUDIO_ONLY ? "jukebox" : "karaoke")) === "karaoke",
           // mediaName: he.decode(firstVideo.snippet.title),
           mediaName: "Jukebox",
-          mediaType: "link",
+          mediaType: DroppedAssetMediaType.LINK,
           audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
           audioRadius: jukeboxAsset.audioRadius || 2, // Far
+          portalName: "",
           syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
         }),
       );
