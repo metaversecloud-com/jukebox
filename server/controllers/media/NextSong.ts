@@ -3,6 +3,7 @@ import { World, getCredentials, getDroppedAsset } from "../../utils/index.js";
 import { Request, Response } from "express";
 import { Video } from "../../types/index.js";
 import { getAvailableVideos } from "../../utils/youtube/index.js";
+import { DroppedAssetMediaType } from "@rtsdk/topia";
 
 const findNextAvailableSong = async (queue: string[], catalog: Video[]): Promise<[Video | null, number]> => {
   const videoIds = await getAvailableVideos(catalog);
@@ -77,21 +78,24 @@ export default async function NextSong(req: Request, res: Response) {
         promises.push(
           jukeboxAsset.updateMediaType({
             mediaLink,
-            isVideo: process.env.AUDIO_ONLY ? false : true,
+            isVideo:
+              (jukeboxAsset.dataObject.settings?.mode ?? (process.env.AUDIO_ONLY ? "jukebox" : "karaoke")) ===
+              "karaoke",
             // mediaName: he.decode(videoTitle),
             mediaName: "Jukebox",
-            mediaType: "link",
+            mediaType: DroppedAssetMediaType.LINK,
             audioSliderVolume: jukeboxAsset.audioSliderVolume || 10, // Between 0 and 100
             audioRadius: jukeboxAsset.audioRadius || 2, // Far
+            portalName: "",
             syncUserMedia: true, // Make it so everyone has the video synced instead of it playing from the beginning when they approach.
           }),
         );
         analytics.push({ analyticName: "plays", urlSlug, uniqueKey: urlSlug });
       } else {
-        promises.push(jukeboxAsset.updateMediaType({ mediaType: "none" }));
+        promises.push(jukeboxAsset.updateMediaType({ mediaType: DroppedAssetMediaType.NONE } as any));
       }
     } else {
-      promises.push(jukeboxAsset.updateMediaType({ mediaType: "none" }));
+      promises.push(jukeboxAsset.updateMediaType({ mediaType: DroppedAssetMediaType.NONE } as any));
     }
 
     promises.push(

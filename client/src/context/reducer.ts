@@ -18,6 +18,7 @@ import {
   UPDATE_PLAYING_SONG,
   ADD_TO_QUEUE,
   REMOVE_FROM_QUEUE,
+  SET_SETTINGS,
   Video,
 } from "./types";
 
@@ -59,6 +60,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
       nowPlaying: nowPlaying ? nowPlaying : videoSample,
       jukeboxLoading: false,
       jukeboxStatus: "success",
+      settings: payload.settings ?? state.settings,
     };
   } else if (type === SET_IS_ADMIN) {
     return {
@@ -131,6 +133,11 @@ const globalReducer = (state: InitialState, action: ActionType) => {
       ...state,
       nowPlaying,
       queue: [...state.queue, ...addedVideos],
+    };
+  } else if (type === SET_SETTINGS) {
+    return {
+      ...state,
+      settings: payload.settings,
     };
   } else if (type === REMOVE_FROM_QUEUE) {
     const filteredQueue = state.queue.filter((video) => !payload.videoIds.includes(video.id.videoId));

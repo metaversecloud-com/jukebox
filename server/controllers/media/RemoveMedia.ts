@@ -20,7 +20,7 @@ export default async function RemoveMedia(req: Request, res: Response) {
   try {
     const jukeboxUpdate: {
       catalog?: Video[];
-      queue: string[];
+      queue?: string[];
     } = {};
 
     if (type === "catalog") {
