@@ -26,4 +26,4 @@ patches:
 images:
   - name: jukebox0
     newName: 368076259134.dkr.ecr.us-east-1.amazonaws.com/sdk-example
-    digest: sha256:6b6495a026052e10eced114b6c3cfdf167150ab102a58ab502a7618e38322741
+    digest: sha256:45a4db43d733ced434caa4f4fb362ed6e61e9fc3fa407e3c6781afdd12d65d11
