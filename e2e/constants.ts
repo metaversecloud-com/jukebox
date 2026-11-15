@@ -1,0 +1,11 @@
+export const APP_PORT = Number(process.env.APP_PORT || 3100);
+export const MOCK_TOPIA_PORT = Number(process.env.MOCK_TOPIA_PORT || 3101);
+export const MOCK_TOPIA_URL = `http://localhost:${MOCK_TOPIA_PORT}`;
+export const INTERACTIVE_KEY = "e2e-public-key";
+// Distinctive on purpose: the platform tests fail if this string ever reaches the browser.
+export const INTERACTIVE_SECRET = "e2e-interactive-secret-must-never-leak";
+// Jukebox fans queue and now-playing changes out to every open drawer's SSE stream over Redis
+// pub/sub; tests run it against mock-redis/server.mjs.
+export const MOCK_REDIS_PORT = Number(process.env.MOCK_REDIS_PORT || MOCK_TOPIA_PORT + 1);
+// Distinctive on purpose, like the interactive secret: it must never reach the browser either.
+export const GOOGLE_API_KEY = "e2e-google-api-key-must-never-leak";
