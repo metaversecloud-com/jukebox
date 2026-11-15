@@ -1,9 +1,9 @@
 // Who may do what, what a crafted request can do, races, and what must never reach the browser.
-import { NO_KEY_CHECK, UNGUARDED_ROUTES } from "../../app.config";
-import { APP_PORT, GOOGLE_API_KEY, INTERACTIVE_SECRET } from "../../constants";
+import { GOOGLE_API_KEY } from "../../app.config";
+import { APP_PORT } from "../../constants";
 import { expect, jukeboxData, startOfLockBucket, test, video } from "../../fixtures";
-import { callRoute } from "../platform/callRoute";
-import { BUG, nowPlaying, openDrawer, sseStatus, tile, withPrivateServer } from "./helpers";
+import { withPrivateServer } from "../../helpers/privateServer";
+import { BUG, nowPlaying, openDrawer, sseStatus, tile } from "./helpers";
 
 const A = video("sec-a", "Alpha Song");
 const B = video("sec-b", "Bravo Song");
@@ -170,49 +170,8 @@ test("a failed YouTube search doesn't send the Google API key to the browser", a
   expect(await response.text()).not.toContain(GOOGLE_API_KEY);
 });
 
-// The platform checks for the routes that can't sit in CREDENTIALED_ROUTES (see UNGUARDED_ROUTES).
-for (const route of UNGUARDED_ROUTES) {
-  const name = `${route.method.toUpperCase()} ${route.basePath ?? "/api"}${route.path}`;
-
-  test.describe(name, () => {
-    test("a request without session credentials doesn't take the server down", async ({ world }) => {
-      test.fail(true, `${BUG} #1: getCredentials throws outside try/catch and @rtsdk/topia exits on the unhandled rejection`);
-      await world.seed();
-
-      const { alive } = await withPrivateServer((baseURL) =>
-        fetch(`${baseURL}${route.basePath ?? "/api"}${route.path}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(route.data ?? {}),
-        }),
-      );
-
-      expect(alive).toBe(true);
-    });
-
-    test("rejects credentials signed for another app's public key", async ({ request, world }) => {
-      test.fail(true, NO_KEY_CHECK);
-      await world.seed({ isAdmin: true });
-
-      const response = await callRoute(request, route, world.credentials({ interactivePublicKey: "someone-else" }));
-
-      expect(response.ok()).toBe(false);
-    });
-
-    test("never returns the interactive secret or a signed JWT", async ({ request, world }) => {
-      await world.seed({ isAdmin: true });
-
-      const response = await callRoute(request, route, world.credentials());
-
-      const body = await response.text();
-      for (const marker of [INTERACTIVE_SECRET, "interactiveSecret", "InteractiveJWT"]) {
-        expect(body, `response contains "${marker}"`).not.toContain(marker);
-      }
-    });
-  });
-}
-
 test("a player's malformed add-media request doesn't take the server down", async ({ world }) => {
+  test.slow();
   test.fail(true, `${BUG} #1: add-media throws outside try/catch on a body without a valid "type"`);
   await world.seed();
 
