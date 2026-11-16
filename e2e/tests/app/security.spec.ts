@@ -174,13 +174,18 @@ test("a player's malformed add-media request doesn't take the server down", asyn
   test.slow();
   await world.seed();
 
-  const { alive } = await withPrivateServer((baseURL) =>
+  const { alive, error } = await withPrivateServer((baseURL) =>
     fetch(`${baseURL}/api/add-media?${world.credentials()}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ videos: ["x"] }),
+      // The handler throws outside try/catch: the server survives, but nothing answers the request.
+      signal: AbortSignal.timeout(10_000),
     }),
   );
 
-  expect(alive).toBe(true);
+  expect(alive, "the app process exited").toBe(true);
+  // Marked only now: the process surviving is fixed, the missing answer isn't.
+  test.fail(true, `${BUG} #1: add-media throws outside try/catch on a body without a valid "type"; the request is never answered`);
+  expect(error, "the request was never answered").toBeUndefined();
 });
