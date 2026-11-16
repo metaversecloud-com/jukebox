@@ -81,9 +81,8 @@ const FOREIGN = { acceptsForeignCredentials: NO_KEY_CHECK, unnamedCredentialErro
  * the platform tests can't read its body and time out. tests/app/security.spec.ts covers it.
  */
 // Routes whose handler (or the isAdmin middleware) calls getCredentials outside any try/catch: a request
-// without credentials becomes an unhandled rejection, and @rtsdk/topia's unhandledRejection hook calls
-// process.exit(1).
-const CRASHES = { crashesServer: `${JUKEBOX_BUG} #1: getCredentials throws outside try/catch and @rtsdk/topia exits on the unhandled rejection`, ...FOREIGN };
+// without credentials becomes an unhandled rejection that's only logged, so the request is never answered.
+const CRASHES = { crashesServer: `${JUKEBOX_BUG} #1: getCredentials throws outside try/catch, request never answered`, ...FOREIGN };
 export const CREDENTIALED_ROUTES: RouteSpec[] = [
   // The only route that compares the public key.
   { method: "get", path: "/system/interactive-credentials" },
@@ -152,10 +151,7 @@ export const HEALTH_KNOWN_BUGS: { incompleteContract?: string } = {};
  * registers its own logging handler. Fix: process.removeAllListeners("unhandledRejection") before
  * registering the app's handler.
  */
-export const PROCESS_KNOWN_BUGS: { exitsOnUnhandledRejection?: string } = {
-  exitsOnUnhandledRejection:
-    "EXP-472: @rtsdk/topia's unhandledRejection hook calls process.exit(1); server/index.ts's handler doesn't stop it",
-};
+export const PROCESS_KNOWN_BUGS: { exitsOnUnhandledRejection?: string } = {};
 
 /**
  * The request system.spec sends a malformed JSON body to. Default: the first POST/PUT route in
@@ -171,9 +167,7 @@ export const MALFORMED_JSON_REQUEST: { method: "post" | "put"; path: string } | 
  * middleware after express.json()). Fix: an error middleware that answers body-parser errors
  * (err.type === "entity.parse.failed") with res.status(400).json({ success: false, error: "Invalid JSON" }).
  */
-export const ERROR_KNOWN_BUGS: { malformedJson?: string } = {
-  malformedJson: "EXP-473: no error middleware: Express' default error page shows the stack trace (NODE_ENV isn't production)",
-};
+export const ERROR_KNOWN_BUGS: { malformedJson?: string } = {};
 
 /**
  * true starts mock-redis/server.mjs (an in-memory Redis) next to mock-topia and points REDIS_URL at it

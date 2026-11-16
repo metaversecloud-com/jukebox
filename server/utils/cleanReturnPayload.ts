@@ -1,6 +1,8 @@
 // @ts-nocheck
 
-const keys = ["topia", "credentials", "jwt", "requestOptions"];
+// SDK objects carry topia.interactiveSecret, requestOptions.headers.InteractiveJWT and credentials;
+// SDK errors carry params.interactiveSecret.
+const keys = ["topia", "credentials", "jwt", "requestOptions", "interactiveSecret"];
 
 export const cleanReturnPayload = (payload) => {
   const keyExists = (payload) => {

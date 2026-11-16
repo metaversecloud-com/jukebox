@@ -172,7 +172,6 @@ test("a failed YouTube search doesn't send the Google API key to the browser", a
 
 test("a player's malformed add-media request doesn't take the server down", async ({ world }) => {
   test.slow();
-  test.fail(true, `${BUG} #1: add-media throws outside try/catch on a body without a valid "type"`);
   await world.seed();
 
   const { alive } = await withPrivateServer((baseURL) =>
