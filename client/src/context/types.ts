@@ -17,6 +17,7 @@ export const ADD_TO_CATALOG = "ADD_TO_CATALOG";
 export const REMOVE_FROM_CATALOG = "REMOVE_FROM_CATALOG";
 export const ADD_TO_QUEUE = "ADD_TO_QUEUE";
 export const REMOVE_FROM_QUEUE = "REMOVE_FROM_QUEUE";
+export const SET_SETTINGS = "SET_SETTINGS";
 
 export type InteractiveParams = {
   assetId: string | null;
@@ -48,7 +49,16 @@ export interface InitialState {
   hasInteractiveParams: boolean;
   interactiveParams: InteractiveParams | null;
   searchTermGlobal: string;
+  settings?: JukeboxSettings;
 }
+
+export type JukeboxMode = "jukebox" | "karaoke";
+
+export type JukeboxSettings = {
+  mode: JukeboxMode;
+  name: string;
+  imageUrl: string;
+};
 
 export type ActionType = {
   type: string;

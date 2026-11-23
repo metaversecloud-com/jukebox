@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import { Video } from "./types";
+import { JukeboxSettings, Video } from "./types";
 
 const searchCatalog = async (backendAPI: AxiosInstance, searchTerm: string, nextPageToken: string) => {
   try {
@@ -91,6 +91,16 @@ const skipToNextSong = async (backendAPI: AxiosInstance) => {
   }
 };
 
+const updateSettings = async (backendAPI: AxiosInstance, settings: Partial<JukeboxSettings>) => {
+  try {
+    const result = await backendAPI.post("/settings", settings);
+    return result.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
 export {
   checkInteractiveCredentials,
   searchCatalog,
@@ -100,5 +110,6 @@ export {
   removeFromCatalog,
   addToQueue,
   removeFromQueue,
-  skipToNextSong
+  skipToNextSong,
+  updateSettings,
 };

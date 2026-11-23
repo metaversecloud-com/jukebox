@@ -24,6 +24,20 @@ export type Video = {
   duration: number;
 };
 
+export type JukeboxMode = "jukebox" | "karaoke";
+
+export type JukeboxSettings = {
+  mode: JukeboxMode;
+  name: string;
+  imageUrl: string;
+};
+
+export const DEFAULT_SETTINGS: JukeboxSettings = {
+  mode: process.env.AUDIO_ONLY ? "jukebox" : "karaoke",
+  name: "",
+  imageUrl: "",
+};
+
 export type AnalyticType = {
   analyticName: string;
   incrementBy?: number;

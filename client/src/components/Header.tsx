@@ -1,9 +1,28 @@
+import { useContext } from "react";
 import { NavLink } from "react-router-dom";
+import { GlobalStateContext } from "@/context/GlobalContext";
+import { InitialState } from "@/context/types";
 
 interface HeaderProps {
   showAdminControls: boolean;
 }
+
+const DEFAULT_IMAGE_BY_MODE: Record<string, string> = {
+  jukebox: "jukebox_bg.png",
+  karaoke: "jukebox_bg.png",
+};
+
+const DEFAULT_NAME_BY_MODE: Record<string, string> = {
+  jukebox: "Jukebox",
+  karaoke: "Karaoke",
+};
+
 const Header: React.FC<HeaderProps> = ({ showAdminControls }) => {
+  const { settings } = useContext(GlobalStateContext) as InitialState;
+  const mode = settings?.mode ?? "karaoke";
+  const displayName = settings?.name?.trim() || DEFAULT_NAME_BY_MODE[mode];
+  const displayImage = settings?.imageUrl?.trim() || DEFAULT_IMAGE_BY_MODE[mode];
+
   return (
     <div className="flex w-full flex-col items-center justify-center">
       {showAdminControls && (
@@ -30,8 +49,8 @@ const Header: React.FC<HeaderProps> = ({ showAdminControls }) => {
       )}
 
       <div className="flex flex-col items-center justify-center mt-2">
-        <img src="jukebox_bg.png" alt="Jukebox" className="w-full object-cover" />
-        <h1 className="h3 !font-semibold !mb-6">Jukebox</h1>
+        <img src={displayImage} alt={displayName} className="w-full object-cover" />
+        <h1 className="h3 !font-semibold !mb-6">{displayName}</h1>
       </div>
     </div>
   );

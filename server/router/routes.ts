@@ -11,6 +11,7 @@ import sse from "../controllers/media/Events.js";
 import RemoveMedia from "../controllers/media/RemoveMedia.js";
 import { handleCheckInteractiveCredentials } from "../controllers/status/handleCheckInteractiveCredentials.js";
 import NextSong from "../controllers/media/NextSong.js";
+import UpdateSettings from "../controllers/media/UpdateSettings.js";
 
 const router = express.Router();
 const SERVER_START_DATE = new Date();
@@ -24,6 +25,8 @@ router.get("/system/health", (req, res) => {
     status: "OK",
     serverStartDate: SERVER_START_DATE,
     envs: {
+      COMMIT_HASH: process.env.COMMIT_HASH ?? "NOT SET",
+      BUILD_TIME: process.env.BUILD_TIME ?? "NOT SET",
       API_KEY: process.env.API_KEY ? "SET" : "NOT SET",
       PORT: process.env.PORT ? process.env.PORT : "NOT SET",
       NODE_ENV: process.env.NODE_ENV ? process.env.NODE_ENV : "NOT SET",
@@ -54,5 +57,6 @@ router.get("/is-admin", isAdminCheck);
 router.post("/add-media", AddMedia);
 router.post("/remove-media", isAdmin, RemoveMedia);
 router.post("/next", isAdmin, NextSong);
+router.post("/settings", isAdmin, UpdateSettings);
 
 export default router;

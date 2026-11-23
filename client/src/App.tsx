@@ -210,6 +210,7 @@ const App = () => {
               catalog: dataObject.catalog,
               queue: dataObject.queue,
               nowPlayingId: dataObject.nowPlaying,
+              settings: dataObject.settings,
             },
           });
         });

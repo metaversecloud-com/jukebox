@@ -20,6 +20,7 @@ const initialState: InitialState = {
   interactiveParams: null,
   backendAPI: null,
   searchTermGlobal: '',
+  settings: { mode: "karaoke", name: "", imageUrl: "" },
 };
 
 const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
